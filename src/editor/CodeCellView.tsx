@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from "../ui/Popover";
 import { StopEditorEvents } from "./StopEditorEvents";
+import { cx } from "../ui/cx";
 
 // The languages a code cell can hold. Markdown is prose, not a code cell, so it
 // is intentionally excluded here.
@@ -41,6 +42,10 @@ export function CodeCellView({
   const output = useCellOutput(id ?? "");
   const reading = useReadingMode();
   const [showCode, setShowCode] = useState(false);
+  // Edit-mode collapse: the source (header + editor) and the output can each be
+  // folded away. Collapsing the source leaves the output as the expand trigger.
+  const [sourceOpen, setSourceOpen] = useState(true);
+  const [outputOpen, setOutputOpen] = useState(true);
 
   // Register / update this cell in the runtime (debounced); deregister non-TS
   // cells. Re-runs when code or language changes.
@@ -90,12 +95,30 @@ export function CodeCellView({
     if (id) rt.update(id, code);
   };
 
-  const codeHidden = reading && !showCode;
+  const sourceVisible = reading ? showCode : sourceOpen;
+  const cellCollapsed = !reading && !sourceOpen;
+  const hasOutput =
+    runnable &&
+    !!output &&
+    (!!output.error ||
+      output.logs.length > 0 ||
+      Object.keys(output.values).length > 0);
 
   return (
-    <NodeViewWrapper className="code-cell" contentEditable={false}>
-      {!reading && (
+    <NodeViewWrapper
+      className={cx("code-cell", cellCollapsed && "code-cell--collapsed")}
+      contentEditable={false}
+    >
+      {!reading && sourceOpen && (
         <div className="code-cell__header">
+          <button
+            type="button"
+            className="code-cell__caret"
+            title="Collapse cell"
+            onClick={() => setSourceOpen(false)}
+          >
+            <Caret open />
+          </button>
           <StopEditorEvents>
             <Popover>
               <PopoverTrigger
@@ -173,7 +196,26 @@ export function CodeCellView({
           )}
         </div>
       )}
-      {!codeHidden && (
+      {/* Edit-mode collapsed cell: a slim trigger; the output below stands in
+          as the preview. Click to expand the source back. */}
+      {cellCollapsed && (
+        <button
+          type="button"
+          className="code-cell__expand"
+          title="Expand cell"
+          onClick={() => setSourceOpen(true)}
+        >
+          <Caret />
+          <span className="font-mono text-[11px] text-text-muted">
+            {language}
+          </span>
+          {!hasOutput && (
+            <span className="text-[11px] text-text-faint">· collapsed</span>
+          )}
+        </button>
+      )}
+
+      {sourceVisible && (
         <CodeEditor
           value={code}
           language={language === "css" ? "css" : "typescript"}
@@ -193,15 +235,66 @@ export function CodeCellView({
           {showCode ? "Hide code" : "Show code"}
         </button>
       )}
-      {runnable && output && <CellOutputView output={output} />}
+
+      {/* Output: independently collapsible in edit mode; always shown reading. */}
+      {hasOutput && (reading || outputOpen) && (
+        <CellOutputView
+          output={output!}
+          onCollapse={!reading ? () => setOutputOpen(false) : undefined}
+        />
+      )}
+      {!reading && hasOutput && !outputOpen && (
+        <button
+          type="button"
+          className="code-cell__output-reveal"
+          onClick={() => setOutputOpen(true)}
+        >
+          <Caret /> output
+        </button>
+      )}
     </NodeViewWrapper>
+  );
+}
+
+function OutputCaret({ onCollapse }: { onCollapse?: () => void }) {
+  if (!onCollapse) return null;
+  return (
+    <button
+      type="button"
+      title="Collapse output"
+      onClick={onCollapse}
+      className="absolute right-2 top-2 flex size-5 items-center justify-center rounded text-text-faint hover:text-text-muted"
+    >
+      <Caret open />
+    </button>
+  );
+}
+
+function Caret({ open = false }: { open?: boolean }) {
+  return (
+    <svg
+      className={cx(
+        "size-3.5 transition-transform",
+        open ? "rotate-0" : "-rotate-90",
+      )}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 6l4 4 4-4" />
+    </svg>
   );
 }
 
 function CellOutputView({
   output,
+  onCollapse,
 }: {
   output: NonNullable<ReturnType<typeof useCellOutput>>;
+  onCollapse?: () => void;
 }) {
   const valueKeys = Object.keys(output.values);
   const hasAnything =
@@ -212,7 +305,8 @@ function CellOutputView({
   // stack dump (the telestrator points at the problem).
   if (output.error) {
     return (
-      <div className="code-cell__error">
+      <div className="code-cell__error relative">
+        <OutputCaret onCollapse={onCollapse} />
         <span className="code-cell__error-icon">!</span>
         <div>
           This cell couldn’t run.{" "}
@@ -223,7 +317,8 @@ function CellOutputView({
   }
 
   return (
-    <div className="code-cell__output">
+    <div className="code-cell__output relative">
+      <OutputCaret onCollapse={onCollapse} />
       {output.logs.map((log, i) => (
         <div key={i} className={`code-cell__log code-cell__log--${log.level}`}>
           {log.text}
