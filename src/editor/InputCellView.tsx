@@ -12,7 +12,12 @@ import { Slider } from "../ui/Slider";
 import { Switch } from "../ui/Switch";
 import { SelectNative } from "../ui/SelectNative";
 import { Input } from "../ui/Input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "../ui/Popover";
 import { StopEditorEvents } from "./StopEditorEvents";
 
 const KINDS: InputKind[] = ["slider", "number", "text", "select", "toggle"];
@@ -22,7 +27,12 @@ const KINDS: InputKind[] = ["slider", "number", "text", "select", "toggle"];
 // existing runtime: an input cell is an auto-generated assignment cell. Same
 // useRuntime + register/deregister lifecycle as CodeCellView, so it needs no new
 // plumbing and its value (in node attrs) persists via Yjs → IndexedDB.
-export function InputCellView({ node, updateAttributes }: NodeViewProps) {
+export function InputCellView({
+  node,
+  updateAttributes,
+  getPos,
+  editor,
+}: NodeViewProps) {
   const id = node.attrs.id as string | null;
   const name = node.attrs.name as string;
   const kind = node.attrs.kind as InputKind;
@@ -75,6 +85,14 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
   const setConfig = (patch: Partial<InputCellConfig>) =>
     updateAttributes({ config: { ...config, ...patch } });
 
+  const deleteSelf = () => {
+    const pos = typeof getPos === "function" ? getPos() : undefined;
+    if (pos == null) return;
+    const view = editor.view;
+    view.dispatch(view.state.tr.delete(pos, pos + node.nodeSize));
+    view.focus();
+  };
+
   return (
     <NodeViewWrapper
       className="input-cell relative overflow-hidden rounded-[10px] border border-border bg-surface-sunken"
@@ -123,6 +141,18 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
                   config={config}
                   setConfig={setConfig}
                 />
+                <div className="border-t border-border-subtle pt-2">
+                  <PopoverClose asChild>
+                    <button
+                      type="button"
+                      onClick={deleteSelf}
+                      className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-danger-text hover:bg-danger-bg"
+                    >
+                      <TrashIcon />
+                      Delete input
+                    </button>
+                  </PopoverClose>
+                </div>
               </PopoverContent>
             </Popover>
           </StopEditorEvents>
@@ -165,6 +195,22 @@ function Field({
       <span className="font-medium text-text-muted">{label}</span>
       {children}
     </label>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg
+      className="size-3.5"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" />
+    </svg>
   );
 }
 

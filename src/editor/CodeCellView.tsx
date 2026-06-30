@@ -194,6 +194,7 @@ export function CodeCellView({
           ) : (
             <span className="code-cell__badge">inert</span>
           )}
+          <CellMenu onDelete={deleteSelf} />
         </div>
       )}
       {/* Edit-mode collapsed cell: a slim trigger; the output below stands in
@@ -285,6 +286,55 @@ function Caret({ open = false }: { open?: boolean }) {
       strokeLinejoin="round"
     >
       <path d="M4 6l4 4 4-4" />
+    </svg>
+  );
+}
+
+// The cell overflow menu (⋯). Delete for now; reorder/duplicate can hang off the
+// same menu later.
+function CellMenu({ onDelete }: { onDelete: () => void }) {
+  return (
+    <StopEditorEvents>
+      <Popover>
+        <PopoverTrigger
+          aria-label="Cell actions"
+          className="flex size-6 items-center justify-center rounded text-text-faint outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-accent-8"
+        >
+          <svg viewBox="0 0 16 16" fill="currentColor" className="size-4">
+            <circle cx="3.5" cy="8" r="1.3" />
+            <circle cx="8" cy="8" r="1.3" />
+            <circle cx="12.5" cy="8" r="1.3" />
+          </svg>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-40 p-1">
+          <PopoverClose asChild>
+            <button
+              type="button"
+              onClick={onDelete}
+              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[13px] text-danger-text hover:bg-danger-bg"
+            >
+              <TrashIcon />
+              Delete cell
+            </button>
+          </PopoverClose>
+        </PopoverContent>
+      </Popover>
+    </StopEditorEvents>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg
+      className="size-3.5"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" />
     </svg>
   );
 }
