@@ -121,3 +121,46 @@
 .code-cell__editor:focus {
   outline: none;
 }
+
+.code-cell__run {
+  font: inherit;
+  font-size: 12px;
+  padding: 2px 10px;
+  border: 1px solid #c4c4d0;
+  border-radius: 6px;
+  background: #fff;
+  color: #2a2a3a;
+  cursor: pointer;
+}
+
+.code-cell__run:hover {
+  background: #eef0ff;
+  border-color: #9aa0e0;
+}
+
+.code-cell__output {
+  border-top: 1px solid #e2e2ea;
+}
+
+.code-cell__output .sp-wrapper,
+.code-cell__output .sp-preview-container {
+  background: #fff;
+}
+
+/*
+ * Hide Sandpack's initial loading overlay (the spinning cube). In this embedded
+ * setup the bundler's "compile done" progress signal doesn't reach the overlay,
+ * so it never clears and masks the (already-rendered) preview. The cell's code
+ * still runs and renders underneath; hiding the overlay reveals it. Revisit in
+ * M3 when the runtime is rebuilt on the headless Sandpack client.
+ */
+.code-cell__output .sp-loading {
+  display: none;
+}
+
+.code-cell__loading {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #8a8a96;
+  border-top: 1px solid #e2e2ea;
+}
