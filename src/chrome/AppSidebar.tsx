@@ -39,7 +39,10 @@ export function AppSidebar({
 }) {
   return (
     <Sidebar variant="inset" collapsible="icon">
-      <SidebarHeader className="pt-14">
+      {/* pt-6 lines the brand row up with the inset top bar's vertical center
+       * (which sits beside, not over, the rail in the inset layout) instead of
+       * the old pt-14 that dropped it below the bar with dead space above. */}
+      <SidebarHeader className="pt-6">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
