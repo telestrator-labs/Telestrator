@@ -52,6 +52,7 @@ export default function App() {
   const [traceOpen, setTraceOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [layout, setLayout] = useState<NotebookLayout>("document");
+  const [wide, setWide] = useState(false);
 
   const openNotebook = (id: string) => {
     setSelectedId(id);
@@ -106,13 +107,15 @@ export default function App() {
               onShare={() => setShareOpen(true)}
               layout={layout}
               onLayoutChange={setLayout}
+              wide={wide}
+              onToggleWide={() => setWide((w) => !w)}
             />
             <div className="flex min-h-0 flex-1">
               <div className="min-w-0 flex-1 overflow-auto">
                 <NotebookView
                   key={selected.id}
                   reading={reading}
-                  wide={layout === "studio"}
+                  wide={wide}
                   docId={selected.id}
                   title={selected.title}
                 />

@@ -5,10 +5,10 @@ import { cx } from "../ui/cx";
 export type NotebookLayout = "document" | "studio";
 
 // The editor's sticky top bar (mockup `.topbar`). Breadcrumb → home, a Live
-// pill, and the tool cluster. Edit/Read is REAL (drives reading mode); the
-// Document/Studio layout toggle, Trace toggle, and Share are visual-only this
-// round. Stays mounted in reading mode so the reader can flip back to Edit.
-// All action buttons use the shared <Button> primitive (src/ui/Button).
+// pill, and the tool cluster. Edit/Read drives reading mode and the expand
+// button drives the wide container; the Document/Studio view toggle, Trace, and
+// Share are visual-only this round. Stays mounted in reading mode so the reader
+// can flip back. All action buttons use the shared <Button> primitive.
 export function EditorTopBar({
   title,
   reading,
@@ -19,6 +19,8 @@ export function EditorTopBar({
   onShare,
   layout,
   onLayoutChange,
+  wide,
+  onToggleWide,
 }: {
   title: string;
   reading: boolean;
@@ -27,9 +29,12 @@ export function EditorTopBar({
   traceOpen: boolean;
   onToggleTrace: () => void;
   onShare: () => void;
-  // Document = constrained measure; Studio = a wider, less-constrained container.
+  // Document vs. Studio (an author-focused view) — visual-only for now.
   layout: NotebookLayout;
   onLayoutChange: (layout: NotebookLayout) => void;
+  // The dedicated container-width toggle (constrained ↔ wide).
+  wide: boolean;
+  onToggleWide: () => void;
 }) {
   return (
     <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border-subtle bg-surface-sunken/85 px-[26px] py-3 backdrop-blur">
@@ -59,6 +64,19 @@ export function EditorTopBar({
         />
         <Button
           variant="secondary"
+          onClick={onToggleWide}
+          title={wide ? "Constrain width" : "Expand width"}
+          aria-pressed={wide}
+          className={cx(
+            "px-2",
+            wide &&
+              "border-action-border bg-action-subtle text-action-text hover:border-action-border hover:text-action-text",
+          )}
+        >
+          <ExpandIcon wide={wide} />
+        </Button>
+        <Button
+          variant="secondary"
           onClick={onToggleTrace}
           className={cx(
             traceOpen &&
@@ -80,6 +98,33 @@ export function EditorTopBar({
         </Button>
       </div>
     </div>
+  );
+}
+
+// Outward chevrons = expand the measure; inward = constrain it back.
+function ExpandIcon({ wide }: { wide: boolean }) {
+  return (
+    <svg
+      className="size-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {wide ? (
+        <>
+          <path d="M3 5l3 3-3 3M13 5l-3 3 3 3" />
+          <path d="M6 8h4" />
+        </>
+      ) : (
+        <>
+          <path d="M6 5L3 8l3 3M10 5l3 3-3 3" />
+          <path d="M3 8h10" />
+        </>
+      )}
+    </svg>
   );
 }
 
