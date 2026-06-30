@@ -119,6 +119,9 @@ importers:
         specifier: ^13.6.31
         version: 13.6.31
     devDependencies:
+      "@tailwindcss/typography":
+        specifier: ^0.5.20
+        version: 0.5.20(tailwindcss@4.3.2)
       "@types/react":
         specifier: ^18.3.3
         version: 18.3.31
@@ -1515,6 +1518,14 @@ packages:
       }
     engines: { node: ">= 20" }
 
+  "@tailwindcss/typography@0.5.20":
+    resolution:
+      {
+        integrity: sha512-hwbzQuNUfcPvbegQFatVPl/MY/tcM9KLl963hQ5laJKPh81TEZ1+dNG9PirGvcaDBkp+BCshExAyKVPW91dozw==,
+      }
+    peerDependencies:
+      tailwindcss: ">=3.0.0 || >=4.0.0 || insiders"
+
   "@tailwindcss/vite@4.3.2":
     resolution:
       {
@@ -2046,6 +2057,14 @@ packages:
         integrity: sha512-X7sjQzceUhu1u7Y/ylrRZFU2FS6LRiFVp6rKLPg23y3x3c3DOKAwuXGDp+PAGjh6CSnCjYeAul8pcT8bAl+lSA==,
       }
     engines: { node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0 }
+
+  cssesc@3.0.0:
+    resolution:
+      {
+        integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==,
+      }
+    engines: { node: ">=4" }
+    hasBin: true
 
   csstype@3.2.3:
     resolution:
@@ -2632,6 +2651,13 @@ packages:
         integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==,
       }
 
+  postcss-selector-parser@6.0.10:
+    resolution:
+      {
+        integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==,
+      }
+    engines: { node: ">=4" }
+
   postcss@8.5.16:
     resolution:
       {
@@ -3094,6 +3120,12 @@ packages:
       }
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  util-deprecate@1.0.2:
+    resolution:
+      {
+        integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==,
+      }
 
   vite-node@1.6.1:
     resolution:
@@ -4053,6 +4085,11 @@ snapshots:
       "@tailwindcss/oxide-win32-arm64-msvc": 4.3.2
       "@tailwindcss/oxide-win32-x64-msvc": 4.3.2
 
+  "@tailwindcss/typography@0.5.20(tailwindcss@4.3.2)":
+    dependencies:
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 4.3.2
+
   "@tailwindcss/vite@4.3.2(vite@5.4.21(lightningcss@1.32.0))":
     dependencies:
       "@tailwindcss/node": 4.3.2
@@ -4416,6 +4453,8 @@ snapshots:
       mdn-data: 2.27.1
       source-map-js: 1.2.1
 
+  cssesc@3.0.0: {}
+
   csstype@3.2.3: {}
 
   data-urls@7.0.0:
@@ -4716,6 +4755,11 @@ snapshots:
       mlly: 1.8.2
       pathe: 2.0.3
 
+  postcss-selector-parser@6.0.10:
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
+
   postcss@8.5.16:
     dependencies:
       nanoid: 3.3.15
@@ -5003,6 +5047,8 @@ snapshots:
   use-sync-external-store@1.6.0(react@18.3.1):
     dependencies:
       react: 18.3.1
+
+  util-deprecate@1.0.2: {}
 
   vite-node@1.6.1(lightningcss@1.32.0):
     dependencies:

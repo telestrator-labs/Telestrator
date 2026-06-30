@@ -43,6 +43,11 @@
 @import "@radix-ui/colors/white-alpha.css";
 @import "@radix-ui/colors/black-alpha.css";
 
+/* `prose` for the notebook document. The plugin self-contains its styles under
+ * .prose, so it needs no Preflight; our customization lives in typography.plugin.ts. */
+@plugin "@tailwindcss/typography";
+@config "../typography.plugin.ts";
+
 @theme inline {
   /* ── Tier 2: raw scale (generic family → primitive) ──────────────────────
    * gray = olive (neutral substrate) · brand = lime (live/brand) ·

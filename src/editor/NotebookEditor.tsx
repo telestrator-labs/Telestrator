@@ -35,6 +35,10 @@ export function NotebookEditor({
       ...editorExtensions,
       Collaboration.configure({ document: ydoc }),
     ],
+    // `prose` goes on the editable itself so its direct children (paragraphs,
+    // headings, cell nodes) get the typography styling; max-w-none lets the
+    // .notebook column own the measure.
+    editorProps: { attributes: { class: "prose max-w-none" } },
   });
 
   // Seed initial content once, after IndexedDB has loaded, only if the doc is
