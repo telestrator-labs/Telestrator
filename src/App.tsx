@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NotebookView } from "./editor/NotebookView";
-import { AppRail } from "./chrome/AppRail";
+import { AppSidebar } from "./chrome/AppSidebar";
+import { SidebarInset, SidebarProvider } from "./ui/sidebar";
 import { EditorTopBar } from "./chrome/EditorTopBar";
 import { TracePanel } from "./chrome/TracePanel";
 import { ShareModal } from "./chrome/ShareModal";
@@ -81,9 +82,9 @@ export default function App() {
   const inEditor = view === "editor" && selected;
 
   return (
-    <div className="flex min-h-screen bg-surface-sunken font-sans text-text">
+    <SidebarProvider className="bg-surface-sunken font-sans text-text">
       {!reading && (
-        <AppRail
+        <AppSidebar
           docs={docs}
           selectedId={selectedId}
           onOpen={openNotebook}
@@ -91,7 +92,7 @@ export default function App() {
           onHome={goHome}
         />
       )}
-      <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
+      <SidebarInset className="h-screen overflow-hidden">
         {inEditor ? (
           <>
             <EditorTopBar
@@ -126,13 +127,13 @@ export default function App() {
             />
           </div>
         )}
-      </main>
+      </SidebarInset>
       {shareOpen && selected && (
         <ShareModal
           title={selected.title}
           onClose={() => setShareOpen(false)}
         />
       )}
-    </div>
+    </SidebarProvider>
   );
 }

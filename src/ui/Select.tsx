@@ -46,7 +46,7 @@ export function Select({
                 className={cx(
                   "relative flex cursor-pointer select-none items-center rounded px-2 py-1.5",
                   "font-sans text-sm text-text outline-none",
-                  "data-[highlighted]:bg-interactive-subtle data-[state=checked]:text-interactive-text",
+                  "data-[highlighted]:bg-action-subtle data-[state=checked]:text-action-text",
                 )}
               >
                 <SelectPrimitive.ItemText>{opt}</SelectPrimitive.ItemText>

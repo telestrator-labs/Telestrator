@@ -1,4 +1,4 @@
-/* Design-language surface ("Ink & Signal"): gray substrate, accent interactive,
+/* Design-language surface ("Ink & Signal"): gray substrate, accent action,
  * live (lime) run-state, value (gold) $-markers; serif prose, sans chrome, mono
  * code. Colors come from the semantic token tier in src/index.css. */
 .notebook {
@@ -48,9 +48,9 @@
 }
 
 .notebook__tools button:hover {
-  background: var(--color-interactive-subtle);
-  border-color: var(--color-interactive-border);
-  color: var(--color-interactive-text);
+  background: var(--color-action-subtle);
+  border-color: var(--color-action-border);
+  color: var(--color-action-text);
 }
 
 .notebook__tools button:focus-visible {
@@ -100,7 +100,7 @@
 }
 
 .notebook__doc blockquote {
-  border-left: 3px solid var(--color-interactive-border);
+  border-left: 3px solid var(--color-action-border);
   padding-left: 16px;
   font-style: italic;
   color: var(--color-text-muted);
@@ -170,8 +170,8 @@
 }
 
 .code-cell__run:hover {
-  border-color: var(--color-interactive-border);
-  color: var(--color-interactive-text);
+  border-color: var(--color-action-border);
+  color: var(--color-action-text);
 }
 
 /* Live indicator: lime is the telestrator "on air" signal. */
@@ -215,7 +215,7 @@
   font-family: var(--font-sans);
   font-size: 11.5px;
   font-weight: 500;
-  color: var(--color-interactive-text);
+  color: var(--color-action-text);
   cursor: pointer;
   padding: 8px 14px;
   border: none;

@@ -54,7 +54,7 @@ export function Dashboard({
           <button
             type="button"
             onClick={onCreateBlank}
-            className="flex min-h-[200px] flex-col items-center justify-center gap-2.5 rounded-[14px] border-[1.5px] border-dashed border-border-strong text-text-faint hover:border-interactive-border hover:bg-interactive-subtle hover:text-interactive-text"
+            className="flex min-h-[200px] flex-col items-center justify-center gap-2.5 rounded-[14px] border-[1.5px] border-dashed border-border-strong text-text-faint hover:border-action-border hover:bg-action-subtle hover:text-action-text"
           >
             <span className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-current text-[22px] font-light">
               +

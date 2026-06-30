@@ -90,13 +90,13 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(
                 onClick={() => command(item)}
                 onMouseEnter={() => setSelected(i)}
                 className={`group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left ${
-                  on ? "bg-interactive-subtle" : ""
+                  on ? "bg-action-subtle" : ""
                 }`}
               >
                 <span
                   className={`flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[7px] font-mono text-[11px] ${
                     on
-                      ? "bg-accent-5 text-interactive-text"
+                      ? "bg-accent-5 text-action-text"
                       : "bg-surface-raised text-text-muted"
                   }`}
                 >
@@ -104,7 +104,7 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(
                 </span>
                 <span className="flex min-w-0 flex-col">
                   <span
-                    className={`text-[13.5px] font-medium ${on ? "text-interactive-text" : "text-text"}`}
+                    className={`text-[13.5px] font-medium ${on ? "text-action-text" : "text-text"}`}
                   >
                     {item.title}
                   </span>

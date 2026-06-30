@@ -10,7 +10,7 @@
  *                   (--color-gray-* → --olive-*, brand → lime, accent → violet,
  *                   gold → gold/signal, danger → red). "Which Radix hue" lives here.
  *   3. Semantic   — design-language roles pointing at raw scales
- *                   (--color-surface, --color-interactive, --color-value, …).
+ *                   (--color-surface, --color-action, --color-value, …).
  * Components use the semantic utilities (bg-surface, text-value, border-border);
  * the raw-scale families (gray-*, accent-*) are the fallback when no role fits.
  * This also sets up dark mode: flip a tier under .dark, components untouched. */
@@ -44,7 +44,7 @@
 @theme inline {
   /* ── Tier 2: raw scale (generic family → primitive) ──────────────────────
    * gray = olive (neutral substrate) · brand = lime (live/brand) ·
-   * accent = violet (interactive) · gold = signal/$-markers · danger = red. */
+   * accent = violet (action) · gold = signal/$-markers · danger = red. */
   --color-gray-1: var(--olive-1);
   --color-gray-2: var(--olive-2);
   --color-gray-3: var(--olive-3);
@@ -173,12 +173,12 @@
   --color-text: var(--color-gray-12);
   --color-text-muted: var(--color-gray-11);
   --color-text-faint: var(--color-gray-9);
-  /* interactive (accent / violet) */
-  --color-interactive-subtle: var(--color-accent-3);
-  --color-interactive-border: var(--color-accent-7);
-  --color-interactive: var(--color-accent-9);
-  --color-interactive-hover: var(--color-accent-10);
-  --color-interactive-text: var(--color-accent-11);
+  /* action (accent / violet) */
+  --color-action-subtle: var(--color-accent-3);
+  --color-action-border: var(--color-accent-7);
+  --color-action: var(--color-accent-9);
+  --color-action-hover: var(--color-accent-10);
+  --color-action-text: var(--color-accent-11);
   /* live / run state (brand / lime) */
   --color-live-subtle: var(--color-brand-3);
   --color-live: var(--color-brand-9);
@@ -191,6 +191,17 @@
   --color-danger-bg: var(--color-danger-3);
   --color-danger-border: var(--color-danger-6);
   --color-danger-text: var(--color-danger-11);
+
+  /* sidebar (consumed by the vendored shadcn sidebar in src/ui/sidebar.tsx) —
+   * mapped onto the semantic roles above so the component is fully on-token. */
+  --color-sidebar: var(--color-surface);
+  --color-sidebar-foreground: var(--color-text);
+  --color-sidebar-border: var(--color-border-subtle);
+  --color-sidebar-ring: var(--color-accent-8);
+  --color-sidebar-accent: var(--color-action-subtle);
+  --color-sidebar-accent-foreground: var(--color-action-text);
+  --color-sidebar-primary: var(--color-action);
+  --color-sidebar-primary-foreground: #fff;
 
   --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;

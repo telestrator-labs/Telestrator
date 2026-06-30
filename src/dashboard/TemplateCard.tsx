@@ -19,7 +19,7 @@ export function TemplateCard({
       <Sparkline seed={template.id} accent />
       <div className="px-4 pt-3 pb-4">
         <div className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-text">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-interactive-text">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-action-text">
             Template
           </span>
         </div>

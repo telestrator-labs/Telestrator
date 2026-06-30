@@ -42,7 +42,7 @@ export function ShareModal({
               Share “{title || "Untitled notebook"}”
             </div>
             <div className="mt-1 text-[12.5px] text-text-faint">
-              Readers open a clean, interactive view — no account needed.
+              Readers open a clean, action view — no account needed.
             </div>
           </div>
           <Button
@@ -146,7 +146,7 @@ function VisOption({
       className={
         "flex flex-1 flex-col gap-0.5 rounded-[11px] border px-3 py-3 text-left " +
         (on
-          ? "border-interactive bg-interactive-subtle shadow-[inset_0_0_0_1px_var(--color-interactive)]"
+          ? "border-action bg-action-subtle shadow-[inset_0_0_0_1px_var(--color-action)]"
           : "border-border hover:border-border-strong")
       }
     >

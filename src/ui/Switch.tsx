@@ -12,7 +12,7 @@ const Switch = forwardRef<
     ref={ref}
     className={cx(
       "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full outline-none transition-colors",
-      "bg-gray-6 data-[state=checked]:bg-interactive",
+      "bg-gray-6 data-[state=checked]:bg-action",
       "focus-visible:ring-2 focus-visible:ring-accent-8 focus-visible:ring-offset-1",
       className,
     )}
