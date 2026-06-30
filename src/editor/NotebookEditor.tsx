@@ -10,6 +10,7 @@ import { createNotebook } from "../core/notebook";
 import { insertCodeCellAt, insertInputCellAt } from "./insertCells";
 import { takePendingTemplate } from "../templates";
 import { Toolbar, type ToolbarAction } from "../ui/Toolbar";
+import { renameNotebook } from "./docIndex";
 import "./editor.css";
 
 // The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
@@ -22,10 +23,12 @@ export function NotebookEditor({
   docId,
   ydoc,
   whenSynced,
+  title,
 }: {
   docId: string;
   ydoc: Y.Doc;
   whenSynced: Promise<unknown>;
+  title: string;
 }) {
   const runtime = useRuntime();
   const reading = useReadingMode();
@@ -148,6 +151,20 @@ export function NotebookEditor({
           <Toolbar groups={toolbarGroups} />
         </div>
       )}
+      <header className="notebook__bar">
+        {reading ? (
+          <h1 className="notebook__title-input">
+            {title || "Untitled notebook"}
+          </h1>
+        ) : (
+          <input
+            className="notebook__title-input"
+            defaultValue={title}
+            placeholder="Untitled notebook"
+            onChange={(e) => renameNotebook(docId, e.target.value)}
+          />
+        )}
+      </header>
       <EditorContent editor={editor} className="notebook__doc" />
     </>
   );
