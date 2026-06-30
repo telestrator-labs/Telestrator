@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import type { Language } from "../core/notebook";
 import { useRuntime, useCellOutput } from "./RuntimeProvider";
+import { CodeEditor } from "./CodeEditor";
 
 // The languages a code cell can hold. Markdown is prose, not a code cell, so it
 // is intentionally excluded here.
@@ -63,19 +64,10 @@ export function CodeCellView({ node, updateAttributes }: NodeViewProps) {
           {runnable ? "reactive · shares $" : "inert"}
         </span>
       </div>
-      <textarea
-        className="code-cell__editor"
+      <CodeEditor
         value={code}
-        spellCheck={false}
-        rows={Math.max(3, code.split("\n").length)}
-        placeholder={
-          language === "css" ? "/* css */" : "// e.g. $.total = $.price * 2"
-        }
-        onChange={(event) => updateAttributes({ code: event.target.value })}
-        // Keep keystrokes/selection inside the textarea instead of letting
-        // ProseMirror treat them as document edits.
-        onMouseDown={(event) => event.stopPropagation()}
-        onKeyDown={(event) => event.stopPropagation()}
+        language={language === "css" ? "css" : "typescript"}
+        onChange={(next) => updateAttributes({ code: next })}
       />
       {runnable && output && <CellOutputView output={output} />}
     </NodeViewWrapper>

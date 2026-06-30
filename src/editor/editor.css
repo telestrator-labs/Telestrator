@@ -104,22 +104,26 @@
   color: #8a8a96;
 }
 
-.code-cell__editor {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  border: 0;
-  resize: vertical;
-  padding: 10px 12px;
+/* CodeMirror cell editor */
+.code-cell__cm .cm-editor {
   background: transparent;
-  color: #1a1a2a;
+  max-height: 360px;
+}
+
+.code-cell__cm .cm-scroller {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.5;
 }
 
-.code-cell__editor:focus {
+.code-cell__cm .cm-editor.cm-focused {
   outline: none;
+}
+
+.code-cell__cm .cm-gutters {
+  background: transparent;
+  border-right: 1px solid #ececf2;
+  color: #b8b8c4;
 }
 
 /* Reactive output: the `$` keys a cell wrote + console + errors. */
