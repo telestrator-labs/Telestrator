@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Compartment, EditorState } from "@codemirror/state";
+import { Compartment, EditorState, Prec } from "@codemirror/state";
 import {
   EditorView,
   keymap,
@@ -48,17 +48,28 @@ export function CodeEditor({
   value,
   language,
   onChange,
+  onArrowOut,
+  onDeleteEmpty,
+  onEscape,
+  onRun,
 }: {
   value: string;
   language: CellLanguage;
   onChange: (code: string) => void;
+  // Escape affordances so the cursor flows between the code island and prose.
+  onArrowOut?: (dir: "up" | "down") => void;
+  onDeleteEmpty?: () => void;
+  onEscape?: () => void;
+  onRun?: () => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const langCompartment = useRef(new Compartment());
-  // Keep the latest onChange without recreating the editor.
+  // Keep the latest callbacks without recreating the editor.
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const cbRef = useRef({ onArrowOut, onDeleteEmpty, onEscape, onRun });
+  cbRef.current = { onArrowOut, onDeleteEmpty, onEscape, onRun };
 
   // Create the EditorView once.
   useEffect(() => {
@@ -68,6 +79,65 @@ export function CodeEditor({
       state: EditorState.create({
         doc: value,
         extensions: [
+          // Escape keys take precedence over CodeMirror defaults; each consumes
+          // only when it acts (at a boundary), else falls through to CM.
+          Prec.highest(
+            keymap.of([
+              {
+                key: "ArrowUp",
+                run: (v) => {
+                  const f = cbRef.current.onArrowOut;
+                  const onFirst =
+                    v.state.doc.lineAt(v.state.selection.main.head).number ===
+                    1;
+                  if (f && onFirst) {
+                    f("up");
+                    return true;
+                  }
+                  return false;
+                },
+              },
+              {
+                key: "ArrowDown",
+                run: (v) => {
+                  const f = cbRef.current.onArrowOut;
+                  const onLast =
+                    v.state.doc.lineAt(v.state.selection.main.head).number ===
+                    v.state.doc.lines;
+                  if (f && onLast) {
+                    f("down");
+                    return true;
+                  }
+                  return false;
+                },
+              },
+              {
+                key: "Backspace",
+                run: (v) => {
+                  const f = cbRef.current.onDeleteEmpty;
+                  if (f && v.state.doc.length === 0) {
+                    f();
+                    return true;
+                  }
+                  return false;
+                },
+              },
+              {
+                key: "Mod-Enter",
+                run: () => {
+                  cbRef.current.onRun?.();
+                  return true;
+                },
+              },
+              {
+                key: "Escape",
+                run: () => {
+                  cbRef.current.onEscape?.();
+                  return true;
+                },
+              },
+            ]),
+          ),
           lineNumbers(),
           history(),
           drawSelection(),

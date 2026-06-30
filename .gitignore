@@ -22,4 +22,7 @@ dist-ssr
 *.sw?
 
 # TypeScript build info
-*.tsbuildinfo.docs/temp/
+*.tsbuildinfo
+
+# Ultraplan / remote-build artifacts
+.docs/temp/

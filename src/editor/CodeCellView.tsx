@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
+import { TextSelection } from "@tiptap/pm/state";
 import type { Language } from "../core/notebook";
 import { useRuntime, useCellOutput } from "./RuntimeProvider";
+import { useReadingMode } from "./ReadingMode";
 import { CodeEditor } from "./CodeEditor";
 
 // The languages a code cell can hold. Markdown is prose, not a code cell, so it
@@ -13,11 +15,16 @@ const CODE_LANGUAGES: Array<Exclude<Language, "markdown">> = [
 
 const REGISTER_DEBOUNCE_MS = 120;
 
-// The React NodeView for a code cell. As of M3, TypeScript cells participate in
-// the shared reactive runtime: editing one re-runs any cell that reads the `$`
-// values it writes. Each cell registers its source (debounced) and shows its
-// live output (the `$` keys it wrote + console + errors) below the editor.
-export function CodeCellView({ node, updateAttributes }: NodeViewProps) {
+// The React NodeView for a code cell. TypeScript cells participate in the shared
+// reactive runtime; editing one re-runs any cell that reads the `$` values it
+// writes. Keyboard flow lets the cursor escape the CodeMirror island into prose;
+// reading mode collapses the cell to its output.
+export function CodeCellView({
+  node,
+  updateAttributes,
+  editor,
+  getPos,
+}: NodeViewProps) {
   const language = node.attrs.language as string;
   const code = node.attrs.code as string;
   const id = node.attrs.id as string | null;
@@ -25,6 +32,8 @@ export function CodeCellView({ node, updateAttributes }: NodeViewProps) {
 
   const rt = useRuntime();
   const output = useCellOutput(id ?? "");
+  const reading = useReadingMode();
+  const [showCode, setShowCode] = useState(false);
 
   // Register / update this cell in the runtime (debounced); deregister non-TS
   // cells. Re-runs when code or language changes.
@@ -44,31 +53,80 @@ export function CodeCellView({ node, updateAttributes }: NodeViewProps) {
     return () => rt.remove(id);
   }, [rt, id]);
 
+  // Keyboard flow: move the selection out of the CodeMirror island into prose.
+  // Use the raw ProseMirror view (dispatch a selection, then view.focus()) —
+  // this reliably steals DOM focus back from CodeMirror, which Tiptap's
+  // chain().focus() does not do synchronously from inside a CM keydown handler.
+  const posOf = (): number | undefined =>
+    typeof getPos === "function" ? getPos() : undefined;
+  const moveOut = (dir: "up" | "down") => {
+    const pos = posOf();
+    if (pos == null) return;
+    const view = editor.view;
+    const target = dir === "up" ? pos : pos + node.nodeSize;
+    const selection = TextSelection.near(
+      view.state.doc.resolve(target),
+      dir === "up" ? -1 : 1,
+    );
+    view.dispatch(view.state.tr.setSelection(selection).scrollIntoView());
+    view.focus();
+  };
+  const deleteSelf = () => {
+    const pos = posOf();
+    if (pos == null) return;
+    const view = editor.view;
+    view.dispatch(view.state.tr.delete(pos, pos + node.nodeSize));
+    view.focus();
+  };
+  const escapeToProse = () => moveOut("down");
+  const runNow = () => {
+    if (id) rt.update(id, code);
+  };
+
+  const codeHidden = reading && !showCode;
+
   return (
     <NodeViewWrapper className="code-cell" contentEditable={false}>
-      <div className="code-cell__header">
-        <select
-          className="code-cell__lang"
-          value={language}
-          onChange={(event) =>
-            updateAttributes({ language: event.target.value })
-          }
+      {!reading && (
+        <div className="code-cell__header">
+          <select
+            className="code-cell__lang"
+            value={language}
+            onChange={(event) =>
+              updateAttributes({ language: event.target.value })
+            }
+          >
+            {CODE_LANGUAGES.map((lang) => (
+              <option key={lang} value={lang}>
+                {lang}
+              </option>
+            ))}
+          </select>
+          <span className="code-cell__badge">
+            {runnable ? "reactive · shares $" : "inert"}
+          </span>
+        </div>
+      )}
+      {!codeHidden && (
+        <CodeEditor
+          value={code}
+          language={language === "css" ? "css" : "typescript"}
+          onChange={(next) => updateAttributes({ code: next })}
+          onArrowOut={moveOut}
+          onDeleteEmpty={deleteSelf}
+          onEscape={escapeToProse}
+          onRun={runNow}
+        />
+      )}
+      {reading && (
+        <button
+          type="button"
+          className="px-3 py-1 font-sans text-xs text-violet-11"
+          onClick={() => setShowCode((s) => !s)}
         >
-          {CODE_LANGUAGES.map((lang) => (
-            <option key={lang} value={lang}>
-              {lang}
-            </option>
-          ))}
-        </select>
-        <span className="code-cell__badge">
-          {runnable ? "reactive · shares $" : "inert"}
-        </span>
-      </div>
-      <CodeEditor
-        value={code}
-        language={language === "css" ? "css" : "typescript"}
-        onChange={(next) => updateAttributes({ code: next })}
-      />
+          {showCode ? "Hide code" : "Show code"}
+        </button>
+      )}
       {runnable && output && <CellOutputView output={output} />}
     </NodeViewWrapper>
   );

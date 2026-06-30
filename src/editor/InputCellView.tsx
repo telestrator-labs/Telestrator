@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { useRuntime } from "./RuntimeProvider";
+import { useReadingMode } from "./ReadingMode";
 import { bindingCode, coerceValue, type InputKind } from "./binding";
 import type { InputCellConfig } from "./inputCellNode";
 
@@ -36,6 +37,7 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
   });
 
   const rt = useRuntime();
+  const reading = useReadingMode();
   const bindTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Persist the coercion (once) when it actually changed the stored value — e.g.
@@ -76,28 +78,30 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
       className="input-cell overflow-hidden rounded-[10px] border border-olive-6 bg-olive-2"
       contentEditable={false}
     >
-      <div className="flex flex-wrap items-center gap-2 border-b border-olive-6 bg-olive-3 px-2.5 py-1.5 font-sans text-xs text-olive-11">
-        <span className="font-medium text-olive-12">input</span>
-        <input
-          aria-label="bound $ key"
-          className="w-28 rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-mono text-xs text-olive-12 outline-none focus-visible:border-violet-8 focus-visible:ring-2 focus-visible:ring-violet-8"
-          value={name}
-          onChange={(e) => updateAttributes({ name: e.target.value })}
-        />
-        <select
-          aria-label="input kind"
-          className="rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-sans text-xs text-olive-12"
-          value={kind}
-          onChange={(e) => updateAttributes({ kind: e.target.value })}
-        >
-          {KINDS.map((k) => (
-            <option key={k} value={k}>
-              {k}
-            </option>
-          ))}
-        </select>
-        <ConfigEditor kind={kind} config={config} setConfig={setConfig} />
-      </div>
+      {!reading && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-olive-6 bg-olive-3 px-2.5 py-1.5 font-sans text-xs text-olive-11">
+          <span className="font-medium text-olive-12">input</span>
+          <input
+            aria-label="bound $ key"
+            className="w-28 rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-mono text-xs text-olive-12 outline-none focus-visible:border-violet-8 focus-visible:ring-2 focus-visible:ring-violet-8"
+            value={name}
+            onChange={(e) => updateAttributes({ name: e.target.value })}
+          />
+          <select
+            aria-label="input kind"
+            className="rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-sans text-xs text-olive-12"
+            value={kind}
+            onChange={(e) => updateAttributes({ kind: e.target.value })}
+          >
+            {KINDS.map((k) => (
+              <option key={k} value={k}>
+                {k}
+              </option>
+            ))}
+          </select>
+          <ConfigEditor kind={kind} config={config} setConfig={setConfig} />
+        </div>
+      )}
 
       <div className="px-3 py-3">
         <Control

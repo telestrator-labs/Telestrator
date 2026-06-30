@@ -36,6 +36,7 @@ function useDocIndex() {
 export default function App() {
   const { ready, docs } = useDocIndex();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [reading, setReading] = useState(false);
 
   // Keep a valid selection as the list changes (initial load, delete, create).
   useEffect(() => {
@@ -50,48 +51,59 @@ export default function App() {
   const selected = docs.find((d) => d.id === selectedId);
 
   return (
-    <div className="app">
-      <aside className="doc-list">
-        <button
-          type="button"
-          className="doc-list__new"
-          onClick={() => setSelectedId(createNotebook().id)}
-        >
-          + New notebook
-        </button>
-        <ul>
-          {docs.map((d) => (
-            <li
-              key={d.id}
-              className={
-                d.id === selectedId
-                  ? "doc-list__row is-active"
-                  : "doc-list__row"
-              }
-            >
-              <button
-                type="button"
-                className="doc-list__item"
-                onClick={() => setSelectedId(d.id)}
+    <div className={reading ? "app app--reading" : "app"}>
+      {/* Fixed Read/Edit toggle — stays reachable when chrome is hidden. */}
+      <button
+        type="button"
+        className="app-mode-toggle"
+        onClick={() => setReading((r) => !r)}
+      >
+        {reading ? "✎ Edit" : "▷ Read"}
+      </button>
+      {!reading && (
+        <aside className="doc-list">
+          <button
+            type="button"
+            className="doc-list__new"
+            onClick={() => setSelectedId(createNotebook().id)}
+          >
+            + New notebook
+          </button>
+          <ul>
+            {docs.map((d) => (
+              <li
+                key={d.id}
+                className={
+                  d.id === selectedId
+                    ? "doc-list__row is-active"
+                    : "doc-list__row"
+                }
               >
-                {d.title || "Untitled notebook"}
-              </button>
-              <button
-                type="button"
-                className="doc-list__del"
-                title="Delete notebook"
-                onClick={() => removeNotebook(d.id)}
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
-      </aside>
+                <button
+                  type="button"
+                  className="doc-list__item"
+                  onClick={() => setSelectedId(d.id)}
+                >
+                  {d.title || "Untitled notebook"}
+                </button>
+                <button
+                  type="button"
+                  className="doc-list__del"
+                  title="Delete notebook"
+                  onClick={() => removeNotebook(d.id)}
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
       <main className="app-main">
         {selected ? (
           <NotebookView
             key={selected.id}
+            reading={reading}
             docId={selected.id}
             title={selected.title}
           />

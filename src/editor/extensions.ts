@@ -2,6 +2,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
 import { CodeCell } from "./codeCellNode";
 import { InputCell } from "./inputCellNode";
+import { SlashCommand } from "./slashCommand";
 
 // The single source of truth for the editor's schema. Shared by the live editor
 // (NotebookEditor) and the headless bridge test so they can never drift.
@@ -11,9 +12,11 @@ import { InputCell } from "./inputCellNode";
 //   - Markdown:   bidirectional prose <-> markdown (powers the bridge)
 //   - CodeCell:   our executable-code-cell node
 //   - InputCell:  a `$`-bound knob (slider/number/text/select/toggle)
+//   - SlashCommand: `/` menu to insert blocks/cells at the cursor
 export const editorExtensions = [
   StarterKit.configure({ undoRedo: false }),
   Markdown,
   CodeCell,
   InputCell,
+  SlashCommand,
 ];

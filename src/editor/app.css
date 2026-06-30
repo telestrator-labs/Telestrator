@@ -124,3 +124,30 @@
 .notebook__tools {
   margin-bottom: 16px;
 }
+
+/* Reading mode: fixed Read/Edit toggle (reachable with chrome hidden). */
+.app-mode-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 50;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid var(--olive-7);
+  border-radius: 6px;
+  background: var(--olive-1);
+  color: var(--olive-12);
+  cursor: pointer;
+}
+
+.app-mode-toggle:hover {
+  background: var(--violet-3);
+  border-color: var(--violet-8);
+}
+
+/* With the sidebar gone, center the document for reading. */
+.app--reading .app-main {
+  max-width: 820px;
+  margin: 0 auto;
+}
