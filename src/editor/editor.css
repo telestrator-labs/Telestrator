@@ -35,19 +35,28 @@
 }
 
 /* The formatting/insert toolbar sticks just under the editor top bar; the
- * document content scrolls beneath it. Opaque surface so scrolling prose doesn't
- * bleed through. */
+ * document content scrolls beneath it. The bar (background + hairline) spans the
+ * full content width so scrolling prose never bleeds through; an opaque surface
+ * matched to the document paper keeps it seamless. */
 .notebook__tools {
   position: sticky;
   top: 0;
   z-index: 5;
+  margin: 0 0 18px;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+/* The controls themselves stay within the narrow reading measure even when the
+ * document is expanded — spanning the full wide column would strand the Restart
+ * action far from the formatting cluster. Left edge tracks the prose. */
+.notebook__tools-inner {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 0 0 18px;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 640px;
   padding: 10px 0;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 /* Tiptap document surface. Typography (serif body, sans headings, gold inline
