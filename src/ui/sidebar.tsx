@@ -141,10 +141,9 @@ export const SidebarProvider = forwardRef<
           }
           className={cx(
             "group/sidebar-wrapper flex min-h-screen w-full",
-            // inset variant: tint the gutter around the floating document card
-            // (a touch darker than the card) so the document reads as the bright
-            // primary surface.
-            "has-[[data-variant=inset]]:bg-surface-sunken",
+            // inset variant: keep the chrome (sidebar + gutter) white; the
+            // floating document card carries the gray (surface-sunken) below.
+            "has-[[data-variant=inset]]:bg-surface",
             className,
           )}
           {...props}
@@ -352,7 +351,7 @@ export const SidebarInset = forwardRef<
   <main
     ref={ref}
     className={cx(
-      "relative flex min-h-screen min-w-0 flex-1 flex-col bg-surface",
+      "relative flex min-h-screen min-w-0 flex-1 flex-col bg-surface-sunken",
       // inset variant: float the content as a rounded, shadowed card with a
       // gutter (the peer Sidebar carries data-variant=inset).
       "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-border-subtle md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
