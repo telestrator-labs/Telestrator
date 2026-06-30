@@ -1,13 +1,19 @@
-/* Design language "Ink & Signal" — Tailwind v4 token layer.
+/* Design language "Ink & Signal" — Tailwind v4 token layer, three tiers.
  *
  * Preflight is intentionally NOT imported: a global reset would fight Tiptap/
  * ProseMirror and CodeMirror. We pull only the theme + utilities layers and add
  * a minimal box-sizing reset (Radix/Tremor primitives assume border-box).
  *
- * Radix gives us accessible 12-step scales (+ alpha) with light/dark for free.
- * @theme inline maps them to Tailwind color tokens by *reference* (var(--olive-2)),
- * so utilities like bg-olive-2 / text-violet-11 / bg-gold-a3 follow dark mode when
- * the .dark class lands (deferred this slice). */
+ * Tokens are tiered so component code binds to *roles*, not palette hues:
+ *   1. Primitive  — the Radix scales (--olive-*, --lime-*, …). Physical colors.
+ *   2. Raw scale  — hue-agnostic families pointing at primitives
+ *                   (--color-gray-* → --olive-*, brand → lime, accent → violet,
+ *                   gold → gold/signal, danger → red). "Which Radix hue" lives here.
+ *   3. Semantic   — design-language roles pointing at raw scales
+ *                   (--color-surface, --color-interactive, --color-value, …).
+ * Components use the semantic utilities (bg-surface, text-value, border-border);
+ * the raw-scale families (gray-*, accent-*) are the fallback when no role fits.
+ * This also sets up dark mode: flip a tier under .dark, components untouched. */
 
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/utilities" layer(utilities);
@@ -32,78 +38,84 @@
 @import "@radix-ui/colors/red-dark.css";
 
 @theme inline {
-  --color-olive-1: var(--olive-1);
-  --color-olive-2: var(--olive-2);
-  --color-olive-3: var(--olive-3);
-  --color-olive-4: var(--olive-4);
-  --color-olive-5: var(--olive-5);
-  --color-olive-6: var(--olive-6);
-  --color-olive-7: var(--olive-7);
-  --color-olive-8: var(--olive-8);
-  --color-olive-9: var(--olive-9);
-  --color-olive-10: var(--olive-10);
-  --color-olive-11: var(--olive-11);
-  --color-olive-12: var(--olive-12);
-  --color-olive-a1: var(--olive-a1);
-  --color-olive-a2: var(--olive-a2);
-  --color-olive-a3: var(--olive-a3);
-  --color-olive-a4: var(--olive-a4);
-  --color-olive-a5: var(--olive-a5);
-  --color-olive-a6: var(--olive-a6);
-  --color-olive-a7: var(--olive-a7);
-  --color-olive-a8: var(--olive-a8);
-  --color-olive-a9: var(--olive-a9);
-  --color-olive-a10: var(--olive-a10);
-  --color-olive-a11: var(--olive-a11);
-  --color-olive-a12: var(--olive-a12);
-  --color-lime-1: var(--lime-1);
-  --color-lime-2: var(--lime-2);
-  --color-lime-3: var(--lime-3);
-  --color-lime-4: var(--lime-4);
-  --color-lime-5: var(--lime-5);
-  --color-lime-6: var(--lime-6);
-  --color-lime-7: var(--lime-7);
-  --color-lime-8: var(--lime-8);
-  --color-lime-9: var(--lime-9);
-  --color-lime-10: var(--lime-10);
-  --color-lime-11: var(--lime-11);
-  --color-lime-12: var(--lime-12);
-  --color-lime-a1: var(--lime-a1);
-  --color-lime-a2: var(--lime-a2);
-  --color-lime-a3: var(--lime-a3);
-  --color-lime-a4: var(--lime-a4);
-  --color-lime-a5: var(--lime-a5);
-  --color-lime-a6: var(--lime-a6);
-  --color-lime-a7: var(--lime-a7);
-  --color-lime-a8: var(--lime-a8);
-  --color-lime-a9: var(--lime-a9);
-  --color-lime-a10: var(--lime-a10);
-  --color-lime-a11: var(--lime-a11);
-  --color-lime-a12: var(--lime-a12);
-  --color-violet-1: var(--violet-1);
-  --color-violet-2: var(--violet-2);
-  --color-violet-3: var(--violet-3);
-  --color-violet-4: var(--violet-4);
-  --color-violet-5: var(--violet-5);
-  --color-violet-6: var(--violet-6);
-  --color-violet-7: var(--violet-7);
-  --color-violet-8: var(--violet-8);
-  --color-violet-9: var(--violet-9);
-  --color-violet-10: var(--violet-10);
-  --color-violet-11: var(--violet-11);
-  --color-violet-12: var(--violet-12);
-  --color-violet-a1: var(--violet-a1);
-  --color-violet-a2: var(--violet-a2);
-  --color-violet-a3: var(--violet-a3);
-  --color-violet-a4: var(--violet-a4);
-  --color-violet-a5: var(--violet-a5);
-  --color-violet-a6: var(--violet-a6);
-  --color-violet-a7: var(--violet-a7);
-  --color-violet-a8: var(--violet-a8);
-  --color-violet-a9: var(--violet-a9);
-  --color-violet-a10: var(--violet-a10);
-  --color-violet-a11: var(--violet-a11);
-  --color-violet-a12: var(--violet-a12);
+  /* ── Tier 2: raw scale (generic family → primitive) ──────────────────────
+   * gray = olive (neutral substrate) · brand = lime (live/brand) ·
+   * accent = violet (interactive) · gold = signal/$-markers · danger = red. */
+  --color-gray-1: var(--olive-1);
+  --color-gray-2: var(--olive-2);
+  --color-gray-3: var(--olive-3);
+  --color-gray-4: var(--olive-4);
+  --color-gray-5: var(--olive-5);
+  --color-gray-6: var(--olive-6);
+  --color-gray-7: var(--olive-7);
+  --color-gray-8: var(--olive-8);
+  --color-gray-9: var(--olive-9);
+  --color-gray-10: var(--olive-10);
+  --color-gray-11: var(--olive-11);
+  --color-gray-12: var(--olive-12);
+  --color-gray-a1: var(--olive-a1);
+  --color-gray-a2: var(--olive-a2);
+  --color-gray-a3: var(--olive-a3);
+  --color-gray-a4: var(--olive-a4);
+  --color-gray-a5: var(--olive-a5);
+  --color-gray-a6: var(--olive-a6);
+  --color-gray-a7: var(--olive-a7);
+  --color-gray-a8: var(--olive-a8);
+  --color-gray-a9: var(--olive-a9);
+  --color-gray-a10: var(--olive-a10);
+  --color-gray-a11: var(--olive-a11);
+  --color-gray-a12: var(--olive-a12);
+
+  --color-brand-1: var(--lime-1);
+  --color-brand-2: var(--lime-2);
+  --color-brand-3: var(--lime-3);
+  --color-brand-4: var(--lime-4);
+  --color-brand-5: var(--lime-5);
+  --color-brand-6: var(--lime-6);
+  --color-brand-7: var(--lime-7);
+  --color-brand-8: var(--lime-8);
+  --color-brand-9: var(--lime-9);
+  --color-brand-10: var(--lime-10);
+  --color-brand-11: var(--lime-11);
+  --color-brand-12: var(--lime-12);
+  --color-brand-a1: var(--lime-a1);
+  --color-brand-a2: var(--lime-a2);
+  --color-brand-a3: var(--lime-a3);
+  --color-brand-a4: var(--lime-a4);
+  --color-brand-a5: var(--lime-a5);
+  --color-brand-a6: var(--lime-a6);
+  --color-brand-a7: var(--lime-a7);
+  --color-brand-a8: var(--lime-a8);
+  --color-brand-a9: var(--lime-a9);
+  --color-brand-a10: var(--lime-a10);
+  --color-brand-a11: var(--lime-a11);
+  --color-brand-a12: var(--lime-a12);
+
+  --color-accent-1: var(--violet-1);
+  --color-accent-2: var(--violet-2);
+  --color-accent-3: var(--violet-3);
+  --color-accent-4: var(--violet-4);
+  --color-accent-5: var(--violet-5);
+  --color-accent-6: var(--violet-6);
+  --color-accent-7: var(--violet-7);
+  --color-accent-8: var(--violet-8);
+  --color-accent-9: var(--violet-9);
+  --color-accent-10: var(--violet-10);
+  --color-accent-11: var(--violet-11);
+  --color-accent-12: var(--violet-12);
+  --color-accent-a1: var(--violet-a1);
+  --color-accent-a2: var(--violet-a2);
+  --color-accent-a3: var(--violet-a3);
+  --color-accent-a4: var(--violet-a4);
+  --color-accent-a5: var(--violet-a5);
+  --color-accent-a6: var(--violet-a6);
+  --color-accent-a7: var(--violet-a7);
+  --color-accent-a8: var(--violet-a8);
+  --color-accent-a9: var(--violet-a9);
+  --color-accent-a10: var(--violet-a10);
+  --color-accent-a11: var(--violet-a11);
+  --color-accent-a12: var(--violet-a12);
+
   --color-gold-1: var(--gold-1);
   --color-gold-2: var(--gold-2);
   --color-gold-3: var(--gold-3);
@@ -128,18 +140,53 @@
   --color-gold-a10: var(--gold-a10);
   --color-gold-a11: var(--gold-a11);
   --color-gold-a12: var(--gold-a12);
-  --color-red-1: var(--red-1);
-  --color-red-2: var(--red-2);
-  --color-red-3: var(--red-3);
-  --color-red-4: var(--red-4);
-  --color-red-5: var(--red-5);
-  --color-red-6: var(--red-6);
-  --color-red-7: var(--red-7);
-  --color-red-8: var(--red-8);
-  --color-red-9: var(--red-9);
-  --color-red-10: var(--red-10);
-  --color-red-11: var(--red-11);
-  --color-red-12: var(--red-12);
+
+  --color-danger-1: var(--red-1);
+  --color-danger-2: var(--red-2);
+  --color-danger-3: var(--red-3);
+  --color-danger-4: var(--red-4);
+  --color-danger-5: var(--red-5);
+  --color-danger-6: var(--red-6);
+  --color-danger-7: var(--red-7);
+  --color-danger-8: var(--red-8);
+  --color-danger-9: var(--red-9);
+  --color-danger-10: var(--red-10);
+  --color-danger-11: var(--red-11);
+  --color-danger-12: var(--red-12);
+
+  /* ── Tier 3: semantic (role → raw scale) ─────────────────────────────────
+   * The layer components actually use. Bind to these by intent. */
+  /* surfaces */
+  --color-surface: var(--color-gray-1);
+  --color-surface-sunken: var(--color-gray-2);
+  --color-surface-raised: var(--color-gray-3);
+  --color-surface-active: var(--color-gray-4);
+  /* borders / hairlines */
+  --color-border-subtle: var(--color-gray-4);
+  --color-border: var(--color-gray-6);
+  --color-border-strong: var(--color-gray-7);
+  /* text */
+  --color-text: var(--color-gray-12);
+  --color-text-muted: var(--color-gray-11);
+  --color-text-faint: var(--color-gray-9);
+  /* interactive (accent / violet) */
+  --color-interactive-subtle: var(--color-accent-3);
+  --color-interactive-border: var(--color-accent-7);
+  --color-interactive: var(--color-accent-9);
+  --color-interactive-hover: var(--color-accent-10);
+  --color-interactive-text: var(--color-accent-11);
+  /* live / run state (brand / lime) */
+  --color-live-subtle: var(--color-brand-3);
+  --color-live: var(--color-brand-9);
+  --color-live-text: var(--color-brand-11);
+  /* signal / $-value markers (gold) */
+  --color-value-bg: var(--color-gold-3);
+  --color-value-border: var(--color-gold-6);
+  --color-value: var(--color-gold-11);
+  /* error (danger / red) */
+  --color-danger-bg: var(--color-danger-3);
+  --color-danger-border: var(--color-danger-6);
+  --color-danger-text: var(--color-danger-11);
 
   --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;

@@ -62,14 +62,14 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(
 
     if (items.length === 0) {
       return (
-        <div className="w-64 rounded-md border border-olive-6 bg-olive-1 p-2 font-sans text-sm text-olive-11 shadow-md">
+        <div className="w-64 rounded-md border border-border bg-surface p-2 font-sans text-sm text-text-muted shadow-md">
           No matches
         </div>
       );
     }
 
     return (
-      <div className="w-64 overflow-hidden rounded-md border border-olive-6 bg-olive-1 p-1 font-sans shadow-md">
+      <div className="w-64 overflow-hidden rounded-md border border-border bg-surface p-1 font-sans shadow-md">
         {items.map((item, i) => (
           <button
             key={item.title}
@@ -79,12 +79,12 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(
             onClick={() => command(item)}
             onMouseEnter={() => setSelected(i)}
             className={`flex w-full items-center justify-between gap-3 rounded px-2 py-1.5 text-left text-sm ${
-              i === selected ? "bg-violet-3 text-violet-11" : "text-olive-12"
+              i === selected ? "bg-interactive-subtle text-interactive-text" : "text-text"
             }`}
           >
             <span>{item.title}</span>
             {item.hint && (
-              <span className="font-mono text-xs text-olive-10">
+              <span className="font-mono text-xs text-gray-10">
                 {item.hint}
               </span>
             )}

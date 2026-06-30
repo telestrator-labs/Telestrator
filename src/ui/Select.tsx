@@ -21,20 +21,20 @@ export function Select({
     <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
       <SelectPrimitive.Trigger
         className={cx(
-          "inline-flex w-full items-center justify-between gap-2 rounded-md border border-olive-7 bg-olive-1 px-2.5 py-1.5",
-          "font-sans text-sm text-olive-12 outline-none",
-          "focus-visible:border-violet-8 focus-visible:ring-2 focus-visible:ring-violet-8",
+          "inline-flex w-full items-center justify-between gap-2 rounded-md border border-border-strong bg-surface px-2.5 py-1.5",
+          "font-sans text-sm text-text outline-none",
+          "focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8",
           className,
         )}
       >
         <SelectPrimitive.Value placeholder={placeholder} />
-        <SelectPrimitive.Icon className="text-olive-11">▾</SelectPrimitive.Icon>
+        <SelectPrimitive.Icon className="text-text-muted">▾</SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
         <SelectPrimitive.Content
           position="popper"
           sideOffset={4}
-          className="z-50 overflow-hidden rounded-md border border-olive-6 bg-olive-1 shadow-md"
+          className="z-50 overflow-hidden rounded-md border border-border bg-surface shadow-md"
         >
           <SelectPrimitive.Viewport className="p-1">
             {options.map((opt) => (
@@ -43,8 +43,8 @@ export function Select({
                 value={opt}
                 className={cx(
                   "relative flex cursor-pointer select-none items-center rounded px-2 py-1.5",
-                  "font-sans text-sm text-olive-12 outline-none",
-                  "data-[highlighted]:bg-violet-3 data-[state=checked]:text-violet-11",
+                  "font-sans text-sm text-text outline-none",
+                  "data-[highlighted]:bg-interactive-subtle data-[state=checked]:text-interactive-text",
                 )}
               >
                 <SelectPrimitive.ItemText>{opt}</SelectPrimitive.ItemText>

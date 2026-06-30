@@ -121,7 +121,7 @@ export function CodeCellView({
       {reading && (
         <button
           type="button"
-          className="px-3 py-1 font-sans text-xs text-violet-11"
+          className="px-3 py-1 font-sans text-xs text-interactive-text"
           onClick={() => setShowCode((s) => !s)}
         >
           {showCode ? "Hide code" : "Show code"}

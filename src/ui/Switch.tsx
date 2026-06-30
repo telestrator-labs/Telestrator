@@ -12,13 +12,13 @@ const Switch = forwardRef<
     ref={ref}
     className={cx(
       "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full outline-none transition-colors",
-      "bg-olive-6 data-[state=checked]:bg-violet-9",
-      "focus-visible:ring-2 focus-visible:ring-violet-8 focus-visible:ring-offset-1",
+      "bg-gray-6 data-[state=checked]:bg-interactive",
+      "focus-visible:ring-2 focus-visible:ring-accent-8 focus-visible:ring-offset-1",
       className,
     )}
     {...props}
   >
-    <SwitchPrimitive.Thumb className="pointer-events-none block h-4 w-4 translate-x-0.5 rounded-full bg-olive-1 shadow-sm transition-transform data-[state=checked]:translate-x-[18px]" />
+    <SwitchPrimitive.Thumb className="pointer-events-none block h-4 w-4 translate-x-0.5 rounded-full bg-surface shadow-sm transition-transform data-[state=checked]:translate-x-[18px]" />
   </SwitchPrimitive.Root>
 ));
 Switch.displayName = "Switch";
