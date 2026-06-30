@@ -38,7 +38,7 @@ export function AppSidebar({
 }) {
   return (
     <Sidebar variant="inset" collapsible="icon">
-      <SidebarHeader>
+      <SidebarHeader className="pt-14">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton

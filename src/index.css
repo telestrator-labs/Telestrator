@@ -40,6 +40,8 @@
 @import "@radix-ui/colors/gold-dark-alpha.css";
 @import "@radix-ui/colors/red.css";
 @import "@radix-ui/colors/red-dark.css";
+@import "@radix-ui/colors/white-alpha.css";
+@import "@radix-ui/colors/black-alpha.css";
 
 @theme inline {
   /* ── Tier 2: raw scale (generic family → primitive) ──────────────────────
@@ -165,6 +167,9 @@
   --color-surface-sunken: var(--color-gray-2);
   --color-surface-raised: var(--color-gray-3);
   --color-surface-active: var(--color-gray-4);
+  /* paper: the bright document surface for the inset card — a near-opaque white
+   * that reads crisp against the gray-3 chrome (alt: var(--color-surface-sunken)). */
+  --color-paper: var(--white-a12);
   /* borders / hairlines */
   --color-border-subtle: var(--color-gray-4);
   --color-border: var(--color-gray-6);
@@ -194,7 +199,7 @@
 
   /* sidebar (consumed by the vendored shadcn sidebar in src/ui/sidebar.tsx) —
    * mapped onto the semantic roles above so the component is fully on-token. */
-  --color-sidebar: var(--color-surface);
+  --color-sidebar: var(--color-surface-raised);
   --color-sidebar-foreground: var(--color-text);
   --color-sidebar-border: var(--color-border-subtle);
   --color-sidebar-ring: var(--color-accent-8);

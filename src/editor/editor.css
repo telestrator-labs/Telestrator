@@ -28,11 +28,20 @@
   line-height: 1.1;
 }
 
+/* The formatting/insert toolbar sticks just under the editor top bar; the
+ * document content scrolls beneath it. Opaque surface so scrolling prose doesn't
+ * bleed through. */
 .notebook__tools {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 18px;
+  margin: 0 0 18px;
+  padding: 10px 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .notebook__tools button {
