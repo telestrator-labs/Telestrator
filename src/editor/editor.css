@@ -44,36 +44,6 @@
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
-.notebook__tools button {
-  font: inherit;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  padding: 5px 9px;
-  border: 1px solid var(--color-border);
-  border-radius: 7px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  cursor: pointer;
-}
-
-.notebook__tools button:hover {
-  background: var(--color-action-subtle);
-  border-color: var(--color-action-border);
-  color: var(--color-action-text);
-}
-
-.notebook__tools button:focus-visible {
-  outline: 2px solid var(--color-accent-8);
-  outline-offset: 1px;
-}
-
-.notebook__sep {
-  width: 1px;
-  height: 18px;
-  background: var(--color-border);
-  margin: 0 4px;
-}
-
 /* Tiptap document surface — prose reads as a serious technical document. */
 .notebook__doc .tiptap {
   outline: none;
