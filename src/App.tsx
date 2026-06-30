@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NotebookView } from "./editor/NotebookView";
 import { AppSidebar } from "./chrome/AppSidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
-import { EditorTopBar } from "./chrome/EditorTopBar";
+import { EditorTopBar, type NotebookLayout } from "./chrome/EditorTopBar";
 import { TracePanel } from "./chrome/TracePanel";
 import { ShareModal } from "./chrome/ShareModal";
 import { Dashboard } from "./dashboard/Dashboard";
@@ -51,6 +51,7 @@ export default function App() {
   const [reading, setReading] = useState(false);
   const [traceOpen, setTraceOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [layout, setLayout] = useState<NotebookLayout>("document");
 
   const openNotebook = (id: string) => {
     setSelectedId(id);
@@ -103,12 +104,15 @@ export default function App() {
               traceOpen={traceOpen}
               onToggleTrace={() => setTraceOpen((o) => !o)}
               onShare={() => setShareOpen(true)}
+              layout={layout}
+              onLayoutChange={setLayout}
             />
             <div className="flex min-h-0 flex-1">
               <div className="min-w-0 flex-1 overflow-auto">
                 <NotebookView
                   key={selected.id}
                   reading={reading}
+                  wide={layout === "studio"}
                   docId={selected.id}
                   title={selected.title}
                 />

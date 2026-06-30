@@ -1,7 +1,6 @@
 import { RuntimeProvider } from "./RuntimeProvider";
 import { NotebookEditor } from "./NotebookEditor";
 import { useNotebookDoc } from "./useNotebookDoc";
-import { renameNotebook } from "./docIndex";
 import { ReadingModeContext } from "./ReadingMode";
 
 // One open notebook. Mounted keyed by docId, so switching notebooks fully
@@ -13,32 +12,26 @@ export function NotebookView({
   docId,
   title,
   reading = false,
+  wide = false,
 }: {
   docId: string;
   title: string;
   reading?: boolean;
+  wide?: boolean;
 }) {
   const { ydoc, whenSynced } = useNotebookDoc(docId);
 
   return (
     <ReadingModeContext.Provider value={reading}>
       <RuntimeProvider>
-        <div className="notebook">
-          <header className="notebook__bar">
-            {reading ? (
-              <h1 className="notebook__title-input">
-                {title || "Untitled notebook"}
-              </h1>
-            ) : (
-              <input
-                className="notebook__title-input"
-                defaultValue={title}
-                placeholder="Untitled notebook"
-                onChange={(e) => renameNotebook(docId, e.target.value)}
-              />
-            )}
-          </header>
-          <NotebookEditor docId={docId} ydoc={ydoc} whenSynced={whenSynced} />
+        <div className={wide ? "notebook notebook--wide" : "notebook"}>
+          {/* Title renders inside NotebookEditor, below the (sticky) toolbar. */}
+          <NotebookEditor
+            docId={docId}
+            ydoc={ydoc}
+            whenSynced={whenSynced}
+            title={title}
+          />
         </div>
       </RuntimeProvider>
     </ReadingModeContext.Provider>

@@ -1,7 +1,8 @@
-import { useState } from "react";
 import { Button } from "../ui/Button";
 import { SidebarTrigger } from "../ui/sidebar";
 import { cx } from "../ui/cx";
+
+export type NotebookLayout = "document" | "studio";
 
 // The editor's sticky top bar (mockup `.topbar`). Breadcrumb → home, a Live
 // pill, and the tool cluster. Edit/Read is REAL (drives reading mode); the
@@ -16,6 +17,8 @@ export function EditorTopBar({
   traceOpen,
   onToggleTrace,
   onShare,
+  layout,
+  onLayoutChange,
 }: {
   title: string;
   reading: boolean;
@@ -24,10 +27,10 @@ export function EditorTopBar({
   traceOpen: boolean;
   onToggleTrace: () => void;
   onShare: () => void;
+  // Document = constrained measure; Studio = a wider, less-constrained container.
+  layout: NotebookLayout;
+  onLayoutChange: (layout: NotebookLayout) => void;
 }) {
-  // Visual-only: a denser "studio" layout is a future milestone.
-  const [layout, setLayout] = useState<"document" | "studio">("document");
-
   return (
     <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border-subtle bg-surface-sunken/85 px-[26px] py-3 backdrop-blur">
       <div className="flex min-w-0 items-center gap-2 text-[13px] text-text-faint">
@@ -52,7 +55,7 @@ export function EditorTopBar({
             { value: "studio", label: "Studio" },
           ]}
           value={layout}
-          onChange={(v) => setLayout(v as "document" | "studio")}
+          onChange={(v) => onLayoutChange(v as NotebookLayout)}
         />
         <Button
           variant="secondary"
