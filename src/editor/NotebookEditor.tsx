@@ -69,6 +69,30 @@ export function NotebookEditor({
       .run();
   };
 
+  // Insert a `$`-bound input cell (a slider by default; kind is switchable in
+  // the cell). Mirrors insertCodeCell. Slash-menu insertion comes in PR 2.
+  const insertInputCell = () => {
+    const id = createCell("typescript").id; // reuse the portable id generator
+    const at = editor.state.selection.to;
+    editor
+      .chain()
+      .insertContentAt(at, [
+        {
+          type: "inputCell",
+          attrs: {
+            id,
+            name: "input1",
+            kind: "slider",
+            value: 0,
+            config: { min: 0, max: 100, step: 1 },
+          },
+        },
+        { type: "paragraph" },
+      ])
+      .focus()
+      .run();
+  };
+
   return (
     <>
       <div className="notebook__tools">
@@ -106,6 +130,9 @@ export function NotebookEditor({
         </button>
         <button type="button" onClick={() => insertCodeCell("css")}>
           + CSS cell
+        </button>
+        <button type="button" onClick={insertInputCell}>
+          + Input
         </button>
         <span className="notebook__sep" aria-hidden />
         <button type="button" onClick={() => runtime.restart()}>

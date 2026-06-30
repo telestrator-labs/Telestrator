@@ -26,6 +26,19 @@ type CellLanguage = "typescript" | "css";
 const languageExtension = (language: CellLanguage) =>
   language === "css" ? css() : javascript({ typescript: true });
 
+// Nudge CodeMirror's selection/cursor to the design-language violet accent so
+// the cell island matches the rest of the chrome. Colors reference the Radix
+// tokens exposed in src/index.css. (Syntax highlighting keeps the CM default.)
+const cellTheme = EditorView.theme({
+  "&": { color: "var(--olive-12)" },
+  ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--violet-11)" },
+  "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection":
+    {
+      backgroundColor: "var(--violet-4)",
+    },
+  ".cm-activeLine": { backgroundColor: "transparent" },
+});
+
 // A thin CodeMirror 6 wrapper for a code cell. It owns the EditorView directly
 // (created once) so it can drive language reconfiguration and keep the inner
 // editor isolated from ProseMirror. The cell is an atom NodeView
@@ -61,6 +74,7 @@ export function CodeEditor({
           indentOnInput(),
           bracketMatching(),
           syntaxHighlighting(defaultHighlightStyle),
+          cellTheme,
           keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
           langCompartment.current.of(languageExtension(language)),
           EditorView.updateListener.of((update) => {
