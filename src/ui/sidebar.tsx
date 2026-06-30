@@ -300,7 +300,8 @@ export const SidebarTrigger = forwardRef<
         toggleSidebar();
       }}
       className={cx(
-        "inline-flex h-8 w-8 items-center justify-center rounded-lg text-sidebar-foreground/80 outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+        // Neutral/ghost: muted icon, gray hover — not the accent fill.
+        "inline-flex h-8 w-8 items-center justify-center rounded-lg text-text-muted outline-none hover:bg-surface-active hover:text-text focus-visible:ring-2 focus-visible:ring-sidebar-ring",
         className,
       )}
       {...props}
