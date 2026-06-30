@@ -172,9 +172,12 @@
   --color-surface-sunken: var(--color-gray-2);
   --color-surface-raised: var(--color-gray-3);
   --color-surface-active: var(--color-gray-4);
-  /* paper: the bright document surface for the inset card — a near-opaque white
-   * that reads crisp against the gray-3 chrome (alt: var(--color-surface-sunken)). */
-  --color-paper: var(--white-a12);
+  /* paper: the document surface for the inset card. It points at --paper (a real
+   * custom property, defined per-mode below) rather than directly at --white-a12,
+   * because white-alpha has no dark variant — a raw white overlay would stay
+   * light when .dark is set. Light = crisp near-white over the gray chrome; dark
+   * = the deepest surface (olive-1 dark) so the document reads as the dark page. */
+  --color-paper: var(--paper);
   /* borders / hairlines */
   --color-border-subtle: var(--color-gray-4);
   --color-border: var(--color-gray-6);
@@ -220,6 +223,16 @@
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Per-mode tokens that can't be expressed as a single Radix scale (alpha overlays
+ * have no dark variant, so they must be flipped explicitly). See the dark-mode
+ * plan in .docs/dark-mode-plan.md. */
+:root {
+  --paper: var(--white-a12);
+}
+.dark {
+  --paper: var(--olive-1);
+}
 
 *,
 ::before,
