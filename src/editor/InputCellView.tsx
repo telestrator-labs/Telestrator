@@ -10,7 +10,7 @@ import type { InputCellConfig } from "./inputCellNode";
 const BIND_DEBOUNCE_MS = 120;
 import { Slider } from "../ui/Slider";
 import { Switch } from "../ui/Switch";
-import { Select } from "../ui/Select";
+import { SelectNative } from "../ui/SelectNative";
 import { Input } from "../ui/Input";
 
 const KINDS: InputKind[] = ["slider", "number", "text", "select", "toggle"];
@@ -87,9 +87,9 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
             value={name}
             onChange={(e) => updateAttributes({ name: e.target.value })}
           />
-          <select
+          <SelectNative
             aria-label="input kind"
-            className="rounded border border-border-strong bg-surface px-1.5 py-0.5 font-sans text-xs text-text"
+            className="w-auto py-0.5 pl-1.5 pr-7 text-xs shadow-none"
             value={kind}
             onChange={(e) => updateAttributes({ kind: e.target.value })}
           >
@@ -98,7 +98,7 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
                 {k}
               </option>
             ))}
-          </select>
+          </SelectNative>
           <ConfigEditor kind={kind} config={config} setConfig={setConfig} />
         </div>
       )}
@@ -186,11 +186,17 @@ function Control({
           </p>
         );
       return (
-        <Select
+        <SelectNative
+          aria-label={`${name} value`}
           value={String(value ?? options[0])}
-          options={options}
-          onValueChange={setValue}
-        />
+          onChange={(e) => setValue(e.target.value)}
+        >
+          {options.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </SelectNative>
       );
     }
     case "toggle":

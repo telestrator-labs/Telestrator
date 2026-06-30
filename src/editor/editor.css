@@ -142,19 +142,6 @@
   font-family: var(--font-sans);
 }
 
-/* The language picker, styled as a mono chip. */
-.code-cell__lang {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  padding: 3px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
 .code-cell__run {
   width: 24px;
   height: 24px;

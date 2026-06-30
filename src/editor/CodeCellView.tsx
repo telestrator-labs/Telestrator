@@ -5,6 +5,7 @@ import type { Language } from "../core/notebook";
 import { useRuntime, useCellOutput } from "./RuntimeProvider";
 import { useReadingMode } from "./ReadingMode";
 import { CodeEditor } from "./CodeEditor";
+import { SelectNative } from "../ui/SelectNative";
 
 // The languages a code cell can hold. Markdown is prose, not a code cell, so it
 // is intentionally excluded here.
@@ -89,19 +90,18 @@ export function CodeCellView({
     <NodeViewWrapper className="code-cell" contentEditable={false}>
       {!reading && (
         <div className="code-cell__header">
-          <select
-            className="code-cell__lang"
+          <SelectNative
+            aria-label="cell language"
+            className="w-auto rounded-md border-border bg-surface-raised py-1 pl-2 pr-7 font-mono text-[11px] text-text-muted shadow-none"
             value={language}
-            onChange={(event) =>
-              updateAttributes({ language: event.target.value })
-            }
+            onChange={(e) => updateAttributes({ language: e.target.value })}
           >
             {CODE_LANGUAGES.map((lang) => (
               <option key={lang} value={lang}>
                 {lang}
               </option>
             ))}
-          </select>
+          </SelectNative>
           {runnable && (
             <button
               type="button"
