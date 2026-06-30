@@ -37,7 +37,7 @@ export function AppSidebar({
   onHome: () => void;
 }) {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar variant="inset" collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -82,13 +82,15 @@ export function AppSidebar({
                       onClick={() => onOpen(d.id)}
                       tooltip={title}
                     >
+                      <DocIcon />
+                      <span className="truncate">{title}</span>
+                      {/* live/idle status dot, hidden when collapsed to icons */}
                       <span
                         className={
-                          "size-[7px] flex-none rounded-full " +
+                          "ml-auto size-[7px] flex-none rounded-full group-data-[collapsible=icon]:hidden " +
                           (active ? "bg-live" : "bg-gray-6")
                         }
                       />
-                      <span className="truncate">{title}</span>
                     </SidebarMenuButton>
                     {/* Sub-document stubs for the open notebook. */}
                     {active && (
@@ -164,6 +166,23 @@ function SearchIcon() {
     >
       <circle cx="7" cy="7" r="4.5" />
       <path d="M11 11l3 3" />
+    </svg>
+  );
+}
+
+function DocIcon() {
+  return (
+    <svg
+      className="size-4 flex-none"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 2H4.5A1.5 1.5 0 0 0 3 3.5v9A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5V6L9 2z" />
+      <path d="M9 2v4h4" />
     </svg>
   );
 }
