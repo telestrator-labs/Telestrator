@@ -19,7 +19,7 @@ export interface NotebookDocument {
 // Portable id generation: browsers and modern runtimes expose
 // `crypto.randomUUID()`; the fallback keeps older/edge runtimes working so the
 // project isn't tied to any one Node version.
-function generateId(): string {
+export function generateId(): string {
   if (typeof globalThis.crypto?.randomUUID === "function") {
     return globalThis.crypto.randomUUID();
   }

@@ -1,9 +1,12 @@
+/* Design-language recolor (no logic change): olive substrate, violet
+ * interactive, lime live/run, gold $-value marker; serif prose, sans chrome,
+ * mono code/values. Tokens are the Radix scales exposed in src/index.css. */
 .notebook {
   max-width: 760px;
   margin: 0 auto;
   padding: 24px 16px 96px;
-  font-family: system-ui, sans-serif;
-  color: #1a1a1a;
+  font-family: var(--font-sans);
+  color: var(--olive-12);
 }
 
 .notebook__bar {
@@ -16,13 +19,13 @@
   gap: 12px;
   padding: 8px 0;
   margin-bottom: 16px;
-  background: #fff;
-  border-bottom: 1px solid #eee;
+  background: var(--olive-1);
+  border-bottom: 1px solid var(--olive-6);
 }
 
 .notebook__title {
   font-size: 14px;
-  color: #555;
+  color: var(--olive-11);
 }
 
 .notebook__tools {
@@ -33,33 +36,50 @@
 
 .notebook__tools button {
   font: inherit;
+  font-family: var(--font-sans);
   font-size: 13px;
   padding: 4px 8px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--olive-7);
   border-radius: 6px;
-  background: #fafafa;
+  background: var(--olive-2);
+  color: var(--olive-12);
   cursor: pointer;
 }
 
 .notebook__tools button:hover {
-  background: #f0f0f0;
+  background: var(--violet-3);
+  border-color: var(--violet-7);
+}
+
+.notebook__tools button:focus-visible {
+  outline: 2px solid var(--violet-8);
+  outline-offset: 1px;
 }
 
 .notebook__sep {
   width: 1px;
   height: 18px;
-  background: #ddd;
+  background: var(--olive-6);
   margin: 0 4px;
 }
 
-/* Tiptap document surface */
+/* Tiptap document surface — prose reads as a serious technical document. */
 .notebook__doc .tiptap {
   outline: none;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--olive-12);
 }
 
 .notebook__doc .tiptap > * + * {
   margin-top: 0.75em;
+}
+
+.notebook__doc h1,
+.notebook__doc h2 {
+  font-family: var(--font-sans);
+  font-weight: 600;
 }
 
 .notebook__doc h1 {
@@ -71,18 +91,19 @@
 }
 
 .notebook__doc code {
-  background: #f4f4f4;
+  background: var(--olive-3);
   padding: 0.15em 0.35em;
   border-radius: 4px;
-  font-size: 0.9em;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
 }
 
-/* Code cell node */
+/* Code cell node — a quiet "instrument" inset into the narrative. */
 .code-cell {
-  border: 1px solid #d8d8e0;
-  border-radius: 8px;
+  border: 1px solid var(--olive-6);
+  border-radius: 10px;
   overflow: hidden;
-  background: #fbfbfd;
+  background: var(--olive-2);
 }
 
 .code-cell__header {
@@ -90,18 +111,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 6px 10px;
-  background: #f1f1f6;
-  border-bottom: 1px solid #e2e2ea;
+  background: var(--olive-3);
+  border-bottom: 1px solid var(--olive-6);
+  font-family: var(--font-sans);
 }
 
 .code-cell__lang {
   font: inherit;
+  font-family: var(--font-sans);
   font-size: 12px;
 }
 
 .code-cell__badge {
   font-size: 11px;
-  color: #8a8a96;
+  color: var(--olive-11);
 }
 
 /* CodeMirror cell editor */
@@ -111,7 +134,7 @@
 }
 
 .code-cell__cm .cm-scroller {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -122,15 +145,15 @@
 
 .code-cell__cm .cm-gutters {
   background: transparent;
-  border-right: 1px solid #ececf2;
-  color: #b8b8c4;
+  border-right: 1px solid var(--olive-6);
+  color: var(--olive-9);
 }
 
 /* Reactive output: the `$` keys a cell wrote + console + errors. */
 .code-cell__output {
-  border-top: 1px solid #e2e2ea;
+  border-top: 1px solid var(--olive-6);
   padding: 8px 12px;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   display: flex;
   flex-direction: column;
@@ -138,21 +161,21 @@
 }
 
 .code-cell__error {
-  color: #c0392b;
+  color: var(--red-11);
   white-space: pre-wrap;
 }
 
 .code-cell__log {
-  color: #444;
+  color: var(--olive-11);
   white-space: pre-wrap;
 }
 
 .code-cell__log--warn {
-  color: #b7791f;
+  color: var(--gold-11);
 }
 
 .code-cell__log--error {
-  color: #c0392b;
+  color: var(--red-11);
 }
 
 .code-cell__values {
@@ -160,13 +183,15 @@
   flex-wrap: wrap;
   gap: 4px 14px;
   margin-top: 2px;
+  font-family: var(--font-mono);
 }
 
 .code-cell__value {
-  color: #1a1a2a;
+  color: var(--olive-12);
 }
 
+/* The $-value marker: gold is the telestrator highlight for live values. */
 .code-cell__value-key {
-  color: #6a4ed6;
+  color: var(--gold-11);
   font-weight: 600;
 }

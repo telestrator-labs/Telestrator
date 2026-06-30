@@ -22,4 +22,4 @@ dist-ssr
 *.sw?
 
 # TypeScript build info
-*.tsbuildinfo
+*.tsbuildinfo.docs/temp/

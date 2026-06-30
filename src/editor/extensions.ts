@@ -1,6 +1,7 @@
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
 import { CodeCell } from "./codeCellNode";
+import { InputCell } from "./inputCellNode";
 
 // The single source of truth for the editor's schema. Shared by the live editor
 // (NotebookEditor) and the headless bridge test so they can never drift.
@@ -9,8 +10,10 @@ import { CodeCell } from "./codeCellNode";
 //     provides Yjs-backed undo/redo — running both corrupts history.
 //   - Markdown:   bidirectional prose <-> markdown (powers the bridge)
 //   - CodeCell:   our executable-code-cell node
+//   - InputCell:  a `$`-bound knob (slider/number/text/select/toggle)
 export const editorExtensions = [
   StarterKit.configure({ undoRedo: false }),
   Markdown,
   CodeCell,
+  InputCell,
 ];

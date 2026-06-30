@@ -1,40 +1,49 @@
-/* App shell: notebook switcher sidebar + main editing area. */
+/* App shell: notebook switcher sidebar + main editing area.
+ * Design-language recolor — left stays quiet (olive, no hue) so the document
+ * holds attention; chrome is Plex Sans; interactive accents are violet. */
 .app {
   display: flex;
   min-height: 100vh;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
 .app-loading {
   padding: 40px;
-  color: #8a8a96;
-  font-family: system-ui, sans-serif;
+  color: var(--olive-11);
+  font-family: var(--font-sans);
 }
 
 .doc-list {
   width: 240px;
   flex: 0 0 240px;
-  border-right: 1px solid #ececf2;
+  border-right: 1px solid var(--olive-6);
   padding: 16px 10px;
   box-sizing: border-box;
-  background: #fafafb;
+  background: var(--olive-2);
 }
 
 .doc-list__new {
   width: 100%;
   font: inherit;
+  font-family: var(--font-sans);
   font-size: 13px;
   padding: 8px 10px;
   margin-bottom: 12px;
-  border: 1px solid #d8d8e0;
+  border: 1px solid var(--olive-7);
   border-radius: 6px;
-  background: #fff;
+  background: var(--olive-1);
+  color: var(--olive-12);
   cursor: pointer;
 }
 
 .doc-list__new:hover {
-  background: #eef0ff;
-  border-color: #9aa0e0;
+  background: var(--violet-3);
+  border-color: var(--violet-7);
+}
+
+.doc-list__new:focus-visible {
+  outline: 2px solid var(--violet-8);
+  outline-offset: 1px;
 }
 
 .doc-list ul {
@@ -50,18 +59,19 @@
 }
 
 .doc-list__row.is-active {
-  background: #eef0ff;
+  background: var(--violet-3);
 }
 
 .doc-list__item {
   flex: 1;
   text-align: left;
   font: inherit;
+  font-family: var(--font-sans);
   font-size: 13px;
   padding: 7px 8px;
   border: 0;
   background: transparent;
-  color: #2a2a3a;
+  color: var(--olive-12);
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -73,7 +83,7 @@
   font-size: 12px;
   border: 0;
   background: transparent;
-  color: #b8b8c4;
+  color: var(--olive-9);
   cursor: pointer;
   padding: 4px 8px;
   opacity: 0;
@@ -84,7 +94,7 @@
 }
 
 .doc-list__del:hover {
-  color: #c0392b;
+  color: var(--red-11);
 }
 
 .app-main {
@@ -93,14 +103,15 @@
   overflow-x: hidden;
 }
 
-/* The editable notebook title sits in the notebook bar. */
+/* The editable notebook title reads like a manuscript title, set in Plex Sans. */
 .notebook__title-input {
   font: inherit;
+  font-family: var(--font-sans);
   font-size: 18px;
   font-weight: 600;
   border: 0;
   background: transparent;
-  color: #1a1a1a;
+  color: var(--olive-12);
   width: 100%;
   padding: 2px 0;
 }
