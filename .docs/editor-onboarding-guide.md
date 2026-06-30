@@ -26,154 +26,70 @@ The `editor` package is the **main application shell** — it's what users see w
 
 ---
 
-## Section 2: Architecture ASCII Diagram
+## Section 2: Architecture
 
+```mermaid
+flowchart TB
+    subgraph EDITOR["Editor package (parent window)"]
+        subgraph ENTRY["Entry points"]
+            idx["index.tsx — checks URL for ?frame"]
+            idx -- "host mode" --> host["index.host.tsx → App.tsx"]
+            idx -- "frame mode" --> ifr["index.iframe.tsx → Frame component (frame pkg)"]
+        end
+        host --> SHELL
+        subgraph SHELL["App shell (host mode) — App.tsx"]
+            router["BrowserRouter<br/>/ → Main + StartScreen · /login · /register · /username · /* → DocumentRoute → DocumentView"]
+            sess["SessionStore (auth state)"]
+        end
+        SHELL --> AUTH
+        SHELL --> LOAD
+        SHELL --> RENDER
+        subgraph AUTH["Authentication"]
+            a["SupabaseSessionStore<br/>login/logout · user state · guest mode · profile · Supabase client (Auth + DB)"]
+        end
+        subgraph LOAD["Document loading"]
+            l["Identifier system (TypeCell/GitHub/HTTPS/File)<br/>DocConnection → SyncManager → local cache + remote sync"]
+        end
+        subgraph RENDER["Document rendering"]
+            r["DocumentView<br/>!project → ProjectRenderer · !richtext → RichTextRenderer · !profile → ProfileRenderer<br/>RichTextRenderer → FrameHost → iframe"]
+        end
+    end
+
+    RENDER == "Penpal + y-penpal (PostMessage)" ==> IFRAME
+    subgraph IFRAME["Iframe (frame package)"]
+        fr["Frame.tsx — BlockNote + Monaco + ReactiveEngine<br/>(see frame-onboarding-guide.md)"]
+    end
 ```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                              EDITOR PACKAGE (Parent Window)                             │
-│                                                                                         │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │                              ENTRY POINTS                                         │  │
-│  │                                                                                   │  │
-│  │   index.tsx ──► Checks URL for "?frame" parameter                                │  │
-│  │        │                                                                          │  │
-│  │        ├── Host mode ──► index.host.tsx ──► App.tsx (main application)           │  │
-│  │        │                                                                          │  │
-│  │        └── Frame mode ──► index.iframe.tsx ──► Frame component (from frame pkg)  │  │
-│  │                                                                                   │  │
-│  └──────────────────────────────────────────────────────────────────────────────────┘  │
-│                                         │                                               │
-│                                         ▼                                               │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │                              APP SHELL (Host Mode)                                │  │
-│  │                                                                                   │  │
-│  │   App.tsx                                                                         │  │
-│  │     │                                                                             │  │
-│  │     ├── BrowserRouter (React Router)                                              │  │
-│  │     │     │                                                                       │  │
-│  │     │     ├── "/" ──► Main.tsx + StartScreen                                      │  │
-│  │     │     ├── "/login" ──► Login.tsx                                              │  │
-│  │     │     ├── "/register" ──► Register.tsx                                        │  │
-│  │     │     ├── "/username" ──► Username.tsx (new user setup)                       │  │
-│  │     │     └── "/*" ──► DocumentRoute ──► DocumentView                             │  │
-│  │     │                                                                             │  │
-│  │     └── SessionStore (authentication state)                                       │  │
-│  │                                                                                   │  │
-│  └──────────────────────────────────────────────────────────────────────────────────┘  │
-│                                         │                                               │
-│              ┌──────────────────────────┼──────────────────────────┐                   │
-│              │                          │                          │                   │
-│              ▼                          ▼                          ▼                   │
-│  ┌────────────────────┐    ┌────────────────────┐    ┌─────────────────────────────┐  │
-│  │   AUTHENTICATION   │    │   DOCUMENT LOADING │    │   DOCUMENT RENDERING        │  │
-│  │                    │    │                    │    │                             │  │
-│  │ SupabaseSession    │    │ Identifier System  │    │ DocumentView.tsx            │  │
-│  │ Store.ts           │    │ ├── TypeCell       │    │   │                         │  │
-│  │   │                │    │ ├── Github         │    │   ├── !project → Project    │  │
-│  │   ├── Login/logout │    │ ├── Https          │    │   │            Renderer     │  │
-│  │   ├── User state   │    │ └── File           │    │   ├── !richtext → RichText  │  │
-│  │   ├── Guest mode   │    │                    │    │   │              Renderer   │  │
-│  │   └── Profile      │    │ DocConnection.ts   │    │   └── !profile → Profile    │  │
-│  │                    │    │   │                │    │                 Renderer    │  │
-│  │ Supabase Client    │    │   └── SyncManager  │    │                             │  │
-│  │   │                │    │        │           │    │ RichTextRenderer.tsx        │  │
-│  │   ├── Auth API     │    │        ├── Local   │    │   │                         │  │
-│  │   └── Database     │    │        │   Cache   │    │   └── FrameHost.tsx         │  │
-│  │                    │    │        └── Remote  │    │         │                   │  │
-│  └────────────────────┘    │            Sync    │    │         └── Creates iframe  │  │
-│                            └────────────────────┘    │             with Frame pkg  │  │
-│                                                      └─────────────────────────────┘  │
-│                                                                     │                  │
-└─────────────────────────────────────────────────────────────────────┼──────────────────┘
-                                                                      │
-                                    Penpal + y-penpal                 │
-                                    (PostMessage)                     │
-                                                                      ▼
-┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                              IFRAME (Frame Package)                                      │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐   │
-│  │  Frame.tsx — BlockNote editor + Monaco + ReactiveEngine                          │   │
-│  │  (See frame-onboarding-guide.md for details)                                     │   │
-│  └──────────────────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────────────────┘
 
+### Document loading & sync architecture
 
-                    DOCUMENT LOADING & SYNC ARCHITECTURE
-                    ════════════════════════════════════
+```mermaid
+flowchart TB
+    url["URL: /@username/document"] --> dr["DocumentRoute.tsx — parse path"]
+    dr --> ac["AliasCoordinator (workspace lookup)"] --> resolve["Resolve @username → document ID"]
+    resolve --> dc["DocConnection.load()<br/>check cache · create SyncManager if needed · return reactive connection"]
+    dc --> sm
+    subgraph sm["SyncManager"]
+        ydoc["Y.Doc — shared state: content, comments, plugins, metadata"]
+        ydoc --> local["Local storage<br/>DocumentCoordinator → IndexedDB (y-indexeddb)<br/>offline access · fast load · sync-status tracking"]
+        ydoc --> remote["Remote sync<br/>TypeCellRemote → HocusPocus WebSocket (real-time)<br/>→ Supabase (persistence, auth)"]
+    end
+```
 
-┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                                                                                         │
-│   URL: /@username/document                                                              │
-│         │                                                                               │
-│         ▼                                                                               │
-│   ┌─────────────────────┐                                                               │
-│   │  DocumentRoute.tsx  │                                                               │
-│   │  Parse URL path     │                                                               │
-│   └──────────┬──────────┘                                                               │
-│              │                                                                          │
-│              ▼                                                                          │
-│   ┌─────────────────────┐         ┌─────────────────────┐                              │
-│   │  AliasCoordinator   │ ──────► │  Resolve @username  │                              │
-│   │  (workspace lookup) │         │  to document ID     │                              │
-│   └──────────┬──────────┘         └─────────────────────┘                              │
-│              │                                                                          │
-│              ▼                                                                          │
-│   ┌─────────────────────────────────────────────────────────────────────────────────┐  │
-│   │                           DocConnection.load()                                   │  │
-│   │                                                                                  │  │
-│   │   • Check cache for existing connection                                          │  │
-│   │   • Create SyncManager if not cached                                             │  │
-│   │   • Return reactive connection to document                                       │  │
-│   └──────────────────────────────────┬──────────────────────────────────────────────┘  │
-│                                      │                                                  │
-│                                      ▼                                                  │
-│   ┌─────────────────────────────────────────────────────────────────────────────────┐  │
-│   │                              SyncManager                                         │  │
-│   │                                                                                  │  │
-│   │   ┌─────────────────────────────────────────────────────────────────────────┐   │  │
-│   │   │                         Y.Doc (Yjs Document)                             │   │  │
-│   │   │                                                                          │   │  │
-│   │   │   Shared state: doc content, comments, plugins, metadata                 │   │  │
-│   │   └─────────────────────────────────────────────────────────────────────────┘   │  │
-│   │                    │                              │                              │  │
-│   │                    ▼                              ▼                              │  │
-│   │   ┌──────────────────────────┐    ┌───────────────────────────────────────┐     │  │
-│   │   │   LOCAL STORAGE          │    │   REMOTE SYNC                         │     │  │
-│   │   │                          │    │                                       │     │  │
-│   │   │   DocumentCoordinator    │    │   TypeCellRemote                      │     │  │
-│   │   │     │                    │    │     │                                 │     │  │
-│   │   │     └── IndexedDB        │    │     ├── HocusPocus WebSocket          │     │  │
-│   │   │         (y-indexeddb)    │    │     │   (real-time sync)              │     │  │
-│   │   │                          │    │     │                                 │     │  │
-│   │   │   • Offline access       │    │     └── Supabase                      │     │  │
-│   │   │   • Fast loading         │    │         (persistence, auth)           │     │  │
-│   │   │   • Sync status tracking │    │                                       │     │  │
-│   │   └──────────────────────────┘    └───────────────────────────────────────┘     │  │
-│   │                                                                                  │  │
-│   └─────────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                         │
-└─────────────────────────────────────────────────────────────────────────────────────────┘
+### Parent ↔ iframe communication
 
-
-                    PARENT ↔ IFRAME COMMUNICATION
-                    ═════════════════════════════
-
-    ┌─────────────────────────┐              ┌─────────────────────────┐
-    │   PARENT (FrameHost)    │              │   IFRAME (Frame.tsx)    │
-    │                         │              │                         │
-    │   Methods EXPOSED:      │   Penpal     │   Methods EXPOSED:      │
-    │   ┌─────────────────┐   │◄────────────►│   ┌─────────────────┐   │
-    │   │ processYjsMsg   │   │   (bidir)    │   │ processYjsMsg   │   │
-    │   │ resolveModule   │   │              │   │ updateModel     │   │
-    │   │ registerModule  │   │              │   │ deleteModel     │   │
-    │   │ markPlugins     │   │              │   │ ping            │   │
-    │   └─────────────────┘   │              │   └─────────────────┘   │
-    │                         │              │                         │
-    │   PenPalProvider        │   y-penpal   │   PenPalProvider        │
-    │   (Yjs sync over        │◄────────────►│   (Yjs sync over        │
-    │    PostMessage)         │              │    PostMessage)         │
-    │                         │              │                         │
-    └─────────────────────────┘              └─────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph P["Parent (FrameHost)"]
+        pm["Methods exposed:<br/>processYjsMessage · resolveModule · registerModule · markPlugins"]
+        ppp["PenPalProvider (Yjs sync over PostMessage)"]
+    end
+    subgraph I["Iframe (Frame.tsx)"]
+        im["Methods exposed:<br/>processYjsMessage · updateModel · deleteModel · ping"]
+        ipp["PenPalProvider (Yjs sync over PostMessage)"]
+    end
+    pm <-- "Penpal (bidirectional RPC)" --> im
+    ppp <-- "y-penpal (Yjs messages)" --> ipp
 ```
 
 ---
@@ -238,11 +154,12 @@ This is determined by checking if the URL contains `?frame`. The iframe URL is c
 **Analogy:** Like a sync service (Dropbox). It keeps your local folder in sync with the cloud, handles conflicts, and knows when you're offline.
 
 **Key State Machine:**
-```
-┌─────────┐     load()      ┌─────────────┐     synced     ┌────────┐
-│ loading │ ──────────────► │ loading from│ ─────────────► │syncing │
-└─────────┘                 │ remote/local│                └────────┘
-                            └─────────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> loading
+    loading --> loadingFromRemoteLocal: load()
+    loadingFromRemoteLocal --> syncing: synced
+    state "loading from remote/local" as loadingFromRemoteLocal
 ```
 
 ### 3.5 `TypeCellRemote.ts` — The Cloud Connection
@@ -326,117 +243,83 @@ This is determined by checking if the URL contains `?frame`. The iframe URL is c
 
 ### The Document Loading Lifecycle
 
-```
-1. USER NAVIGATES TO /@username/document
-   └─► React Router matches DocumentRoute
-
-2. RESOLVE ALIAS
-   └─► AliasCoordinator queries Supabase for @username
-   └─► Returns the document's TypeCellIdentifier
-
-3. LOAD DOCUMENT
-   └─► DocConnection.load(identifier, sessionStore)
-   └─► Creates or reuses cached SyncManager
-
-4. SYNC MANAGER INITIALIZES
-   ├─► Check DocumentCoordinator for local copy
-   │   ├── Found ──► Load from IndexedDB
-   │   └── Not found ──► Fetch from remote
-   │
-   └─► Start TypeCellRemote sync
-       └─► Connect to HocusPocus WebSocket
-
-5. DOCUMENT READY
-   └─► DocConnection.doc returns BaseResource
-   └─► DocumentView renders appropriate view
-
-6. FOR RICHTEXT DOCUMENTS
-   └─► RichTextRenderer creates iframe URL
-   └─► FrameHost spawns iframe with Frame component
-   └─► Penpal connection established
-   └─► y-penpal starts tunneling Yjs updates
+```mermaid
+flowchart TB
+    s1["1. User navigates to /@username/document<br/>React Router matches DocumentRoute"]
+    s2["2. Resolve alias<br/>AliasCoordinator queries Supabase for @username → TypeCellIdentifier"]
+    s3["3. Load document<br/>DocConnection.load(identifier, sessionStore) — create or reuse cached SyncManager"]
+    s4{"4. SyncManager: local copy in DocumentCoordinator?"}
+    s4a["Found → load from IndexedDB"]
+    s4b["Not found → fetch from remote"]
+    s4c["Start TypeCellRemote sync → connect to HocusPocus WebSocket"]
+    s5["5. Document ready<br/>DocConnection.doc returns BaseResource → DocumentView renders"]
+    s6["6. For richtext docs<br/>RichTextRenderer builds iframe URL → FrameHost spawns iframe → Penpal connects → y-penpal tunnels Yjs"]
+    s1 --> s2 --> s3 --> s4
+    s4 -->|yes| s4a --> s4c
+    s4 -->|no| s4b --> s4c
+    s4c --> s5 --> s6
 ```
 
 ### State Management Hierarchy
 
-```
-SupabaseSessionStore (singleton)
-    │
-    ├── user ──► Authentication state
-    │
-    ├── coordinators
-    │   ├── DocumentCoordinator ──► Local IndexedDB cache
-    │   ├── AliasCoordinator ──► Username → document mapping
-    │   └── BackgroundSyncer ──► Sync unsynced documents
-    │
-    └── supabase ──► Supabase client instance
-
-
-DocConnection (per document, cached)
-    │
-    ├── identifier ──► Where the document lives
-    │
-    ├── manager (SyncManager)
-    │   ├── ydoc ──► The actual Y.Doc
-    │   ├── state ──► "loading" | { status: "syncing", localDoc }
-    │   └── remote (TypeCellRemote)
-    │       ├── hocuspocusProvider ──► WebSocket connection
-    │       └── awareness ──► Cursor/presence data
-    │
-    └── doc ──► "loading" | "not-found" | BaseResource
+```mermaid
+flowchart TB
+    subgraph SSS["SupabaseSessionStore (singleton)"]
+        u["user → authentication state"]
+        coord["coordinators<br/>DocumentCoordinator (IndexedDB cache) · AliasCoordinator (username → doc) · BackgroundSyncer"]
+        sb["supabase → client instance"]
+    end
+    subgraph DC["DocConnection (per document, cached)"]
+        id["identifier → where the doc lives"]
+        mgr["manager (SyncManager)<br/>ydoc (Y.Doc) · state: loading | { syncing, localDoc }"]
+        rem["remote (TypeCellRemote)<br/>hocuspocusProvider (WebSocket) · awareness (cursors/presence)"]
+        doc["doc → loading | not-found | BaseResource"]
+        mgr --> rem
+    end
+    SSS -. "provides session to" .-> DC
 ```
 
 ### Parent ↔ Iframe Data Flow
 
-```
-    PARENT WINDOW                           IFRAME
-    ─────────────                           ──────
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant RTR as RichTextRenderer
+    participant FH as FrameHost (parent)
+    participant FR as Frame.tsx (iframe)
 
-    User opens document
-           │
-           ▼
-    RichTextRenderer
-           │
-           │ Creates iframe with URL:
-           │ //?frame#documentId=xxx&userName=xxx&...
-           │
-           ▼
-    FrameHost.tsx ◄──────── Penpal ────────► Frame.tsx
-           │                connection               │
-           │                                         │
-           │   ┌─────────────────────────────────┐   │
-           │   │       Yjs Document Sync         │   │
-           │   │                                 │   │
-           │   │  Parent's PenPalProvider        │   │
-           │   │         │                       │   │
-    Y.Doc ─┼───┼─────────┼───────────────────────┼───┼─ Y.Doc
-           │   │         │ processYjsMessage()   │   │  (same CRDT)
-           │   │         ▼                       │   │
-           │   │  Frame's PenPalProvider         │   │
-           │   │                                 │   │
-           │   └─────────────────────────────────┘   │
-           │                                         │
-           │   ┌─────────────────────────────────┐   │
-           │   │    Module Resolution            │   │
-           │   │                                 │   │
-           │   │  Frame imports "!otherDoc"      │   │
-           │   │         │                       │   │
-           │   │         ▼                       │   │
-           │   │  resolveModuleName()            │   │
-           │   │         │                       │   │
-           │   │         ▼                       │   │
-           │   │  registerTypeCellModuleCompiler │   │
-           │   │         │                       │   │
-           │   │         ▼                       │   │
-           │   │  Parent loads other doc,        │   │
-           │   │  forwards models to frame       │   │
-           │   │                                 │   │
-           │   └─────────────────────────────────┘   │
-           │                                         │
-    DocumentResource                         Frame executes code,
-    (with awareness,                         renders to user
-     comments, plugins)
+    U->>RTR: open document
+    RTR->>FH: create iframe URL //?frame#documentId=…&userName=…
+    FH->>FR: Penpal connection established (bidirectional RPC)
+
+    Note over FH,FR: Yjs document sync (same CRDT, both sides)
+    FH->>FR: parent PenPalProvider → processYjsMessage()
+    FR->>FH: frame PenPalProvider → processYjsMessage()
+
+    Note over FH,FR: Module resolution
+    FR->>FH: import "!otherDoc" → resolveModuleName()
+    FH->>FH: registerTypeCellModuleCompiler() — load other doc
+    FH->>FR: forward compiled models to frame
+    Note over FR: Frame executes code, renders to user
 ```
+
+---
+
+## Public API / Boundaries
+
+- **Internal dependencies:** `util`, `shared`, `engine`, `parsers`, `frame`, `y-penpal` — it depends on **everything**, which is why it is built **last** (see [development-history.md](./development-history.md#part-2--recommended-rebuild-sequence)).
+- **Depended on by:** nothing (it is the application root / deployable).
+- **Cross-boundary role:** acts as the **host** — implements `HostBridgeMethods` from [`shared`](./shared-onboarding-guide.md), spawns the iframe ([`frame`](./frame-onboarding-guide.md)), owns the HocusPocus + Supabase connection, and tunnels Yjs via [`y-penpal`](./y-penpal-onboarding-guide.md).
+
+---
+
+## Rebuild Notes
+
+- **Build this last.** It assembles every other package; stabilize the foundations, engine, frame, and server first.
+- **The host/frame split is sacred.** Auth tokens, Supabase, and HocusPocus must live *only* in the host; the iframe gets data exclusively through the typed bridge. This isolation is the core security property introduced by V3 (`#339`).
+- **Local-first is non-trivial.** The `DocConnection` → `SyncManager` → `DocumentCoordinator`/`TypeCellRemote` layering (cache + ref-counting + offline) is the riskiest area to rebuild — treat IndexedDB caching and HocusPocus sync as separable, individually-testable concerns.
+- The **identifier system** (`TypeCell`/`GitHub`/`HTTPS`/`File`) is a clean extension point; preserve its shape.
 
 ---
 

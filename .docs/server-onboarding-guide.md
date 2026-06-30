@@ -22,152 +22,58 @@ The `server` package is the **backend collaboration server** — it's the bridge
 
 ---
 
-## Section 2: Architecture ASCII Diagram
+## Section 2: Architecture
 
+```mermaid
+flowchart TB
+    subgraph SERVER["Server package"]
+        idx["index.ts — entry point<br/>load env (.env.development/.staging/.production) · Server.configure with extensions Logger + SupabaseHocuspocus · listen on PORT"]
+        idx --> ext
+        subgraph ext["SupabaseHocuspocus (extends @hocuspocus/extension-database)"]
+            hooks["Lifecycle hooks<br/>onAuthenticate() → set readOnly if no write · afterLoadDocument() → ref listener · onChange() (log only) · onDisconnect() → clean up ref listener"]
+            dbops["Database operations<br/>fetch() → SELECT data FROM documents WHERE nano_id = ? · store() → UPDATE documents SET data = ? WHERE nano_id = ?"]
+        end
+    end
+
+    SERVER -- "WebSocket (HocusPocus)" --> CA["Client A (editor)<br/>HocusPocus provider"]
+    SERVER -- "WebSocket (HocusPocus)" --> CB["Client B (editor)<br/>HocusPocus provider"]
+    SERVER == "Supabase API (PostgreSQL, RLS)" ==> DB[("Supabase database<br/>documents · workspaces · document_permissions · document_relations")]
 ```
-┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                              SERVER PACKAGE                                              │
-│                                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐   │
-│  │                              index.ts (Entry Point)                               │   │
-│  │                                                                                   │   │
-│  │   • Load environment config (.env.development/.staging/.production)              │   │
-│  │   • Configure HocusPocus Server with extensions                                  │   │
-│  │   • Start listening on PORT                                                       │   │
-│  │                                                                                   │   │
-│  │   Server.configure({                                                              │   │
-│  │     extensions: [                                                                 │   │
-│  │       new Logger(),              // Request logging                               │   │
-│  │       new SupabaseHocuspocus(),  // Auth + persistence                           │   │
-│  │     ]                                                                             │   │
-│  │   })                                                                              │   │
-│  │                                                                                   │   │
-│  └──────────────────────────────────────────────────────────────────────────────────┘   │
-│                                         │                                                │
-│                                         ▼                                                │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐   │
-│  │                         SupabaseHocuspocus Extension                              │   │
-│  │                    (extends @hocuspocus/extension-database)                       │   │
-│  │                                                                                   │   │
-│  │   ┌─────────────────────────────────────────────────────────────────────────┐    │   │
-│  │   │                        LIFECYCLE HOOKS                                   │    │   │
-│  │   │                                                                          │    │   │
-│  │   │   onAuthenticate()     Verify token, check permissions                   │    │   │
-│  │   │         │               └─► Sets readOnly if no write access             │    │   │
-│  │   │         ▼                                                                │    │   │
-│  │   │   afterLoadDocument()  Set up ref listener for relations                 │    │   │
-│  │   │         │                                                                │    │   │
-│  │   │         ▼                                                                │    │   │
-│  │   │   onChange()           Called on every document change                   │    │   │
-│  │   │         │               (currently no-op, logging only)                  │    │   │
-│  │   │         ▼                                                                │    │   │
-│  │   │   onDisconnect()       Clean up ref listener when last client leaves    │    │   │
-│  │   │                                                                          │    │   │
-│  │   └─────────────────────────────────────────────────────────────────────────┘    │   │
-│  │                                                                                   │   │
-│  │   ┌─────────────────────────────────────────────────────────────────────────┐    │   │
-│  │   │                     DATABASE OPERATIONS                                  │    │   │
-│  │   │                                                                          │    │   │
-│  │   │   fetch()    Load document from Supabase                                 │    │   │
-│  │   │               └─► SELECT data FROM documents WHERE nano_id = ?           │    │   │
-│  │   │                                                                          │    │   │
-│  │   │   store()    Save document to Supabase                                   │    │   │
-│  │   │               └─► UPDATE documents SET data = ? WHERE nano_id = ?        │    │   │
-│  │   │                                                                          │    │   │
-│  │   └─────────────────────────────────────────────────────────────────────────┘    │   │
-│  │                                                                                   │   │
-│  └──────────────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                          │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
-                                         │
-                        WebSocket        │        Supabase API
-                     (HocusPocus)        │        (PostgreSQL)
-                                         │
-          ┌──────────────────────────────┼──────────────────────────────┐
-          │                              │                              │
-          ▼                              │                              ▼
-┌─────────────────────┐                  │                 ┌─────────────────────────┐
-│   CLIENT A          │                  │                 │   SUPABASE DATABASE     │
-│   (editor package)  │                  │                 │                         │
-│                     │                  │                 │   documents             │
-│   HocusPocus        │◄─── Real-time ───┤                 │   ├── id (uuid)         │
-│   Provider          │     sync         │                 │   ├── nano_id           │
-│                     │                  │                 │   ├── data (bytea)      │
-└─────────────────────┘                  │                 │   ├── user_id           │
-                                         │                 │   └── public_access     │
-┌─────────────────────┐                  │                 │                         │
-│   CLIENT B          │                  │                 │   workspaces            │
-│   (editor package)  │                  │                 │   ├── name (@username)  │
-│                     │                  │                 │   ├── owner_user_id     │
-│   HocusPocus        │◄─── Real-time ───┤                 │   └── document_nano_id  │
-│   Provider          │     sync         │                 │                         │
-│                     │                  │                 │   document_permissions  │
-└─────────────────────┘                  │                 │   ├── document_id       │
-                                         │                 │   ├── user_id           │
-                                         │                 │   └── access_level      │
-                                         │                 │                         │
-                                         │                 │   document_relations    │
-                                         │                 │   ├── parent_id         │
-                                         │                 │   └── child_id          │
-                                         │                 │                         │
-                                         └────────────────►│   (Row Level Security)  │
-                                                           └─────────────────────────┘
 
+### Connection & authentication flow
 
-                    CONNECTION & AUTHENTICATION FLOW
-                    ═════════════════════════════════
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant S as Server
+    participant DB as Supabase
 
-    Client                          Server                         Supabase
-      │                               │                               │
-      │  WebSocket connect            │                               │
-      │  + token (access$refresh)     │                               │
-      ├──────────────────────────────►│                               │
-      │                               │                               │
-      │                               │  setSession(token)            │
-      │                               ├──────────────────────────────►│
-      │                               │                               │
-      │                               │  UPDATE documents             │
-      │                               │  (test write access)          │
-      │                               ├──────────────────────────────►│
-      │                               │◄──────────────────────────────┤
-      │                               │  count = 1? Write access      │
-      │                               │  count = 0? Try read...       │
-      │                               │                               │
-      │                               │  SELECT documents             │
-      │                               │  (test read access)           │
-      │                               ├──────────────────────────────►│
-      │                               │◄──────────────────────────────┤
-      │                               │  count = 1? Read-only         │
-      │                               │  count = 0? Check exists...   │
-      │                               │                               │
-      │  Auth result                  │                               │
-      │  (readOnly: true/false)       │                               │
-      │◄──────────────────────────────┤                               │
-      │                               │                               │
-      │  Sync begins...               │                               │
-      │◄─────────────────────────────►│                               │
-      │                               │                               │
+    C->>S: WebSocket connect + token (access$refresh, or "guest")
+    S->>DB: setSession(token)
+    S->>DB: UPDATE documents (test write access)
+    DB-->>S: count = 1 → write · count = 0 → try read
+    S->>DB: SELECT documents (test read access)
+    DB-->>S: count = 1 → read-only · count = 0 → check exists
+    Note over S,DB: if doc exists but no access → reject<br/>if not exists → not-found
+    S-->>C: auth result (readOnly: true/false)
+    C->>S: sync begins (bidirectional Yjs sync)
+```
 
+### Document sync flow
 
-                    DOCUMENT SYNC FLOW
-                    ══════════════════
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as Client A
+    participant S as Server
+    participant B as Client B
+    participant DB as Supabase
 
-    Client A              Server              Client B         Supabase
-      │                     │                     │               │
-      │  Y.Doc change       │                     │               │
-      │  (user types)       │                     │               │
-      ├────────────────────►│                     │               │
-      │                     │                     │               │
-      │                     │  Broadcast update   │               │
-      │                     ├────────────────────►│               │
-      │                     │                     │               │
-      │                     │  store() triggered  │               │
-      │                     │  (debounced)        │               │
-      │                     ├─────────────────────┼──────────────►│
-      │                     │                     │               │
-      │                     │◄────────────────────┼───────────────┤
-      │                     │  Stored             │               │
-      │                     │                     │               │
+    A->>S: Y.Doc change (user types)
+    S->>B: broadcast update
+    S->>DB: store() triggered (debounced)
+    DB-->>S: stored
 ```
 
 ---
@@ -253,46 +159,40 @@ await serviceClient.from("documents")
 
 ### Tables Overview
 
+```mermaid
+erDiagram
+    documents {
+        uuid id PK
+        varchar nano_id UK "short id e.g. dABC123"
+        bytea data "Yjs document state (binary)"
+        uuid user_id FK "owner → auth.users"
+        enum public_access_level "no-access | read | write"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    workspaces {
+        uuid id PK
+        varchar name UK "username or workspace name"
+        uuid owner_user_id FK "→ auth.users"
+        boolean is_username "primary username?"
+        varchar document_nano_id "→ profile/workspace doc"
+    }
+    document_permissions {
+        uuid document_id FK "→ documents"
+        uuid user_id FK "→ auth.users"
+        enum access_level "no-access | read | write"
+    }
+    document_relations {
+        uuid parent_id FK "→ documents (parent)"
+        uuid child_id FK "→ documents (child)"
+    }
+    documents ||--o{ document_permissions : "grants"
+    documents ||--o{ document_relations : "parent of"
+    documents ||--o{ document_relations : "child of"
+    documents ||--o| workspaces : "profile/workspace doc"
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              documents                                           │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│  id                 uuid           Primary key                                   │
-│  nano_id            varchar(20)    Short ID (e.g., "dABC123"), unique           │
-│  data               bytea          Yjs document state (binary)                   │
-│  user_id            uuid           Owner (FK → auth.users)                       │
-│  public_access_level enum          'no-access' | 'read' | 'write'               │
-│  created_at         timestamptz    Creation time                                 │
-│  updated_at         timestamptz    Last modification time                        │
-└─────────────────────────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              workspaces                                          │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│  id                 uuid           Primary key                                   │
-│  name               varchar        Username or workspace name (unique)           │
-│  owner_user_id      uuid           Owner (FK → auth.users)                       │
-│  is_username        boolean        True if this is the user's primary username  │
-│  document_nano_id   varchar        Points to profile/workspace document          │
-└─────────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           document_permissions                                   │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│  document_id        uuid           FK → documents                                │
-│  user_id            uuid           FK → auth.users                               │
-│  access_level       enum           'no-access' | 'read' | 'write'               │
-│  UNIQUE(document_id, user_id)                                                    │
-└─────────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                           document_relations                                     │
-├─────────────────────────────────────────────────────────────────────────────────┤
-│  parent_id          uuid           FK → documents (parent)                       │
-│  child_id           uuid           FK → documents (child)                        │
-│  UNIQUE(parent_id, child_id)                                                     │
-└─────────────────────────────────────────────────────────────────────────────────┘
-```
+> `document_permissions` is unique on `(document_id, user_id)`; `document_relations` is unique on `(parent_id, child_id)`.
 
 ### Row Level Security (RLS) Policies
 
@@ -331,62 +231,54 @@ name_domain: '^[A-Za-z][A-Za-z0-9_]*$'
 
 ### The Complete Request Lifecycle
 
-```
-1. CLIENT CONNECTS
-   └─► WebSocket handshake with HocusPocus server
-
-2. AUTHENTICATION (onAuthenticate)
-   └─► Parse token: "access$refresh" or "guest"
-   └─► Create Supabase client with session
-   └─► Test write access via UPDATE
-   └─► If no write, test read access via SELECT
-   └─► If no access, reject connection
-
-3. DOCUMENT LOAD (fetch + afterLoadDocument)
-   └─► Query document from Supabase
-   └─► Decode hex binary to Yjs state
-   └─► Apply to Y.Doc
-   └─► Set up refs observer for relations
-
-4. REAL-TIME SYNC
-   └─► HocusPocus broadcasts updates to all clients
-   └─► onChange() fires (currently just logging)
-
-5. PERSISTENCE (store, debounced)
-   └─► Encode Y.Doc state to hex
-   └─► UPDATE documents SET data = ...
-
-6. DISCONNECT (onDisconnect)
-   └─► If last client, remove refs observer
-   └─► HocusPocus cleans up internally
+```mermaid
+flowchart TB
+    s1["1. Client connects<br/>WebSocket handshake with HocusPocus"]
+    s2["2. Authentication (onAuthenticate)<br/>parse token (access$refresh / guest) · Supabase client w/ session · test write (UPDATE) → else read (SELECT) → else reject"]
+    s3["3. Document load (fetch + afterLoadDocument)<br/>query from Supabase · decode hex → Yjs state · apply to Y.Doc · set up refs observer"]
+    s4["4. Real-time sync<br/>HocusPocus broadcasts updates · onChange() fires (logging only)"]
+    s5["5. Persistence (store, debounced)<br/>encode Y.Doc to hex · UPDATE documents SET data = …"]
+    s6["6. Disconnect (onDisconnect)<br/>if last client → remove refs observer · HocusPocus cleans up"]
+    s1 --> s2 --> s3 --> s4 --> s5 --> s6
 ```
 
 ### Server ↔ Client Relationship
 
+```mermaid
+flowchart LR
+    subgraph CLIENT["Editor package (client)"]
+        tr["TypeCellRemote.ts"]
+        hp["HocusPocusProvider<br/>name: documentId · token: access$refresh · websocketProvider"]
+        cdoc["Y.Doc (client)"]
+        tr --> hp --> cdoc
+    end
+    subgraph SRV["Server package"]
+        sh["SupabaseHocuspocus.ts"]
+        hs["HocusPocus Server<br/>extensions: […]"]
+        sdoc["Y.Doc (server)"]
+        sh --> hs --> sdoc
+    end
+    hp <-- "WebSocket · Yjs sync protocol (awareness, updates)" --> hs
+    sdoc -- "store()" --> sup[("Supabase")]
 ```
-    Editor Package (Client)                  Server Package
-    ──────────────────────                  ──────────────
 
-    TypeCellRemote.ts                       SupabaseHocuspocus.ts
-         │                                        │
-         │  HocusPocusProvider                    │  HocusPocus Server
-         │  ├── name: documentId                  │  ├── extensions: [...]
-         │  ├── token: access$refresh             │  │
-         │  └── websocketProvider                 │  │
-         │          │                             │  │
-         │          │                             │  │
-         └──────────┼─────── WebSocket ───────────┼──┘
-                    │                             │
-                    │  Yjs sync protocol          │
-                    │  (awareness, updates)       │
-                    │                             │
-                    ▼                             ▼
-              Y.Doc (client)              Y.Doc (server)
-                    │                             │
-                    │                             │  store()
-                    │                             ├─────────► Supabase
-                    │                             │
-```
+---
+
+## Public API / Boundaries
+
+- **Internal dependencies:** `shared` (the `schema.ts` types + `Ref` definitions), `shared-test` (test harness), `util`.
+- **Depended on by:** nothing — it's a standalone Node process (the deployable backend).
+- **Cross-boundary role:** the **only writer to Supabase document state**. Clients ([`editor`](./editor-onboarding-guide.md)) connect via HocusPocus WebSocket; authorization is delegated to **Postgres RLS**, not enforced in server code.
+
+---
+
+## Rebuild Notes
+
+- **Keep authorization in the database.** The "attempt the operation and let RLS answer" pattern in `onAuthenticate` is deliberate — it keeps one source of truth (SQL policies). Don't reimplement permission logic in the server.
+- **The recursive `check_document_access()` function is the crux of access inheritance** (parent grants flow to children). Migrate it carefully and cover it with the existing access-control tests.
+- **`shared/schema.ts` is generated from these migrations** (`npm run gentypes`). Treat the migrations as the source of truth and regenerate the shared types in the build (see [shared-onboarding-guide.md](./shared-onboarding-guide.md)).
+- This replaced the Matrix backend in V3 (`#339`); there is no Matrix code to carry forward (see [development-history.md](./development-history.md#epoch-5--v3-the-big-rewrite-2023-q3-)).
+- **Deployment note:** this is a long-lived WebSocket server. On Vercel, that points to a separately-hosted Node process or Fluid Compute function rather than a standard serverless endpoint — decide the host early in the rebuild.
 
 ---
 

@@ -24,133 +24,57 @@ The `frame` package is the **sandboxed runtime environment** where user code act
 
 ---
 
-## Section 2: Architecture ASCII Diagram
+## Section 2: Architecture
 
+```mermaid
+flowchart TB
+    subgraph PARENT["Parent window (editor package)"]
+        host["Auth · document list · Supabase persistence · HocusPocus WebSocket"]
+        bridge["Penpal bridge methods<br/>processYjsMessage() · updateModel() · resolveModuleName()"]
+        host --- bridge
+    end
+
+    bridge == "Penpal (PostMessage) · IFRAME BOUNDARY" ==> entry
+
+    subgraph FRAME["FRAME (this package, in the iframe)"]
+        entry["Frame.tsx — entry point<br/>connect to parent · create Y.Doc + PenPalProvider · wire Compiler → Engine → ExecutionHost"]
+
+        subgraph EDIT["Editing"]
+            bn["BlockNote editor<br/>Notion-like blocks, slash commands, collab UI"]
+            mon["Monaco integration<br/>MonacoCodeBlock · MonacoInlineCode · Monaco ↔ ProseMirror sync"]
+        end
+
+        subgraph EXEC["Execution pipeline"]
+            comp["SourceModelCompiler"] --> eng["ReactiveEngine (engine pkg)"]
+            eng --> leh["LocalExecutionHost"] --> outc["Output components"]
+        end
+
+        subgraph RES["Resolver system"]
+            r1["TypeCellHelperLibraryResolver<br/>import &quot;typecell&quot;"]
+            r2["TypeCellModuleResolver<br/>import &quot;!docId&quot;"]
+            r3["NPMLibraryResolver → ImportShimResolver<br/>import &quot;lodash&quot; (ESM.sh/Skypack)"]
+        end
+
+        ctx["Shared React context<br/>RichTextContext { editorStore, executionHost, compiler, documentId } · MonacoContext { monaco }"]
+
+        entry --> EDIT
+        entry --> EXEC
+        eng --> RES
+        entry --> ctx
+    end
 ```
-┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│                           PARENT WINDOW (editor package)                                 │
-│  ┌─────────────────────────────────────────────────────────────────────────────────┐    │
-│  │  • Authentication & user session                                                │    │
-│  │  • Document list & navigation                                                   │    │
-│  │  • Persistence to Supabase                                                      │    │
-│  │  • HocusPocus WebSocket connection                                              │    │
-│  └─────────────────────────────────────┬───────────────────────────────────────────┘    │
-│                                        │                                                │
-│                           Penpal (PostMessage)                                          │
-│                         ┌──────────────┴──────────────┐                                 │
-│                         │  • processYjsMessage()      │                                 │
-│                         │  • updateModel()            │                                 │
-│                         │  • resolveModuleName()      │                                 │
-│                         └──────────────┬──────────────┘                                 │
-└────────────────────────────────────────┼────────────────────────────────────────────────┘
-                                         │
-                    ═══════════ IFRAME BOUNDARY ═══════════
-                                         │
-┌────────────────────────────────────────┼────────────────────────────────────────────────┐
-│                                        │                                                │
-│                              FRAME (this package)                                       │
-│                                        │                                                │
-│  ┌─────────────────────────────────────┴───────────────────────────────────────────┐   │
-│  │                            Frame.tsx (Entry Point)                               │   │
-│  │                                                                                  │   │
-│  │   • Connects to parent via Penpal                                               │   │
-│  │   • Creates Y.Doc + PenPalProvider for Yjs sync                                 │   │
-│  │   • Sets up Monaco, BlockNote, and all contexts                                 │   │
-│  │   • Wires together: Compiler → Engine → ExecutionHost                           │   │
-│  └──────────────────────────────────────────────────────────────────────────────────┘   │
-│                                        │                                                │
-│              ┌─────────────────────────┼─────────────────────────┐                     │
-│              │                         │                         │                     │
-│              ▼                         ▼                         ▼                     │
-│  ┌───────────────────────┐  ┌───────────────────────┐  ┌────────────────────────┐     │
-│  │   BLOCKNOTE EDITOR    │  │   MONACO INTEGRATION  │  │   EXECUTION PIPELINE   │     │
-│  │                       │  │                       │  │                        │     │
-│  │ • Notion-like blocks  │  │ • MonacoCodeBlock     │  │  SourceModelCompiler   │     │
-│  │ • Slash commands      │  │ • MonacoInlineCode    │  │         ↓              │     │
-│  │ • Collaboration UI    │  │ • Monaco ↔ Prosemirror│  │   ReactiveEngine       │     │
-│  │                       │  │   bidirectional sync  │  │   (from engine pkg)    │     │
-│  └───────────────────────┘  └───────────────────────┘  │         ↓              │     │
-│                                        │               │  LocalExecutionHost    │     │
-│                                        │               │         ↓              │     │
-│                                        │               │   Output Components    │     │
-│                                        │               └────────────────────────┘     │
-│                                        │                                               │
-│                                        ▼                                               │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │                              RESOLVER SYSTEM                                      │  │
-│  │  ┌────────────────────┐  ┌────────────────────┐  ┌────────────────────────────┐  │  │
-│  │  │ TypeCellHelper     │  │ TypeCellModule     │  │ NPMLibrary                 │  │  │
-│  │  │ LibraryResolver    │  │ Resolver           │  │ Resolver                   │  │  │
-│  │  │                    │  │                    │  │                            │  │  │
-│  │  │ import "typecell"  │  │ import "!docId"    │  │ import "lodash"            │  │  │
-│  │  │      ↓             │  │      ↓             │  │      ↓                     │  │  │
-│  │  │ Helper library     │  │ Load another       │  │ ImportShimResolver         │  │  │
-│  │  │ (Input, editor,    │  │ TypeCell notebook  │  │ (ESM.sh, Skypack, etc)     │  │  │
-│  │  │  AutoForm, etc)    │  │ as a module        │  │                            │  │  │
-│  │  └────────────────────┘  └────────────────────┘  └────────────────────────────┘  │  │
-│  └──────────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                        │
-│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │                              SHARED CONTEXT (React)                               │  │
-│  │                                                                                   │  │
-│  │   RichTextContext: { editorStore, executionHost, compiler, documentId }          │  │
-│  │   MonacoContext: { monaco }                                                      │  │
-│  │                                                                                   │  │
-│  └──────────────────────────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────────────────────────┘
 
+### Data flow: from keystroke to output
 
-                    DATA FLOW: From Keystroke to Output
-                    ════════════════════════════════════
-
-  User types in Monaco editor
-        │
-        ▼
-  ┌─────────────────────────────────────────────────────┐
-  │  MonacoElement detects change                       │
-  │  → Updates Prosemirror node (via helper functions)  │
-  │  → Prosemirror syncs to Yjs                         │
-  │  → Yjs syncs to parent via PenPalProvider           │
-  └──────────────────────┬──────────────────────────────┘
-                         │
-        ┌────────────────┴────────────────┐
-        ▼                                 ▼
-  ┌──────────────┐                 ┌──────────────┐
-  │ MonacoCode   │                 │ Collaboration│
-  │ Model        │                 │ (other users │
-  │ (local)      │                 │  see changes)│
-  └──────┬───────┘                 └──────────────┘
-         │
-         ▼
-  ┌─────────────────────────────────────────────────────┐
-  │  SourceModelCompiler                                │
-  │  → Receives CodeModel change event                  │
-  │  → Calls Monaco's TypeScript compiler               │
-  │  → Outputs compiled JavaScript as BasicCodeModel    │
-  └──────────────────────┬──────────────────────────────┘
-                         │
-                         ▼
-  ┌─────────────────────────────────────────────────────┐
-  │  ReactiveEngine (from engine package)               │
-  │  → Receives compiled JS                             │
-  │  → Resolves imports via Resolver                    │
-  │  → Executes in MobX autorun                         │
-  │  → Writes exports to observable context ($)         │
-  └──────────────────────┬──────────────────────────────┘
-                         │
-                         ▼
-  ┌─────────────────────────────────────────────────────┐
-  │  LocalExecutionHost                                 │
-  │  → Captures output from engine.onOutput             │
-  │  → Stores in ModelOutput observable map             │
-  └──────────────────────┬──────────────────────────────┘
-                         │
-                         ▼
-  ┌─────────────────────────────────────────────────────┐
-  │  Output Component (rendered below code block)       │
-  │  → Observes ModelOutput                             │
-  │  → Renders values, React elements, or errors        │
-  └─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    k["User types in Monaco editor"] --> me["MonacoElement detects change<br/>→ updates ProseMirror node → ProseMirror syncs to Yjs → PenPalProvider syncs to parent"]
+    me --> mm["MonacoCodeModel (local)"]
+    me --> collab["Collaboration: other users see the change"]
+    mm --> smc["SourceModelCompiler<br/>receives CodeModel change → Monaco TS compiler → emits BasicCodeModel (JS)"]
+    smc --> re["ReactiveEngine<br/>resolves imports → executes in MobX autorun → writes exports to $"]
+    re --> leh["LocalExecutionHost<br/>captures engine.onOutput → stores in ModelOutput observable map"]
+    leh --> out["Output component (below the code block)<br/>observes ModelOutput → renders values / React elements / errors"]
 ```
 
 ---
@@ -231,10 +155,11 @@ The `frame` package is the **sandboxed runtime environment** where user code act
 **Analogy:** Like a **concierge service** at a hotel. "Need React? We have it in-house. Need lodash? Let me order it from the CDN. Need another TypeCell notebook? Let me connect you."
 
 **Import Resolution Chain:**
-```
-import "typecell"     → TypeCellHelperLibraryResolver → Helper library (Input, editor, etc.)
-import "!dALYTUW8..."  → TypeCellModuleResolver → Load & compile another notebook
-import "lodash"       → NPMLibraryResolver → ImportShimResolver → ESM.sh/Skypack CDN
+```mermaid
+flowchart LR
+    a["import &quot;typecell&quot;"] --> ar["TypeCellHelperLibraryResolver"] --> a2["Helper library (Input, editor, …)"]
+    b["import &quot;!dALYTUW8…&quot;"] --> br["TypeCellModuleResolver"] --> b2["Load & compile another notebook"]
+    c["import &quot;lodash&quot;"] --> cr["NPMLibraryResolver"] --> cr2["ImportShimResolver"] --> c2["ESM.sh / Skypack CDN"]
 ```
 
 ### 3.7 `lib/exports.tsx` — The Helper Library
@@ -275,148 +200,87 @@ import "lodash"       → NPMLibraryResolver → ImportShimResolver → ESM.sh/S
 
 ### The Frame Bootstrap Sequence
 
-```
-1. IFRAME LOADS Frame.tsx
-   └─► Sets up Monaco defaults and type resolvers
-
-2. PENPAL CONNECTION
-   └─► connectToParent() establishes communication
-   └─► Registers methods: processYjsMessage, updateModel, deleteModel
-
-3. YJS DOCUMENT CREATION
-   └─► new Y.Doc() creates the collaborative document
-   └─► PenPalProvider wraps it for cross-frame sync
-   └─► provider.connect() starts sync handshake
-
-4. TOOLING SETUP
-   └─► new SourceModelCompiler(monaco)
-   └─► new Resolver(typeCellModuleCompilerFactory, editorStore)
-   └─► new ReactiveEngine(resolver.resolveImport)
-   └─► new LocalExecutionHost(compiler, monaco, engine)
-
-5. BLOCKNOTE SETUP
-   └─► useCreateBlockNote() with custom schema
-   └─► Schema includes MonacoCodeBlock and MonacoInlineCode
-
-6. CONTEXT PROVISION
-   └─► MonacoContext.Provider
-   └─► RichTextContext.Provider
-   └─► BlockNoteView renders
+```mermaid
+flowchart TB
+    s1["1. Iframe loads Frame.tsx<br/>set up Monaco defaults & type resolvers"]
+    s2["2. Penpal connection<br/>connectToParent() · register processYjsMessage, updateModel, deleteModel"]
+    s3["3. Yjs document<br/>new Y.Doc() · wrap in PenPalProvider · provider.connect() handshake"]
+    s4["4. Tooling<br/>SourceModelCompiler · Resolver · ReactiveEngine · LocalExecutionHost"]
+    s5["5. BlockNote<br/>useCreateBlockNote() with schema incl. MonacoCodeBlock + MonacoInlineCode"]
+    s6["6. Context provision<br/>MonacoContext.Provider · RichTextContext.Provider · BlockNoteView renders"]
+    s1 --> s2 --> s3 --> s4 --> s5 --> s6
 ```
 
 ### Component Dependencies
 
-```
-Frame.tsx
-    │
-    ├── creates ──► PenPalProvider (y-penpal)
-    │                    │
-    │                    └── syncs with ──► Parent window (Yjs messages)
-    │
-    ├── creates ──► SourceModelCompiler
-    │                    │
-    │                    └── uses ──► Monaco TypeScript compiler
-    │                    │
-    │                    └── outputs ──► BasicCodeModel (compiled JS)
-    │
-    ├── creates ──► Resolver
-    │                    │
-    │                    ├── TypeCellHelperLibraryResolver ──► exports.tsx
-    │                    ├── TypeCellModuleResolver ──► Other notebooks
-    │                    └── NPMLibraryResolver ──► ImportShimResolver ──► CDNs
-    │
-    ├── creates ──► ReactiveEngine (from engine package)
-    │                    │
-    │                    └── registered with ──► SourceModelCompiler
-    │
-    ├── creates ──► LocalExecutionHost
-    │                    │
-    │                    ├── connects ──► ReactiveEngine.onOutput
-    │                    └── stores ──► Observable Map of ModelOutput
-    │
-    └── provides via Context ──► RichTextContext
-                                      │
-                                      ├── editorStore
-                                      ├── executionHost
-                                      ├── compiler
-                                      └── documentId
+```mermaid
+flowchart TB
+    F["Frame.tsx"]
+    F --> PP["PenPalProvider (y-penpal)"] --> parent["Parent window (Yjs messages)"]
+    F --> SMC["SourceModelCompiler"]
+    SMC --> tsc["Monaco TypeScript compiler"]
+    SMC --> bcm["BasicCodeModel (compiled JS)"]
+    F --> R["Resolver"]
+    R --> R1["TypeCellHelperLibraryResolver → exports.tsx"]
+    R --> R2["TypeCellModuleResolver → other notebooks"]
+    R --> R3["NPMLibraryResolver → ImportShimResolver → CDNs"]
+    F --> RE["ReactiveEngine (engine pkg)"] -. registered with .-> SMC
+    F --> LEH["LocalExecutionHost"]
+    LEH --> oo["ReactiveEngine.onOutput"]
+    LEH --> mo["Observable Map of ModelOutput"]
+    F --> RTC["RichTextContext (via Provider)"]
+    RTC --> fields["editorStore · executionHost · compiler · documentId"]
 ```
 
-### The Monaco ↔ Prosemirror Sync
+### The Monaco ↔ ProseMirror Sync
 
+Two-way sync, guarded by an `isUpdating` flag on each side to prevent infinite echo loops.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant M as Monaco
+    participant B as bindMonacoAndProsemirror
+    participant PM as ProseMirror
+    participant Y as Y.Doc
+    participant P as PenPalProvider
+
+    rect rgb(31,111,84)
+    Note over U,P: Local edit (Monaco → parent)
+    U->>M: type
+    M->>B: onDidChangeContent
+    B->>B: if (!isUpdating) — guard echo
+    B->>PM: transaction.replaceWith()
+    PM->>Y: Yjs binding syncs
+    Y->>P: send update to parent
+    end
+
+    rect rgb(59,74,107)
+    Note over P,M: Remote edit (parent → Monaco)
+    P->>P: onMessage() (from processYjsMessage)
+    P->>Y: applyUpdate
+    Y->>PM: Yjs binding updates node
+    PM->>M: React re-renders MonacoElement →<br/>applyNodeChangesToMonaco() (isUpdating = true)
+    end
 ```
-       USER TYPES IN MONACO
-              │
-              ▼
-    ┌───────────────────────┐
-    │  Monaco fires         │
-    │  onDidChangeContent   │
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  bindMonacoAndProse-  │
-    │  mirror() intercepts  │
-    │  if (!isUpdating)     │◄─── Prevents infinite loops
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  Creates ProseMirror  │
-    │  transaction with     │
-    │  replaceWith()        │
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  ProseMirror updates  │
-    │  Yjs binding syncs    │
-    │  to Y.Doc             │
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  PenPalProvider sends │
-    │  to parent window     │
-    └───────────────────────┘
 
+---
 
-       REMOTE USER MAKES CHANGE
-              │
-              ▼
-    ┌───────────────────────┐
-    │  Parent receives from │
-    │  HocusPocus, sends    │
-    │  via processYjsMessage│
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  PenPalProvider.      │
-    │  onMessage() applies  │
-    │  to Y.Doc             │
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  Yjs binding updates  │
-    │  ProseMirror node     │
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  React re-renders     │
-    │  MonacoElement        │
-    └───────────┬───────────┘
-                │
-                ▼
-    ┌───────────────────────┐
-    │  applyNodeChangesTo   │
-    │  Monaco() syncs to    │
-    │  Monaco model         │
-    │  (isUpdating = true)  │◄─── Prevents echo
-    └───────────────────────┘
-```
+## Public API / Boundaries
+
+- **Internal dependencies:** `engine`, `shared`, `util`, `y-penpal`.
+- **Depended on by:** `editor` (which hosts the iframe).
+- **Cross-boundary contract:** implements `IframeBridgeMethods` and calls `HostBridgeMethods` — both defined in [`shared`](./shared-onboarding-guide.md). Yjs updates ride [`y-penpal`](./y-penpal-onboarding-guide.md); code execution is delegated to [`engine`](./engine-onboarding-guide.md).
+
+---
+
+## Rebuild Notes
+
+- **The hardest part is the Monaco ↔ ProseMirror ↔ Yjs sync** (`MonacoElement.tsx`, `bindMonacoAndProsemirror`). The `isUpdating` echo guards are load-bearing; rebuild this with tests for both directions before layering features on top.
+- **Keep the iframe boundary clean.** The frame must only talk to the host through the typed `shared` bridge methods + `y-penpal`. Any direct coupling to the host (Supabase, HocusPocus) breaks the sandbox model that V3 deliberately introduced (see [development-history.md](./development-history.md#epoch-5--v3-the-big-rewrite-2023-q3-)).
+- **BlockNote is the current editor baseline** (since `#317`); the bespoke ProseMirror code from the original editor era is gone. Build code blocks as BlockNote custom block types, not raw ProseMirror nodes.
+- The three-way resolver split (`typecell` / `!notebook` / npm) is a good seam to preserve.
 
 ---
 

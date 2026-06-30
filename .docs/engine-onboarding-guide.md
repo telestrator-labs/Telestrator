@@ -17,99 +17,49 @@ The `engine` package is the **brain** of TypeCell's live coding experience. Its 
 
 ---
 
-## Section 2: Architecture ASCII Diagram
+## Section 2: Architecture
 
+```mermaid
+flowchart TB
+    subgraph RE["ReactiveEngine.ts — Orchestrator"]
+        orch["Registers cells · debounces changes · manages evaluator cache"]
+    end
+    orch -- "creates per cell" --> CE
+
+    subgraph CE["CellEvaluator.ts — Worker"]
+        work["Transform code → run it → capture exports → report output/errors"]
+    end
+
+    work --> MOD
+    work --> EXEC
+    work --> IMP
+
+    subgraph MOD["modules.ts"]
+        m["Patch code to AMD · inject scope ($, autorun, observable) · parse define()"]
+    end
+    subgraph EXEC["executor.ts"]
+        e["MobX autorun() wraps execution · dependency tracking · auto re-run · cleanup hooks"]
+    end
+    subgraph IMP["Import resolution"]
+        isr["ImportShimResolver"]
+        isr --> loc["LocalModuleResolver (react, …)"]
+        isr --> ext["External resolvers (ESM.sh, JSPM, Skypack)"]
+    end
+
+    work == "exports assigned to shared context" ==> CTX
+    subgraph CTX["context.ts — Observable context ($)"]
+        c["MobX observable object + Proxy<br/>Cell A: $.count = 5 → Cell B reads $.count<br/>Cell A: $.count = 10 → Cell B RE-RUNS automatically"]
+    end
 ```
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                                  REACTIVE ENGINE                                     │
-│                              (ReactiveEngine.ts)                                    │
-│  ┌─────────────────────────────────────────────────────────────────────────────┐    │
-│  │  Orchestrator: Registers cells, debounces changes, manages evaluator cache  │    │
-│  └──────────────────────────────────┬──────────────────────────────────────────┘    │
-│                                     │                                               │
-│                                     │ creates per cell                              │
-│                                     ▼                                               │
-│  ┌─────────────────────────────────────────────────────────────────────────────┐    │
-│  │                           CELL EVALUATOR                                     │    │
-│  │                          (CellEvaluator.ts)                                  │    │
-│  │   Transforms code → Runs it → Captures exports → Reports output/errors      │    │
-│  └──────────────────────────────────┬──────────────────────────────────────────┘    │
-│                                     │                                               │
-│              ┌──────────────────────┼──────────────────────┐                        │
-│              │                      │                      │                        │
-│              ▼                      ▼                      ▼                        │
-│  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────────────────┐   │
-│  │    MODULES        │  │    EXECUTOR       │  │    IMPORT RESOLUTION          │   │
-│  │   (modules.ts)    │  │  (executor.ts)    │  │                               │   │
-│  │                   │  │                   │  │  ┌─────────────────────────┐  │   │
-│  │ • Patch code to   │  │ • MobX autorun()  │  │  │  ImportShimResolver     │  │   │
-│  │   AMD format      │  │   wraps execution │  │  │  (ImportShimResolver.ts)│  │   │
-│  │ • Inject scope:   │  │ • Dependency      │  │  └───────────┬─────────────┘  │   │
-│  │   $, autorun,     │  │   tracking        │  │              │               │   │
-│  │   observable      │  │ • Auto re-run     │  │   ┌─────────┴─────────┐      │   │
-│  │ • Parse define()  │  │   on changes      │  │   ▼                   ▼      │   │
-│  │   calls           │  │ • Cleanup hooks   │  │ ┌─────────┐    ┌──────────┐  │   │
-│  └───────────────────┘  └───────────────────┘  │ │ Local   │    │ External │  │   │
-│                                                 │ │Resolver │    │Resolvers │  │   │
-│                                                 │ │(react,  │    │(ESM.sh,  │  │   │
-│                                                 │ │ etc.)   │    │ JSPM,    │  │   │
-│                                                 │ └─────────┘    │ Skypack) │  │   │
-│                                                 │                └──────────┘  │   │
-│                                                 └───────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                    Exports assigned │ to shared context
-                                     ▼
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                           OBSERVABLE CONTEXT ($)                                    │
-│                              (context.ts)                                           │
-│  ┌─────────────────────────────────────────────────────────────────────────────┐   │
-│  │                                                                              │   │
-│  │   MobX Observable Object + Proxy                                            │   │
-│  │                                                                              │   │
-│  │   Cell A exports:  $.count = 5        ──────────►  Cell B reads: $.count    │   │
-│  │   Cell A changes:  $.count = 10       ──────────►  Cell B RE-RUNS           │   │
-│  │                                                    automatically!           │   │
-│  │                                                                              │   │
-│  └─────────────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────────────────────┘
 
-                          DATA FLOW (Single Cell Execution)
-                          ═══════════════════════════════════
+### Data flow: single-cell execution
 
-  User Types Code                    Compiled JavaScript
-        │                                   │
-        ▼                                   ▼
-┌───────────────┐                  ┌────────────────────┐
-│ export const  │   TypeScript    │ define(["require", │
-│ x = 5;        │ ═══Compiler═══► │ "exports"], fn(){  │
-│               │                  │   exports.x = 5;  │
-└───────────────┘                  └─────────┬──────────┘
-                                             │
-                    ┌────────────────────────┘
-                    ▼
-           ┌────────────────┐      ┌────────────────┐
-           │ getPatchedCode │ ───► │ Inject scope:  │
-           │                │      │ let $ = this.$ │
-           └────────────────┘      └───────┬────────┘
-                                           │
-                    ┌──────────────────────┘
-                    ▼
-           ┌────────────────────────────────────────────┐
-           │           MobX autorun(() => {            │
-           │              execute(code)                 │
-           │              // reads $.someValue          │──── Tracked!
-           │              exports.x = 5                 │
-           │           })                               │
-           └─────────────────────┬──────────────────────┘
-                                 │
-                    ┌────────────┘
-                    ▼
-           ┌────────────────────────────────────────────┐
-           │  $.x = exports.x   // Written to context   │
-           │                                            │
-           │  Other cells reading $.x will now re-run!  │
-           └────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    src["User types: export const x = 5;"] -- "TypeScript compiler" --> amd["AMD module: define(require, exports) with factory fn → exports.x = 5"]
+    amd --> patch["getPatchedCode → inject scope: let $ = this.$"]
+    patch --> run["MobX autorun(() => execute(code)): reads $.someValue (tracked!) and sets exports.x = 5"]
+    run --> write["$.x = exports.x — written to context<br/>other cells reading $.x now re-run"]
 ```
 
 ---
@@ -207,87 +157,62 @@ The `engine` package is the **brain** of TypeCell's live coding experience. Its 
 
 ### The Complete Execution Lifecycle
 
-```
-1. USER TYPES CODE
-   └─► Editor sends compiled JS to ReactiveEngine
-
-2. REACTIVEENGINE DEBOUNCES
-   └─► Waits 100ms for typing to pause
-   └─► Calls evaluateUpdate() on the cell
-
-3. CELLEVALUATOR TRANSFORMS CODE
-   └─► getPatchedTypeCellCode() injects scope variables
-   └─► getModulesFromPatchedTypeCellCode() parses AMD define()
-
-4. EXECUTOR RUNS WITH AUTORUN
-   └─► resolveDependencyArray() resolves imports
-   └─► installHooks() intercepts setTimeout/setInterval/addEventListener
-   └─► factoryFunction.apply() runs the user code
-   └─► MobX tracks all $.xxx reads
-
-5. EXPORTS WRITTEN TO CONTEXT
-   └─► runInAction() batches all writes to $.xxx
-   └─► Other cells' autoruns trigger if they read changed values
-
-6. CLEANUP ON RE-RUN
-   └─► disposeEveryRun[] clears timers/listeners
-   └─► cleanVariablesFromContext[] removes old exports
+```mermaid
+flowchart TB
+    s1["1. User types code<br/>editor sends compiled JS to ReactiveEngine"]
+    s2["2. ReactiveEngine debounces (~100ms)<br/>then calls evaluateUpdate() on the cell"]
+    s3["3. CellEvaluator transforms code<br/>getPatchedTypeCellCode() injects scope · getModulesFromPatchedTypeCellCode() parses AMD define()"]
+    s4["4. Executor runs with autorun<br/>resolveDependencyArray() · installHooks() · factoryFunction.apply() · MobX tracks all $.xxx reads"]
+    s5["5. Exports written to context<br/>runInAction() batches writes to $.xxx · dependent cells' autoruns re-trigger"]
+    s6["6. Cleanup on re-run<br/>disposeEveryRun[] clears timers/listeners · cleanVariablesFromContext[] removes old exports"]
+    s1 --> s2 --> s3 --> s4 --> s5 --> s6
 ```
 
 ### Critical Data Dependencies
 
-```
-ReactiveEngine
-     │
-     ├── owns ──► Map<Model, CellEvaluator>  (one evaluator per cell)
-     │
-     ├── owns ──► TypeCellContext ($)        (shared between ALL cells)
-     │
-     └── uses ──► resolveImport function     (injected at construction)
+```mermaid
+flowchart LR
+    RE["ReactiveEngine"] -- owns --> map["Map&lt;Model, CellEvaluator&gt; (one per cell)"]
+    RE -- owns --> ctx["TypeCellContext ($) — shared across ALL cells"]
+    RE -- "uses (injected at construction)" --> ri["resolveImport function"]
 
+    CE["CellEvaluator"] -- uses --> mod["modules.ts (code transformation)"]
+    CE -- uses --> exec["executor.ts (MobX-wrapped execution)"]
+    CE -- "references" --> ctx
 
-CellEvaluator
-     │
-     ├── uses ──► modules.ts                 (code transformation)
-     │
-     ├── uses ──► executor.ts                (MobX-wrapped execution)
-     │
-     └── references ──► TypeCellContext      (to assign exports)
-
-
-ImportShimResolver
-     │
-     ├── uses ──► LocalModuleResolver        (check local packages first)
-     │
-     ├── uses ──► ExternalModuleResolver[]   (try CDNs in order)
-     │
-     └── uses ──► es-module-shims            (browser ESM polyfill)
+    ISR["ImportShimResolver"] -- "check local first" --> lmr["LocalModuleResolver"]
+    ISR -- "try CDNs in order" --> emr["ExternalModuleResolver[]"]
+    ISR -- uses --> esm["es-module-shims (browser ESM polyfill)"]
 ```
 
 ### The `$` Context: Heart of Reactivity
 
+```mermaid
+flowchart TB
+    A["Cell A<br/>export const count = 5;"] -- writes --> D
+    B["Cell B<br/>const doubled = $.count * 2;"] -- reads --> D
+    subgraph D["$ (shared context)"]
+        obs["count: 5 — MobX observable<br/>when count changes → MobX notifies observers →<br/>Cell B's autorun re-triggers → Cell B re-executes automatically"]
+    end
 ```
-     Cell A                              Cell B
-  ┌──────────────┐                   ┌──────────────┐
-  │ export const │                   │ const doubled│
-  │ count = 5;   │                   │   = $.count  │
-  └──────┬───────┘                   │     * 2;     │
-         │                           └──────┬───────┘
-         │                                  │
-         │ writes                           │ reads
-         ▼                                  ▼
-    ┌─────────────────────────────────────────────┐
-    │                    $                         │
-    │  ┌─────────────────────────────────────┐    │
-    │  │  count: 5  ◄─── MobX Observable     │    │
-    │  │                                      │    │
-    │  │  When count changes:                 │    │
-    │  │  • MobX notifies all observers      │    │
-    │  │  • Cell B's autorun re-triggers     │    │
-    │  │  • Cell B re-executes automatically │    │
-    │  └─────────────────────────────────────┘    │
-    └─────────────────────────────────────────────┘
-```
+
+---
+
+## Public API / Boundaries
+
+- **Exports:** `ReactiveEngine` (the orchestrator), the `$` context types/helpers (`context.ts`), and the resolver interfaces.
+- **Internal dependencies:** `shared` (for the `CodeModel` abstraction and types).
+- **Depended on by:** `frame` (runs the engine in the iframe), `parsers`, `packager`, `editor`.
+- **Injected at construction:** a `resolveImport` function — the engine does **not** know how modules are fetched; the host (`frame`) supplies that. This keeps the engine transport- and CDN-agnostic.
+
+---
+
+## Rebuild Notes
+
+- **This is the oldest load-bearing idea in the codebase** (the reactive `autorun` model dates to the 2021 engine-refactor `#146`; see [development-history.md](./development-history.md#epoch-2--reactive-engine--execution-2021-q3q4)). It changed the least across rewrites — a strong candidate to **port largely intact** rather than redesign.
+- The two subtle correctness points are **loop detection** (a cell that reads and writes the same `$` value) and **disposal ordering** (`disposeEveryRun` / `cleanVariablesFromContext`). Rebuild these with tests first.
+- Keep `resolveImport` **injected**, not hardcoded — that decoupling is why the engine can run unchanged inside the sandboxed iframe.
+- Keep `context.ts` independent of any editor (Monaco/BlockNote) — it should only depend on MobX + `shared`.
 
 ---
 
