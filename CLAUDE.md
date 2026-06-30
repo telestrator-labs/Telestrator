@@ -36,13 +36,16 @@ M0 scaffold + cell model · M1 Tiptap document with code-cell node · M2 run one
 
 ## Commands
 
+This project uses **pnpm** (see `pnpm-lock.yaml` / `pnpm-workspace.yaml`). pnpm needs Node ≥ 22.13;
+if your shell defaults to an older Node, run pnpm under a newer one, e.g. `fnm exec --using=24 corepack pnpm <cmd>`.
+
 ```bash
-npm install        # install deps
-npm run dev        # Vite dev server
-npm run build      # tsc typecheck + vite build
-npm test           # vitest (run once)
-npm run test:watch # vitest watch
-npm run format     # prettier --write (scoped by .prettierignore)
+pnpm install        # install deps
+pnpm dev            # Vite dev server
+pnpm build          # tsc typecheck + vite build
+pnpm test           # vitest (run once)
+pnpm test:watch     # vitest watch
+pnpm format         # prettier --write (scoped by .prettierignore)
 ```
 
 ## Architecture & key files
@@ -50,9 +53,10 @@ npm run format     # prettier --write (scoped by .prettierignore)
 The app is intentionally small right now:
 
 - **`src/core/notebook.ts`** — the load-bearing data model: a `NotebookDocument` is an ordered list of typed `Cell`s (`markdown | typescript | css`), plus `createCell` / `createNotebook` / `serialize` / `deserialize`. **Every later milestone reads and writes this shape** — change it deliberately. Keep it framework-agnostic (no React/DOM imports) so it stays the shared `core`.
-- **`src/App.tsx`** — the M0 demo (builds a notebook, round-trips it through JSON, renders the result). Will be replaced by the Tiptap editor in M1.
+- **`src/editor/`** — the M1 Tiptap editor over the cell model. `codeCellNode.ts` + `CodeCellView.tsx` are the custom code-cell Node/NodeView (inert in M1; CodeMirror lands in M4); `extensions.ts` is the shared schema; `bridge.ts` maps the ProseMirror doc ⟷ `NotebookDocument` (prose runs ⟷ markdown cells via `@tiptap/markdown`); `persistence.ts` is localStorage load/save; `NotebookEditor.tsx` wires it together.
+- **`src/App.tsx`** — renders `<NotebookEditor />` (replaced the M0 JSON round-trip demo).
 - **`src/main.tsx`** — React entry.
-- **`src/core/notebook.test.ts`** — vitest round-trip test guarding the model invariant.
+- **`src/core/notebook.test.ts`** — vitest round-trip test guarding the model invariant; **`src/editor/bridge.test.ts`** guards the editor ⟷ core round-trip.
 
 ## Conventions
 

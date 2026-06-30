@@ -150,6 +150,14 @@ The one thing BlockNote does better — turnkey collaboration — is a well-trod
 (`@tiptap/extension-collaboration` over `y-prosemirror`), so it doesn't outweigh the cell-seam
 control.
 
+**M1 implementation note (added when M1 shipped).** Built on **Tiptap v3** (`@tiptap/*` 3.x) — React
+stays 18 (Tiptap v3's React peer dep is `^17 || ^18 || ^19`, so the React-18 constraint holds). Prose
+↔ markdown uses the **official `@tiptap/markdown`** extension (shipped in Tiptap 3.7; its
+`editor.storage.markdown.manager` exposes `parse()` / `serialize()`), **not** the third-party
+`tiptap-markdown`, which the author has put in maintenance mode and now redirects to the official one.
+The `core` `NotebookDocument` stays the persisted contract: a code-cell NodeView ↔ a `typescript`/`css`
+cell, and each run of prose between cells ↔ one `markdown` cell serialized via that manager.
+
 ---
 
 ## 3. In-block code editor

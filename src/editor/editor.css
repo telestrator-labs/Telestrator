@@ -1,0 +1,123 @@
+.notebook {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 16px 96px;
+  font-family: system-ui, sans-serif;
+  color: #1a1a1a;
+}
+
+.notebook__bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.notebook__title {
+  font-size: 14px;
+  color: #555;
+}
+
+.notebook__tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notebook__tools button {
+  font: inherit;
+  font-size: 13px;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.notebook__tools button:hover {
+  background: #f0f0f0;
+}
+
+.notebook__sep {
+  width: 1px;
+  height: 18px;
+  background: #ddd;
+  margin: 0 4px;
+}
+
+/* Tiptap document surface */
+.notebook__doc .tiptap {
+  outline: none;
+  line-height: 1.6;
+}
+
+.notebook__doc .tiptap > * + * {
+  margin-top: 0.75em;
+}
+
+.notebook__doc h1 {
+  font-size: 1.8em;
+}
+
+.notebook__doc h2 {
+  font-size: 1.4em;
+}
+
+.notebook__doc code {
+  background: #f4f4f4;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Code cell node */
+.code-cell {
+  border: 1px solid #d8d8e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fbfbfd;
+}
+
+.code-cell__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #f1f1f6;
+  border-bottom: 1px solid #e2e2ea;
+}
+
+.code-cell__lang {
+  font: inherit;
+  font-size: 12px;
+}
+
+.code-cell__badge {
+  font-size: 11px;
+  color: #8a8a96;
+}
+
+.code-cell__editor {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  resize: vertical;
+  padding: 10px 12px;
+  background: transparent;
+  color: #1a1a2a;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.code-cell__editor:focus {
+  outline: none;
+}
