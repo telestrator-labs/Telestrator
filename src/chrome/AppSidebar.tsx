@@ -1,4 +1,5 @@
 import type { NotebookEntry } from "../editor/docIndex";
+import { Logo } from "./Logo";
 import {
   Sidebar,
   SidebarContent,
@@ -47,8 +48,8 @@ export function AppSidebar({
               tooltip="Telestrator"
               className="group-data-[collapsible=icon]:!p-1"
             >
-              <span className="relative flex size-6 flex-none items-center justify-center overflow-hidden rounded-[7px] bg-gray-12">
-                <span className="size-2.5 rounded-full bg-live shadow-[0_0_0_3px_var(--color-brand-a5)]" />
+              <span className="flex size-6 flex-none items-center justify-center">
+                <Logo className="h-5 w-auto" />
               </span>
               <span className="flex flex-col group-data-[collapsible=icon]:hidden">
                 <span className="text-[15px] font-semibold tracking-tight text-sidebar-foreground">
