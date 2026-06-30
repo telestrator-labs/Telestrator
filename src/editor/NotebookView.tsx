@@ -38,7 +38,7 @@ export function NotebookView({
               />
             )}
           </header>
-          <NotebookEditor ydoc={ydoc} whenSynced={whenSynced} />
+          <NotebookEditor docId={docId} ydoc={ydoc} whenSynced={whenSynced} />
         </div>
       </RuntimeProvider>
     </ReadingModeContext.Provider>

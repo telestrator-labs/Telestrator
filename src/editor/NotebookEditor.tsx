@@ -8,6 +8,7 @@ import { useRuntime } from "./RuntimeProvider";
 import { useReadingMode } from "./ReadingMode";
 import { createNotebook } from "../core/notebook";
 import { insertCodeCellAt, insertInputCellAt } from "./insertCells";
+import { takePendingTemplate } from "../templates";
 import "./editor.css";
 
 // The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
@@ -17,9 +18,11 @@ import "./editor.css";
 // after IndexedDB sync, only if the doc is empty (Collaboration forbids the
 // `content` option, which would duplicate on reload).
 export function NotebookEditor({
+  docId,
   ydoc,
   whenSynced,
 }: {
+  docId: string;
   ydoc: Y.Doc;
   whenSynced: Promise<unknown>;
 }) {
@@ -45,15 +48,22 @@ export function NotebookEditor({
       if (!config.get("seeded") && fragment.length === 0) {
         config.set("seeded", true);
         const markdown = editor.storage.markdown.manager;
+        // Seed from a pending template if "create from template" set one for
+        // this docId; otherwise the blank default. Taking the template only
+        // inside this guarded branch means a torn-down StrictMode editor never
+        // consumes it and leaves the live mount blank.
+        const template = takePendingTemplate(docId);
         editor.commands.setContent(
-          notebookToDocJSON(markdown, createNotebook()),
+          template
+            ? template.build(markdown)
+            : notebookToDocJSON(markdown, createNotebook()),
         );
       }
     });
     return () => {
       cancelled = true;
     };
-  }, [editor, ydoc, whenSynced]);
+  }, [editor, docId, ydoc, whenSynced]);
 
   if (!editor) return null;
 
