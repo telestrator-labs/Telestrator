@@ -168,6 +168,8 @@ function Field({
   );
 }
 
+// A sliders/adjustments glyph — conveys "tune this input" far better than the
+// old radial gear (which read as a sun).
 function GearIcon() {
   return (
     <svg
@@ -175,10 +177,12 @@ function GearIcon() {
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.4}
+      strokeWidth={1.5}
+      strokeLinecap="round"
     >
-      <circle cx="8" cy="8" r="2.2" />
-      <path d="M8 1.5v1.6M8 12.9v1.6M14.5 8h-1.6M3.1 8H1.5M12.6 3.4l-1.1 1.1M4.5 11.5l-1.1 1.1M12.6 12.6l-1.1-1.1M4.5 4.5L3.4 3.4" />
+      <path d="M2 5h6M11 5h3M2 11h3M8 11h6" />
+      <circle cx="9.5" cy="5" r="1.6" fill="currentColor" stroke="none" />
+      <circle cx="6.5" cy="11" r="1.6" fill="currentColor" stroke="none" />
     </svg>
   );
 }
