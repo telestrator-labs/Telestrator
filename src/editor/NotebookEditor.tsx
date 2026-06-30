@@ -5,7 +5,10 @@ import type * as Y from "yjs";
 import { editorExtensions } from "./extensions";
 import { notebookToDocJSON } from "./bridge";
 import { useRuntime } from "./RuntimeProvider";
-import { createCell, createNotebook, generateId } from "../core/notebook";
+import { useReadingMode } from "./ReadingMode";
+import { createNotebook } from "../core/notebook";
+import { insertCodeCellAt, insertInputCellAt } from "./insertCells";
+import { takePendingTemplate } from "../templates";
 import "./editor.css";
 
 // The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
@@ -15,13 +18,16 @@ import "./editor.css";
 // after IndexedDB sync, only if the doc is empty (Collaboration forbids the
 // `content` option, which would duplicate on reload).
 export function NotebookEditor({
+  docId,
   ydoc,
   whenSynced,
 }: {
+  docId: string;
   ydoc: Y.Doc;
   whenSynced: Promise<unknown>;
 }) {
   const runtime = useRuntime();
+  const reading = useReadingMode();
 
   const editor = useEditor({
     extensions: [
@@ -42,103 +48,80 @@ export function NotebookEditor({
       if (!config.get("seeded") && fragment.length === 0) {
         config.set("seeded", true);
         const markdown = editor.storage.markdown.manager;
+        // Seed from a pending template if "create from template" set one for
+        // this docId; otherwise the blank default. Taking the template only
+        // inside this guarded branch means a torn-down StrictMode editor never
+        // consumes it and leaves the live mount blank.
+        const template = takePendingTemplate(docId);
         editor.commands.setContent(
-          notebookToDocJSON(markdown, createNotebook()),
+          template
+            ? template.build(markdown)
+            : notebookToDocJSON(markdown, createNotebook()),
         );
       }
     });
     return () => {
       cancelled = true;
     };
-  }, [editor, ydoc, whenSynced]);
+  }, [editor, docId, ydoc, whenSynced]);
 
   if (!editor) return null;
 
-  const insertCodeCell = (language: "typescript" | "css") => {
-    const cell = createCell(language, "");
-    // Insert *after* the current selection so a selected code cell (an atom with
-    // a NodeSelection) is not replaced; a trailing paragraph keeps a typing target.
-    const at = editor.state.selection.to;
-    editor
-      .chain()
-      .insertContentAt(at, [
-        { type: "codeCell", attrs: { id: cell.id, language, code: "" } },
-        { type: "paragraph" },
-      ])
-      .focus()
-      .run();
-  };
-
-  // Insert a `$`-bound input cell (a slider by default; kind is switchable in
-  // the cell). Mirrors insertCodeCell. Slash-menu insertion comes in PR 2.
-  const insertInputCell = () => {
-    const id = generateId();
-    const at = editor.state.selection.to;
-    editor
-      .chain()
-      .insertContentAt(at, [
-        {
-          type: "inputCell",
-          attrs: {
-            id,
-            name: "input1",
-            kind: "slider",
-            value: 0,
-            config: { min: 0, max: 100, step: 1 },
-          },
-        },
-        { type: "paragraph" },
-      ])
-      .focus()
-      .run();
-  };
+  // Toolbar insertion shares the same helpers as the slash menu (insertCells.ts)
+  // so both produce identical cells. Insert *after* the current selection.
+  const insertCodeCell = (language: "typescript" | "css") =>
+    insertCodeCellAt(editor, editor.state.selection.to, language);
+  const insertInputCell = () =>
+    insertInputCellAt(editor, editor.state.selection.to);
 
   return (
     <>
-      <div className="notebook__tools">
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          B
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
-          I
-        </button>
-        <button
-          type="button"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-        >
-          H1
-        </button>
-        <button
-          type="button"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-        >
-          H2
-        </button>
-        <span className="notebook__sep" aria-hidden />
-        <button type="button" onClick={() => insertCodeCell("typescript")}>
-          + TS cell
-        </button>
-        <button type="button" onClick={() => insertCodeCell("css")}>
-          + CSS cell
-        </button>
-        <button type="button" onClick={insertInputCell}>
-          + Input
-        </button>
-        <span className="notebook__sep" aria-hidden />
-        <button type="button" onClick={() => runtime.restart()}>
-          ↻ Restart runtime
-        </button>
-      </div>
+      {!reading && (
+        <div className="notebook__tools">
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleBold().run()}
+          >
+            B
+          </button>
+          <button
+            type="button"
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+          >
+            I
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 1 }).run()
+            }
+          >
+            H1
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
+          >
+            H2
+          </button>
+          <span className="notebook__sep" aria-hidden />
+          <button type="button" onClick={() => insertCodeCell("typescript")}>
+            + TS cell
+          </button>
+          <button type="button" onClick={() => insertCodeCell("css")}>
+            + CSS cell
+          </button>
+          <button type="button" onClick={insertInputCell}>
+            + Input
+          </button>
+          <span className="notebook__sep" aria-hidden />
+          <button type="button" onClick={() => runtime.restart()}>
+            ↻ Restart runtime
+          </button>
+        </div>
+      )}
       <EditorContent editor={editor} className="notebook__doc" />
     </>
   );

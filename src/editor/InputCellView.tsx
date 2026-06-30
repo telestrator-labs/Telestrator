@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { useRuntime } from "./RuntimeProvider";
+import { useReadingMode } from "./ReadingMode";
 import { bindingCode, coerceValue, type InputKind } from "./binding";
 import type { InputCellConfig } from "./inputCellNode";
 
@@ -36,6 +37,7 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
   });
 
   const rt = useRuntime();
+  const reading = useReadingMode();
   const bindTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Persist the coercion (once) when it actually changed the stored value — e.g.
@@ -73,31 +75,33 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
 
   return (
     <NodeViewWrapper
-      className="input-cell overflow-hidden rounded-[10px] border border-olive-6 bg-olive-2"
+      className="input-cell overflow-hidden rounded-[10px] border border-border bg-surface-sunken"
       contentEditable={false}
     >
-      <div className="flex flex-wrap items-center gap-2 border-b border-olive-6 bg-olive-3 px-2.5 py-1.5 font-sans text-xs text-olive-11">
-        <span className="font-medium text-olive-12">input</span>
-        <input
-          aria-label="bound $ key"
-          className="w-28 rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-mono text-xs text-olive-12 outline-none focus-visible:border-violet-8 focus-visible:ring-2 focus-visible:ring-violet-8"
-          value={name}
-          onChange={(e) => updateAttributes({ name: e.target.value })}
-        />
-        <select
-          aria-label="input kind"
-          className="rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-sans text-xs text-olive-12"
-          value={kind}
-          onChange={(e) => updateAttributes({ kind: e.target.value })}
-        >
-          {KINDS.map((k) => (
-            <option key={k} value={k}>
-              {k}
-            </option>
-          ))}
-        </select>
-        <ConfigEditor kind={kind} config={config} setConfig={setConfig} />
-      </div>
+      {!reading && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-surface-raised px-2.5 py-1.5 font-sans text-xs text-text-muted">
+          <span className="font-medium text-text">input</span>
+          <input
+            aria-label="bound $ key"
+            className="w-28 rounded border border-border-strong bg-surface px-1.5 py-0.5 font-mono text-xs text-text outline-none focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8"
+            value={name}
+            onChange={(e) => updateAttributes({ name: e.target.value })}
+          />
+          <select
+            aria-label="input kind"
+            className="rounded border border-border-strong bg-surface px-1.5 py-0.5 font-sans text-xs text-text"
+            value={kind}
+            onChange={(e) => updateAttributes({ kind: e.target.value })}
+          >
+            {KINDS.map((k) => (
+              <option key={k} value={k}>
+                {k}
+              </option>
+            ))}
+          </select>
+          <ConfigEditor kind={kind} config={config} setConfig={setConfig} />
+        </div>
+      )}
 
       <div className="px-3 py-3">
         <Control
@@ -108,15 +112,15 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
         />
       </div>
 
-      <div className="flex items-center gap-2 border-t border-olive-6 px-3 py-1.5 font-mono text-xs">
+      <div className="flex items-center gap-2 border-t border-border px-3 py-1.5 font-mono text-xs">
         <span
-          className="inline-block h-2 w-2 rounded-full bg-lime-9"
+          className="inline-block h-2 w-2 rounded-full bg-live"
           aria-hidden
         />
         <span>
           <span className="font-semibold text-gold-11">${name}</span>{" "}
-          <span className="text-olive-11">=</span>{" "}
-          <span className="text-olive-12">{formatValue(value)}</span>
+          <span className="text-text-muted">=</span>{" "}
+          <span className="text-text">{formatValue(value)}</span>
         </span>
       </div>
     </NodeViewWrapper>
@@ -177,7 +181,7 @@ function Control({
       const options = config.options ?? [];
       if (options.length === 0)
         return (
-          <p className="font-sans text-sm text-olive-11">
+          <p className="font-sans text-sm text-text-muted">
             Add options in the header (comma-separated).
           </p>
         );
@@ -215,11 +219,11 @@ function ConfigEditor({
     key: "min" | "max" | "step",
     fallback: number,
   ) => (
-    <label className="flex items-center gap-1 text-olive-11">
+    <label className="flex items-center gap-1 text-text-muted">
       {label}
       <input
         type="number"
-        className="w-14 rounded border border-olive-7 bg-olive-1 px-1 py-0.5 font-mono text-xs text-olive-12 outline-none focus-visible:border-violet-8"
+        className="w-14 rounded border border-border-strong bg-surface px-1 py-0.5 font-mono text-xs text-text outline-none focus-visible:border-accent-8"
         value={String(config[key] ?? fallback)}
         onChange={(e) =>
           setConfig({
@@ -241,11 +245,11 @@ function ConfigEditor({
 
   if (kind === "select")
     return (
-      <label className="flex items-center gap-1 text-olive-11">
+      <label className="flex items-center gap-1 text-text-muted">
         options
         <input
           aria-label="select options, comma-separated"
-          className="w-44 rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-sans text-xs text-olive-12 outline-none focus-visible:border-violet-8"
+          className="w-44 rounded border border-border-strong bg-surface px-1.5 py-0.5 font-sans text-xs text-text outline-none focus-visible:border-accent-8"
           placeholder="a, b, c"
           // Source of truth is the raw text (config.optionsText), so the comma
           // separator survives keystrokes and re-renders; the parsed `options`

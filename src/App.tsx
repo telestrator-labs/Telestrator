@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
 import { NotebookView } from "./editor/NotebookView";
+import { AppSidebar } from "./chrome/AppSidebar";
+import { SidebarInset, SidebarProvider } from "./ui/sidebar";
+import { EditorTopBar } from "./chrome/EditorTopBar";
+import { TracePanel } from "./chrome/TracePanel";
+import { ShareModal } from "./chrome/ShareModal";
+import { Dashboard } from "./dashboard/Dashboard";
+import {
+  setPendingTemplate,
+  clearPendingTemplate,
+  type NotebookTemplate,
+} from "./templates";
 import {
   createNotebook,
   list,
@@ -10,8 +21,9 @@ import {
 } from "./editor/docIndex";
 import "./editor/app.css";
 
-// Subscribe to the document index (a dedicated Yjs doc in IndexedDB), ensuring
-// at least one notebook exists once it has loaded.
+// Subscribe to the document index (a dedicated Yjs doc in IndexedDB). Selection
+// and the dashboard↔editor view are now explicit (no auto-create / auto-select):
+// the dashboard is the landing screen and is where notebooks get created.
 function useDocIndex() {
   const [docs, setDocs] = useState<NotebookEntry[]>([]);
   const [ready, setReady] = useState(false);
@@ -20,7 +32,6 @@ function useDocIndex() {
     let unsubscribe = () => {};
     void whenReady.then(() => {
       if (cancelled) return;
-      if (list().length === 0) createNotebook();
       setDocs(list());
       unsubscribe = subscribe(() => setDocs(list()));
       setReady(true);
@@ -35,70 +46,94 @@ function useDocIndex() {
 
 export default function App() {
   const { ready, docs } = useDocIndex();
+  const [view, setView] = useState<"dashboard" | "editor">("dashboard");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [reading, setReading] = useState(false);
+  const [traceOpen, setTraceOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
-  // Keep a valid selection as the list changes (initial load, delete, create).
-  useEffect(() => {
-    if (docs.length === 0) return;
-    if (!selectedId || !docs.some((d) => d.id === selectedId)) {
-      setSelectedId(docs[0].id);
+  const openNotebook = (id: string) => {
+    setSelectedId(id);
+    setReading(false);
+    setView("editor");
+  };
+  const createBlank = () => openNotebook(createNotebook().id);
+  const createFromTemplate = (template: NotebookTemplate) => {
+    const { id } = createNotebook(template.title);
+    setPendingTemplate(id, template); // consumed by NotebookEditor's seed effect
+    openNotebook(id);
+  };
+  const goHome = () => {
+    setShareOpen(false);
+    setView("dashboard");
+  };
+  const deleteNotebook = (id: string) => {
+    clearPendingTemplate(id); // in case it never got seeded
+    removeNotebook(id);
+    if (selectedId === id) {
+      setSelectedId(null);
+      setView("dashboard");
     }
-  }, [docs, selectedId]);
+  };
 
   if (!ready) return <div className="app-loading">Loading…</div>;
 
   const selected = docs.find((d) => d.id === selectedId);
+  const inEditor = view === "editor" && selected;
 
   return (
-    <div className="app">
-      <aside className="doc-list">
-        <button
-          type="button"
-          className="doc-list__new"
-          onClick={() => setSelectedId(createNotebook().id)}
-        >
-          + New notebook
-        </button>
-        <ul>
-          {docs.map((d) => (
-            <li
-              key={d.id}
-              className={
-                d.id === selectedId
-                  ? "doc-list__row is-active"
-                  : "doc-list__row"
-              }
-            >
-              <button
-                type="button"
-                className="doc-list__item"
-                onClick={() => setSelectedId(d.id)}
-              >
-                {d.title || "Untitled notebook"}
-              </button>
-              <button
-                type="button"
-                className="doc-list__del"
-                title="Delete notebook"
-                onClick={() => removeNotebook(d.id)}
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
-      </aside>
-      <main className="app-main">
-        {selected ? (
-          <NotebookView
-            key={selected.id}
-            docId={selected.id}
-            title={selected.title}
-          />
+    <SidebarProvider className="bg-surface-sunken font-sans text-text">
+      {!reading && (
+        <AppSidebar
+          docs={docs}
+          selectedId={selectedId}
+          onOpen={openNotebook}
+          onNewBlank={createBlank}
+          onHome={goHome}
+        />
+      )}
+      <SidebarInset className="h-screen overflow-hidden">
+        {inEditor ? (
+          <>
+            <EditorTopBar
+              title={selected.title}
+              reading={reading}
+              onToggleReading={setReading}
+              onHome={goHome}
+              traceOpen={traceOpen}
+              onToggleTrace={() => setTraceOpen((o) => !o)}
+              onShare={() => setShareOpen(true)}
+            />
+            <div className="flex min-h-0 flex-1">
+              <div className="min-w-0 flex-1 overflow-auto">
+                <NotebookView
+                  key={selected.id}
+                  reading={reading}
+                  docId={selected.id}
+                  title={selected.title}
+                />
+              </div>
+              {traceOpen && !reading && <TracePanel />}
+            </div>
+          </>
         ) : (
-          <div className="app-loading">No notebook selected</div>
+          <div className="flex-1 overflow-auto">
+            <Dashboard
+              docs={docs}
+              onOpen={openNotebook}
+              onCreateBlank={createBlank}
+              onCreateFromTemplate={createFromTemplate}
+              onDelete={deleteNotebook}
+            />
+          </div>
         )}
-      </main>
-    </div>
+      </SidebarInset>
+      {shareOpen && selected && (
+        <ShareModal
+          title={selected.title}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
+    </SidebarProvider>
   );
 }

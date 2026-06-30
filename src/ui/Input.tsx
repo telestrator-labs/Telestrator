@@ -12,10 +12,10 @@ const Input = forwardRef<
     ref={ref}
     type={type}
     className={cx(
-      "w-full rounded-md border border-olive-7 bg-olive-1 px-2.5 py-1.5",
-      "font-mono text-sm text-olive-12 outline-none",
-      "placeholder:text-olive-9",
-      "focus-visible:border-violet-8 focus-visible:ring-2 focus-visible:ring-violet-8",
+      "w-full rounded-md border border-border-strong bg-surface px-2.5 py-1.5",
+      "font-mono text-sm text-text outline-none",
+      "placeholder:text-text-faint",
+      "focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8",
       className,
     )}
     {...props}

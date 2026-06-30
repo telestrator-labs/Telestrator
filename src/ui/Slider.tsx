@@ -3,7 +3,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cx } from "./cx";
 
 // A rethemed Radix Slider (adapted from Tremor Raw, Apache-2.0). Track is olive,
-// the filled range + handle are violet (the design-language interactive accent),
+// the filled range + handle are violet (the design-language action accent),
 // focus ring is violet-8. The bound value is shown by the caller in gold.
 const Slider = forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -17,10 +17,10 @@ const Slider = forwardRef<
     )}
     {...props}
   >
-    <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-olive-5">
-      <SliderPrimitive.Range className="absolute h-full rounded-full bg-violet-9" />
+    <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-gray-5">
+      <SliderPrimitive.Range className="absolute h-full rounded-full bg-action" />
     </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-violet-9 bg-olive-1 shadow-sm transition outline-none focus-visible:ring-2 focus-visible:ring-violet-8 focus-visible:ring-offset-1" />
+    <SliderPrimitive.Thumb className="block h-4 w-4 rounded-full border-2 border-action bg-surface shadow-sm transition outline-none focus-visible:ring-2 focus-visible:ring-accent-8 focus-visible:ring-offset-1" />
   </SliderPrimitive.Root>
 ));
 Slider.displayName = "Slider";
