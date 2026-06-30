@@ -16,6 +16,10 @@ export interface InputCellConfig {
   max?: number;
   step?: number;
   options?: string[];
+  // Raw, comma-separated text the author typed for `options`. Kept as the
+  // select field's source of truth so separators survive keystrokes/re-renders;
+  // `options` is the parsed array used by the control + binding.
+  optionsText?: string;
   label?: string;
 }
 

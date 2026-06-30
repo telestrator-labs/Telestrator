@@ -1,8 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { useRuntime } from "./RuntimeProvider";
-import { bindingCode, type InputKind } from "./binding";
+import { bindingCode, coerceValue, type InputKind } from "./binding";
 import type { InputCellConfig } from "./inputCellNode";
+
+// Debounce runtime re-registration so a slider drag doesn't spam the sandbox
+// with re-transpiles (mirrors CodeCellView's REGISTER_DEBOUNCE_MS).
+const BIND_DEBOUNCE_MS = 120;
 import { Slider } from "../ui/Slider";
 import { Switch } from "../ui/Switch";
 import { Select } from "../ui/Select";
@@ -19,17 +23,42 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
   const id = node.attrs.id as string | null;
   const name = node.attrs.name as string;
   const kind = node.attrs.kind as InputKind;
-  const value = node.attrs.value as unknown;
   const config = (node.attrs.config ?? {}) as InputCellConfig;
+  const rawValue = node.attrs.value as unknown;
+  // Coerce the stored value to one valid for the current kind/config so the
+  // control, the readout, and the generated `$` binding never diverge (e.g. a
+  // fresh select still holding the numeric default, or a value left over from a
+  // previous kind).
+  const value = coerceValue(kind, rawValue, {
+    min: config.min,
+    max: config.max,
+    options: config.options,
+  });
 
   const rt = useRuntime();
+  const bindTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Register / update the generated assignment cell (re-runs dependents). Note:
+  // Persist the coercion (once) when it actually changed the stored value — e.g.
+  // after a kind switch, or once a select gains options. The Object.is guard
+  // converges (no render loop) because coerceValue returns primitives.
+  useEffect(() => {
+    if (!Object.is(value, rawValue)) updateAttributes({ value });
+  }, [value, rawValue, updateAttributes]);
+
+  // Register / refresh the generated assignment cell (re-runs dependents),
+  // debounced so dragging a slider doesn't re-transpile every tick. Note:
   // renaming `name` leaves the old `$` key set until a runtime restart — the
   // engine only clears a cell's *recorded* writes, not stale keys. Acceptable here.
   useEffect(() => {
     if (!id) return;
-    rt.update(id, bindingCode(kind, name, value));
+    if (bindTimer.current) clearTimeout(bindTimer.current);
+    bindTimer.current = setTimeout(
+      () => rt.update(id, bindingCode(kind, name, value)),
+      BIND_DEBOUNCE_MS,
+    );
+    return () => {
+      if (bindTimer.current) clearTimeout(bindTimer.current);
+    };
   }, [rt, id, kind, name, value]);
 
   // Remove from the runtime when the cell is deleted.
@@ -218,9 +247,15 @@ function ConfigEditor({
           aria-label="select options, comma-separated"
           className="w-44 rounded border border-olive-7 bg-olive-1 px-1.5 py-0.5 font-sans text-xs text-olive-12 outline-none focus-visible:border-violet-8"
           placeholder="a, b, c"
-          value={(config.options ?? []).join(", ")}
+          // Source of truth is the raw text (config.optionsText), so the comma
+          // separator survives keystrokes and re-renders; the parsed `options`
+          // array (for the control + binding) is derived alongside it. A
+          // controlled value of options.join(", ") would strip the separator on
+          // each keystroke (split→filter→rejoin).
+          value={config.optionsText ?? (config.options ?? []).join(", ")}
           onChange={(e) =>
             setConfig({
+              optionsText: e.target.value,
               options: e.target.value
                 .split(",")
                 .map((s) => s.trim())

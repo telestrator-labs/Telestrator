@@ -7,6 +7,48 @@
 
 export type InputKind = "slider" | "number" | "text" | "select" | "toggle";
 
+export interface CoerceOpts {
+  min?: number;
+  max?: number;
+  options?: string[];
+}
+
+// Coerce a stored value to one that is valid for `kind` (+ its config), so the
+// control, the displayed value, and the generated `$` binding can never diverge.
+// Needed because `value` persists across kind switches and starts at the numeric
+// default (0): a select must resolve to a real option, a slider must be a finite
+// in-range number, etc.
+export function coerceValue(
+  kind: InputKind,
+  value: unknown,
+  opts: CoerceOpts = {},
+): number | string | boolean {
+  switch (kind) {
+    case "slider": {
+      const n = Number(value);
+      const base = Number.isFinite(n) ? n : (opts.min ?? 0);
+      return Math.min(
+        Math.max(base, opts.min ?? -Infinity),
+        opts.max ?? Infinity,
+      );
+    }
+    case "number": {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+    case "toggle":
+      return Boolean(value);
+    case "select": {
+      const options = opts.options ?? [];
+      const s = value == null ? "" : String(value);
+      return options.includes(s) ? s : (options[0] ?? "");
+    }
+    case "text":
+    default:
+      return value == null ? "" : String(value);
+  }
+}
+
 export function bindingCode(
   kind: InputKind,
   name: string,

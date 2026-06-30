@@ -5,7 +5,7 @@ import type * as Y from "yjs";
 import { editorExtensions } from "./extensions";
 import { notebookToDocJSON } from "./bridge";
 import { useRuntime } from "./RuntimeProvider";
-import { createCell, createNotebook } from "../core/notebook";
+import { createCell, createNotebook, generateId } from "../core/notebook";
 import "./editor.css";
 
 // The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
@@ -72,7 +72,7 @@ export function NotebookEditor({
   // Insert a `$`-bound input cell (a slider by default; kind is switchable in
   // the cell). Mirrors insertCodeCell. Slash-menu insertion comes in PR 2.
   const insertInputCell = () => {
-    const id = createCell("typescript").id; // reuse the portable id generator
+    const id = generateId();
     const at = editor.state.selection.to;
     editor
       .chain()
