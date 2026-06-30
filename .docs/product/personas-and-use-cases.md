@@ -12,10 +12,13 @@
 prose and live TypeScript/React cells share state, so an explanation and the thing it explains are
 the same artifact.**
 
-It is not a data-science notebook (Python/SQL/ETL — that's Deepnote/Jupyter), not a code playground
-(throwaway snippets — that's CodeSandbox), and not a BI dashboard tool. It sits where **TypeCell and
-Observable** sit: the *computational document* — but TypeScript-first and React-native, local-first,
-and collaborative.
+It belongs to **serious technical knowledge work** — the lineage of **Deepnote and Jupyter** as
+respected tools for thinking in code — but aimed at *explorable explanations* in **TypeScript/React**,
+not data pipelines. So: it is **not** a data-science notebook (Python/SQL/ETL), **not** a code
+playground (throwaway snippets — CodeSandbox), and **not** a BI dashboard. On capability it sits where
+**TypeCell and Observable** sit (the *computational document*), but TypeScript-first, React-native,
+local-first, and collaborative. The framing is *interactive play-by-play analysis*: break an idea down,
+let the reader replay it.
 
 **Primary audience (decided): explorable authors & educators** — people who write to *explain*, and
 whose explanations are better when the reader can run, tweak, and see. Everything below centers them;

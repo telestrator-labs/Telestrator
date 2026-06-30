@@ -76,20 +76,20 @@ Gaps that block the north star:
   reassuring); **Esc** → blur the cell to prose.
 - **Cell menu** (⋯ on the handle): duplicate, delete, move up/down, change language, **collapse code**
   (show output only — key for reading-leaning drafts), **convert** input↔code.
-- Selecting a cell as a block (atom NodeSelection) should be obvious (a `--signal` focus ring), and
+- Selecting a cell as a block (atom NodeSelection) should be obvious (a **violet** focus ring), and
   cut/copy/paste of whole cells must preserve `id`/attrs.
 
 ## Making "live" legible (the signature, applied)
 
-- **Live dot** (`--signal`) on runnable cells; **run pulse** along the cell edge on execution.
+- **Live dot** (**lime**) on runnable cells; **run pulse** (lime) along the cell edge on execution.
 - **Provenance on intent:** focus a cell → its `$` reads/writes highlight; hovering a `$` value →
-  marker-underline it and draw light `--signal` connectors to the cells that react (design-language
-  signature). A "trace" toggle pins these for teaching.
+  **gold-marker**-underline it and draw light **lime** connectors to the cells that react
+  (design-language signature). A "trace" toggle pins these for teaching.
 - **Errors** read like guidance, in the cell's voice, not a stack dump by default: one-line cause +
   "show details." The **reactive-loop** guard already produces a clear message — surface it inline with
   a "which cells?" affordance.
-- **Re-run ripple:** when `$.x` changes, dependents flash a one-shot marker underline so the author
-  (and reader) *sees* propagation.
+- **Re-run ripple:** when `$.x` changes, dependents flash a one-shot gold-marker underline so the
+  author (and reader) *sees* propagation.
 
 ## Reading mode (Riley, first-class)
 

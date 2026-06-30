@@ -1,154 +1,158 @@
 # Design Language — "Ink & Signal"
 
-> **Status:** first articulation (post-M5). Serves the primary persona in
+> **Status:** revised first articulation (post-M5). Serves the primary persona in
 > [personas-and-use-cases.md](./personas-and-use-cases.md) (explorable authors, educators, and their
-> readers). This is the visual/identity direction; the interaction direction is in
-> [authoring-experience.md](./authoring-experience.md). Inspiration reference:
-> [../design/inspiration-00.png](../design/inspiration-00.png) (Deepnote — borrowed for *craft*, not domain or palette).
+> readers). Interaction direction in [authoring-experience.md](./authoring-experience.md). Craft
+> reference: [../design/inspiration-00.png](../design/inspiration-00.png) (Deepnote).
 
-## Thesis: ink drawn over a live signal
+## Thesis: interactive play-by-play analysis
 
-A **telestrator** is the marker a commentator draws over live video with — annotation on top of
-something moving. That is exactly this product: an author *draws prose over live computation*, and
-reactive values flow between cells like a signal. The identity makes that literal:
+A **telestrator** is the tool a commentator uses for *play-by-play analysis* — freezing the live play,
+circling what matters, drawing the routes, replaying it so you understand. Telestrator-the-product does
+that for **technical knowledge work**: an author breaks down an idea by interleaving prose with live
+code, and the reader replays it by dragging the inputs and watching the consequences move.
 
-- an **editorial reading surface** (this is a tool for *explaining*, so it should read like a
-  considered document, not a SaaS app shell), with
-- a single **marker** accent (the telestrator stroke) reserved for one job — showing what is *live*
-  and what *reacts to what*.
+Two forces name the identity:
 
-**The product is a document you can think with.** The design should feel closer to a beautifully set
-explorable essay than to an IDE.
+- **Ink** — this is *knowledge work you read*: considered prose, set seriously, like a technical
+  document. (We sit in the lineage of Deepnote/Jupyter as *serious* technical tools — but for TS/React
+  explorables, not data pipelines.)
+- **Signal** — the live, reactive current running under the prose: values flowing between cells, the
+  "play" being analyzed.
+
+The signature move is **drawing the play**: making the reactive flow *visible as annotation* (see
+[Signature](#signature--drawing-the-play)).
 
 ### What we are deliberately *not* doing
-- Not the cream-paper + high-contrast-serif + terracotta look (the current AI-design cliché).
+- Not the cream-paper + high-contrast-serif + terracotta cliché.
 - Not the near-black + acid-green/vermilion look.
 - Not the broadsheet hairline-rules look.
-- Not Deepnote's friendly-SaaS indigo/blue — we take its **block craft and calm chrome**, not its palette.
+- **Not Inter-everywhere SaaS.** We ground in technical-knowledge-work seriousness (Deepnote/Jupyter
+  lineage) and spend identity on an unusual, confident palette + a serif reading voice.
 
-## Palette — "Ink & Signal"
+## Palette — Radix `olive` · `lime` · `violet` · `gold`
 
-A cool *drafting-board* surface (not warm cream), near-black **ink**, and **two accents with strict
-jobs**: a marigold **marker** (the signature; annotation/highlight/active) and a teal **signal**
-(functional only; "live", reactivity, running).
+Built on [Radix Colors](https://www.radix-ui.com/colors) (accessible 12-step scales, light/dark + alpha
+variants for free). An **olive** neutral grounds it in a technical/lab register; **lime** is the brand
+and carries "live/reactive"; **violet** is the interactive accent; **gold** is the telestrator marker
+(highlight/annotation).
 
-| Token | Hex | Role |
+| Role | Radix scale | Use |
 |---|---|---|
-| `--paper` | `#FCFCFE` | Reading surface (cool near-white) |
-| `--panel` | `#EEF0F5` | Chrome: sidebar, cell headers, inset wells |
-| `--line` | `#DEE1EA` | Hairlines, borders, dividers |
-| `--ink` | `#17171F` | Primary text + primary buttons (dark fill) |
-| `--slate` | `#5B6072` | Secondary/UI text, labels, captions |
-| `--marker` | `#F5B301` | **Signature.** Highlight/underline, active cell, run pulse. Used like a highlighter, sparingly. |
-| `--signal` | `#0FB5C9` | Functional only: "live" dots, reactive connectors, running state, `$` provenance |
+| **Neutral** | `olive` | Surfaces (olive 1–2), panels/wells (3–5), borders (6–8), text (11–12). The whole calm substrate. |
+| **Brand — "Signal"** | `lime` | Identity + everything *live/reactive*: run pulse, live dots, the reactive flow, brand mark. (lime-9/10 solid needs dark text; lime-a for washes/glow.) |
+| **Accent — interactive** | `violet` | Links, focus rings, selection, primary buttons (violet-9 solid / white text), active nav. The thing you click. |
+| **Highlight — "Ink/marker"** | `gold` | The telestrator marker: annotation highlights, the provenance stroke, `$`-value emphasis (gold-a wash + gold-11 text). |
 
-- **Spend boldness on `--marker`.** It is the one loud thing; everything else is ink/slate/line on
-  paper. Primary actions are **ink-filled** (dark), not marker-filled — the marker is for *drawing
-  over*, not for chrome.
-- `--marker` is typically used at low alpha as a highlighter wash (`#F5B301` @ ~22%) so it reads as
-  *ink over content*, not a fill.
-- **Dark/"broadcast" mode (later):** invert to a true near-black `#0E0E13` surface where the marker
-  and signal pop like markings over live video — defer to a theming pass, but the palette is chosen so
-  it survives the inversion.
+Conventions (Radix steps): `1–2` app/subtle bg · `3–5` component bg (rest/hover/active) · `6–8` borders
+(subtle/ui/strong) · `9–10` solid + hover · `11` low-contrast text · `12` high-contrast text. Pull
+`@radix-ui/colors` and expose as CSS custom properties (`--olive-1 … --violet-9 …`); dark mode is the
+matching Radix dark scales (a true "broadcast booth" dark — defer the theming pass, but the system is
+built for it).
 
-## Typography — editorial prose, technical chrome
+- **Spend boldness on the lime↔violet pairing + gold marker.** It's a confident, non-SaaS combination;
+  keep everything else olive-quiet so it reads as intentional, not loud.
+- **Never rely on hue alone for state** (lime/gold/violet must each pair with shape/text/icon for
+  colorblind users).
 
-The risk worth taking: **set prose in a serif.** Every notebook/SaaS tool defaults to Inter
-everywhere; an explorable-explanation tool earns trust by *reading like an essay*. So reading text is
-a screen-optimized serif, while UI chrome and code stay sans/mono — the contrast itself signals
-"document, not app."
+## Typography — the IBM Plex superfamily, serif voice
+
+One coherent technical family, used in clear roles. The deliberate, anti-Inter move: **prose is set in
+a serif** so the document reads like considered knowledge work, not an app.
 
 | Role | Family | Notes |
 |---|---|---|
-| Display (notebook title, hero) | **Fraunces** (variable, opsz/soft) | Characterful, optically-sized; used *sparingly* — title + section openers only |
-| Reading / prose | **Newsreader** | Screen-tuned serif for body prose; generous measure & leading |
-| UI / utility | **Geist Sans** | Labels, buttons, sidebar, cell chrome, captions — technical, calm |
-| Code & values | **JetBrains Mono** | Code cells, `$` values, data; clear at small sizes |
+| Reading / prose | **IBM Plex Serif** | Body prose — generous measure & leading; the editorial voice. |
+| UI / display | **IBM Plex Sans** | Titles, headings, labels, buttons, sidebar, cell chrome (display = larger/semibold). |
+| Code & values | **IBM Plex Mono** | Code cells, `$` values, data. |
 
-All four are open-licensed (Google Fonts / OFL / Vercel OFL). Scale (fluid):
+All open-licensed (OFL). One superfamily = automatic harmony and a distinctly *technical* character,
+with the serif/sans contrast doing the "document vs chrome" signalling. (If titles ever feel flat we can
+add one characterful display face — but coherence wins first.)
 
-- Title `clamp(28px, 4vw, 40px)` Fraunces · section heading 22–26 · prose **18/1.7** Newsreader ·
-  UI 13–14 Geist · code 13 JetBrains Mono · caption/label 11–12 Geist, tracked +.04em, uppercase for
-  eyebrows only.
+Scale (fluid): title `clamp(28px, 4vw, 40px)` Plex Sans semibold · section heading 22–26 · prose
+**18/1.7** Plex Serif · UI 13–14 Plex Sans · code 13 Plex Mono · eyebrow/label 11–12 Plex Sans,
+tracked +.04em, uppercase only for true eyebrows.
 
 ## Layout — the document is the hero
 
-Three zones (the proven notebook shell, à la the inspiration), but the center reads as an **explorable
-essay**, not a code grid: a comfortable single-column measure, prose in serif, and **code cells as
-quiet "instruments" inset into the narrative** rather than dominating it.
+Three zones (the proven notebook shell from the inspiration), but the center reads as an **explorable
+essay**, not a code grid: a comfortable single-column measure, serif prose, and **code cells as quiet
+"instruments" inset into the narrative**.
 
 ```
 ┌──────────┬───────────────────────────────────────┬───────────┐
-│ NOTEBOOKS│   Title (Fraunces)                     │  CONTEXT  │
+│ NOTEBOOKS│   Title (Plex Sans, semibold)          │  CONTEXT  │
 │  · doc a │   ─────────────────────────────        │ (later:   │
-│  · doc b │   Prose, set in Newsreader, at a        │  outline, │
+│  · doc b │   Prose, set in IBM Plex Serif, at a    │  outline, │
 │ [+ new]  │   comfortable reading measure…          │  comments,│
 │          │                                          │  AI)      │
 │ (quiet,  │   ┌───────────────────────────┐  ‹inst› │           │
-│  panel,  │   │ ▷ ts   $.rate            ●live│       │  collapsed│
-│  ink-on- │   │   12  ································│      │  by      │
-│  panel)  │   └───────────────────────────┘        │  default  │
-│          │   …prose continues, and a value set     │           │
-│          │   here is ✎underlined-in-marker where   │           │
-│          │   another cell reacts to it…            │           │
+│  olive,  │   │ ▷ ts   $.rate            ●live│       │  collapsed│
+│  no hue) │   │   12  ································│      │  by      │
+│          │   └───────────────────────────┘        │  default  │
+│          │   …and a value set here is ✎marked in   │           │
+│          │   gold, with lime connectors drawn to   │           │
+│          │   the cells that react to it…           │           │
 └──────────┴───────────────────────────────────────┴───────────┘
 ```
 
-- **Left** stays quiet (`--panel`, ink-on-panel, no color) so the document holds attention.
-- **Center** is the document: max measure ~68–72ch for prose; cells break out slightly wider.
-- **Right** context panel (outline / comments / AI) is **collapsed by default** — it's support, not
-  the stage. (Deepnote keeps it open; we don't, because reading is the job.)
+- **Left** stays quiet (olive, no hue) so the document holds attention.
+- **Center** is the document: prose measure ~68–72ch; cells break out slightly wider.
+- **Right** context panel collapsed by default — support, not the stage. (We diverge from Deepnote here:
+  reading is the job.)
 - **Reading mode (Riley):** a toggle that strips *all* chrome — no sidebars, no cell toolbars, code
-  collapsible — leaving the explorable as a clean essay. First-class, not an afterthought.
+  collapsible — leaving the explorable as a clean essay. **First-class; default when opening a shared
+  link.**
 
-## Signature — the telestrator stroke (reactive provenance)
+## Signature — drawing the play
 
-**The one memorable element:** reactivity is drawn, not hidden. When a cell writes `$.rate` and
-another cell reads it, the connection is rendered as a **hand-drawn-feeling marker stroke** — a
-`--marker` underline on the source value and, on hover/focus, a light **connector** (in `--signal`)
-to the cells that react. Running a cell emits a brief `--signal` pulse along that path.
+**The one memorable element: reactivity is drawn, not hidden.** A value's *provenance* — the chain of
+what-feeds-what — is normally invisible. We make it the telestrator's play-by-play:
 
-This is subject-true twice over: it *is* a telestrator drawing over the live play, **and** it makes
-the product's defining feature — the reactive `$` graph — visible and legible. No other notebook draws
-its dependency graph as marker annotation; this is ours.
+- Focus a cell, or hover a `$` value, and it gets a **gold marker** highlight, with light **lime
+  connectors** drawn to the cells that read it (and pulsing along the path when it recomputes).
+- A "trace" toggle pins the diagram for teaching ("here's how the rate drives the chart").
 
-Keep it disciplined: the stroke appears on **focus/hover or when tracing**, not constantly (a
-permanently scribbled page is noise). Default state is calm; the marker reveals on intent.
+It's subject-true twice: it **is** the telestrator circling a player and drawing the route, **and** it
+makes the product's defining feature — the reactive `$` graph — legible. No other notebook draws its
+dependency graph as annotation; this is ours.
+
+Keep it disciplined: connectors appear **on focus/hover or when tracing**, not constantly — a
+permanently scribbled page is noise. Calm by default; the marker reveals on intent. (Aspirational /
+Tier-1 — see [stretch-goals.md](./stretch-goals.md); the palette + motion below are the day-one down payment.)
 
 ## Motion — restrained, signal-shaped
-
-- **Run pulse:** a single `--signal` sweep along the cell edge / provenance path on execution (~400ms).
-- **Reactive ripple:** when `$.x` changes, dependents get a one-shot subtle marker-underline flash —
-  the reader *sees* the propagation that just happened.
-- **Reveal on intent:** provenance connectors draw on hover/focus (a quick "ink" draw-on), gone on blur.
-- Everything respects `prefers-reduced-motion` (pulses become instant state changes). No ambient/looping motion.
+- **Run pulse:** one lime sweep along the cell edge / provenance path on execution (~400ms).
+- **Reactive ripple:** when `$.x` changes, dependents flash a one-shot gold underline — the reader
+  *sees* the propagation.
+- **Reveal on intent:** provenance connectors draw on hover/focus (quick "ink" draw-on), gone on blur.
+- Respect `prefers-reduced-motion` (pulses become instant state changes). No ambient/looping motion.
 
 ## Component direction (applies the system)
-
-- **Cell = "instrument":** quiet `--panel` header (lang chip + run + live dot in `--signal`), body in
-  JetBrains Mono on `--paper`, hairline `--line` border, generous radius (10px). Inert/non-runnable
-  cells lose the live dot. Output sits below in a calmer well; `$` writes shown as
-  `<key>` in `--marker`-underlined mono.
-- **Inputs** (sliders/fields bound to `$`) are first-class "instruments" too — the explorable's knobs.
-- **Buttons:** primary = `--ink` fill / paper text; secondary = `--line` outline; the marker is never a
-  button fill.
-- **Title** in Fraunces; the editable title field should feel like a manuscript title, not a form input.
+- **Cell = "instrument":** quiet olive header (lang chip + run + lime live dot), body in Plex Mono on
+  olive-1, hairline olive-6 border, ~10px radius. Inert cells lose the live dot. Output sits in a calmer
+  well; `$` writes shown in gold-marked Plex Mono.
+- **Inputs** (sliders/fields bound to `$`) are first-class instruments — the explorable's knobs; the
+  control track/handle uses violet, the bound value marked in gold.
+- **Buttons:** primary = violet-9 solid; secondary = olive-7 outline; gold is never a button fill (it's
+  for *drawing over*, not chrome).
+- **Title** in Plex Sans; the editable title field reads like a manuscript title, not a form input.
 
 ## Quality floor (non-negotiable)
-Responsive to mobile (readers arrive on phones); visible keyboard focus (`--signal` ring);
-`prefers-reduced-motion` honored; prose meets contrast AA (ink on paper ≈ 16:1); the marker accent is
-never the *only* signal for state (pair with shape/text, since marigold + colorblindness).
+Responsive to mobile (readers arrive on phones); visible keyboard focus (violet ring); reduced-motion
+honored; prose contrast AA via Radix `olive-12` on `olive-1`; state never hue-only.
 
 ## The one risk (named)
-**Serif prose + cells-as-instruments + drawn reactive provenance** makes Telestrator read like an
-editorial explorable, not an IDE — less dense/"powerful-looking" than Deepnote. Justified: the primary
-users are authors and *readers of explanations*, for whom reading quality and a legible reactive graph
-matter more than IDE density. If it ever fights real authoring throughput, the reading-mode/edit-mode
-split absorbs the tension.
+**Serif prose + lime/violet/gold + cells-as-instruments** reads as an editorial, *technical* explorable
+— not an IDE, and an unusual palette for the category. Justified: the audience is authors and *readers
+of explanations* who value reading quality and a legible reactive flow over IDE density; the
+distinctive palette is the anti-SaaS identity we're explicitly buying. The reading-mode/edit-mode split
+absorbs any tension with authoring throughput.
 
 ## Mapping to current code
-Today `app.css`/`editor.css` use `system-ui` and an ad-hoc purple (`#6a4ed6`) for `$` keys. Adopting
-this language means: load the four fonts; replace the palette with the tokens above (CSS custom
-properties on `:root`); set prose to Newsreader, chrome to Geist, code to JetBrains Mono, title to
-Fraunces; recolor `$` values/active state to `--marker`/`--signal`. This is a **styling pass**
-(no logic change) and a natural companion to the [authoring-experience](./authoring-experience.md) work.
+Today `app.css`/`editor.css` use `system-ui` and an ad-hoc purple. Adopting this means: add
+`@radix-ui/colors`; expose the four scales as CSS variables on `:root`; set prose → IBM Plex Serif,
+chrome → IBM Plex Sans, code → IBM Plex Mono, title → Plex Sans; recolor `$` values/active to
+gold, interactive/focus to violet, live/run to lime. A **styling pass** (no logic change), companion to
+the [authoring-experience](./authoring-experience.md) work.

@@ -10,8 +10,8 @@
 ## Tier 1 — strongest fit (do soon after the authoring increment)
 
 - **Provenance visualization, full.** The design-language signature taken all the way: hover/trace the
-  reactive graph as marker strokes + `--signal` connectors; a "dependency lens." *Maya/Riley · soul of
-  the product · depends on: reactive runtime (M3 ✅) + the styling pass.*
+  reactive graph as gold-marker strokes + lime connectors; a "dependency lens" — the play-by-play of
+  the data flow. *Maya/Riley · soul of the product · depends on: reactive runtime (M3 ✅) + the styling pass.*
 - **Chart block.** A first-class viz cell wrapping an npm chart lib, reading `$` and re-rendering
   reactively — so "input → chart" needs no boilerplate. *Maya · the most common explorable shape ·
   depends on: input cells + a sanctioned viz lib.*
