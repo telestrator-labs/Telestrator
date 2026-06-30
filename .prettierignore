@@ -1,0 +1,8 @@
+# Build output
+dist
+
+# Docs are carried over verbatim from the previous implementation — don't reformat
+.docs
+
+# Tooling-managed
+package-lock.json
