@@ -1,4 +1,5 @@
 import type { NotebookEntry } from "../editor/docIndex";
+import { DocBadge } from "./DocBadge";
 import { Logo } from "./Logo";
 import {
   Sidebar,
@@ -86,7 +87,7 @@ export function AppSidebar({
                       onClick={() => onOpen(d.id)}
                       tooltip={title}
                     >
-                      <AbbrevBadge title={title} active={active} />
+                      <DocBadge id={d.id} title={title} />
                       <span className="truncate group-data-[collapsible=icon]:hidden">
                         {title}
                       </span>
@@ -173,32 +174,6 @@ function SearchIcon() {
       <circle cx="7" cy="7" r="4.5" />
       <path d="M11 11l3 3" />
     </svg>
-  );
-}
-
-// A 2-letter abbreviation of the document title (initials of the first two
-// words, else the first two letters) — the document's "icon" in the collapsed
-// rail, and a quick visual anchor when expanded.
-function abbreviate(title: string): string {
-  const words = title.trim().split(/\s+/).filter(Boolean);
-  const letters =
-    words.length >= 2
-      ? words[0][0] + words[1][0]
-      : (words[0] ?? "").slice(0, 2);
-  return letters.toUpperCase() || "··";
-}
-
-function AbbrevBadge({ title, active }: { title: string; active: boolean }) {
-  return (
-    <span
-      aria-hidden
-      className={
-        "flex size-5 flex-none items-center justify-center rounded-[5px] text-[9.5px] font-semibold leading-none " +
-        (active ? "bg-action text-white" : "bg-surface-active text-text-muted")
-      }
-    >
-      {abbreviate(title)}
-    </span>
   );
 }
 
