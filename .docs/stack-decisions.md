@@ -111,6 +111,16 @@ iframe half of `frame`, the resolver subsystem of `engine`, and `packager`. You 
 subsystems for one maintained dependency, and you stop synchronizing a CRDT across a process
 boundary.
 
+**M3/M4 outcome — Sandpack DROPPED (decision made at M4, as planned).** Execution settled on a
+**plain sandbox iframe** running our `@vue/reactivity` engine over `postMessage` (M3), and **npm
+imports** resolve at runtime from **esm.sh** via `await import()` (M4) — the in-iframe runtime parses
+a cell's imports, resolves them once *before* building the cell body (so the body stays synchronous
+and `$`-tracking survives), then runs it. Sandpack's update loop (whole-project re-bundle + reload)
+is fundamentally incompatible with state-preserving cross-cell re-run, and esm.sh covers npm
+resolution more directly than its bundler. `@codesandbox/sandpack-react` was removed in M4. If
+**export/publish (M8)** later needs project bundling, reach for the lighter
+`@codesandbox/sandpack-client` then — Sandpack is no longer a standing dependency.
+
 ---
 
 ## 2. Editor foundation
@@ -177,6 +187,13 @@ for npm imports) justify the weight (the M4 optional sub-step).
 **Why.** Monaco is large and its bidirectional sync with ProseMirror is one of the current
 codebase's most fragile seams; CodeMirror is lighter and embeds cleanly in a NodeView. You get
 syntax + editing cheaply and can upgrade the authoring experience later without blocking execution.
+
+**M4 outcome (implemented).** CodeMirror 6 is in (`src/editor/CodeEditor.tsx`) — an assembled package
+set (`@codemirror/{state,view,commands,language,lang-javascript,lang-css}`, no meta-package) behind a
+thin wrapper that owns the `EditorView`, syncs to `node.attrs.code` with a diff-guarded binding, and
+swaps language via a `Compartment`. Because the cell is an **atom + `contentEditable=false`** NodeView,
+the official ProseMirror example's selection-bridging is unnecessary. **Monaco + full type
+IntelliSense/`.d.ts` acquisition stays deferred** (build on esm.sh's `X-TypeScript-Types` header later).
 
 ---
 
