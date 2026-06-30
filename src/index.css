@@ -15,6 +15,10 @@
  * the raw-scale families (gray-*, accent-*) are the fallback when no role fits.
  * This also sets up dark mode: flip a tier under .dark, components untouched. */
 
+/* Declare the layer order up front so our base-layer reset (below) loses to the
+ * utilities layer — Tailwind border/bg utilities must still win over it. */
+@layer theme, base, components, utilities;
+
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/utilities" layer(utilities);
 
@@ -200,4 +204,29 @@
 ::before,
 ::after {
   box-sizing: border-box;
+}
+
+/* Preflight is intentionally omitted (it fights Tiptap/ProseMirror and
+ * CodeMirror), so native controls keep their user-agent chrome — most visibly a
+ * default border on every <button> (the rail items, breadcrumb, etc.). Reset
+ * button defaults here in the base layer so our Tailwind/CSS borders are the
+ * only source of truth; utilities still win, so explicitly-bordered buttons
+ * (Trace, cards) keep their border. Native select/inputs are left alone so their
+ * affordances (the dropdown arrow) survive. */
+@layer base {
+  button {
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+    background-image: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
 }

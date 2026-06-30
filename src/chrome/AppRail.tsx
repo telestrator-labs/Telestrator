@@ -1,4 +1,5 @@
 import type { NotebookEntry } from "../editor/docIndex";
+import { Button } from "../ui/Button";
 
 // The persistent left rail (mockup's `.rail`): brand → home, a visual search
 // affordance, the notebook list, and a user footer. Shared by the dashboard and
@@ -71,13 +72,13 @@ export function AppRail({
             </button>
           );
         })}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={onNewBlank}
-          className="mx-4 mt-2.5 flex w-[calc(100%-2rem)] items-center justify-center gap-2 rounded-[9px] border border-dashed border-border-strong px-3 py-2.5 text-[13px] font-medium text-text-muted hover:border-interactive-border hover:bg-interactive-subtle hover:text-interactive-text"
+          className="mx-4 mt-2.5 w-[calc(100%-2rem)] gap-2 rounded-[9px] border-dashed border-border-strong px-3 py-2.5 text-[13px] hover:border-interactive-border hover:bg-interactive-subtle hover:text-interactive-text"
         >
           <span className="text-[15px] leading-none">+</span> New notebook
-        </button>
+        </Button>
       </div>
 
       <div className="flex items-center gap-2.5 border-t border-border-subtle px-4 py-3">

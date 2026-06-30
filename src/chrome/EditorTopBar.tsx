@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Button } from "../ui/Button";
+import { cx } from "../ui/cx";
 
 // The editor's sticky top bar (mockup `.topbar`). Breadcrumb → home, a Live
 // pill, and the tool cluster. Edit/Read is REAL (drives reading mode); the
 // Document/Studio layout toggle, Trace toggle, and Share are visual-only this
 // round. Stays mounted in reading mode so the reader can flip back to Edit.
+// All action buttons use the shared <Button> primitive (src/ui/Button).
 export function EditorTopBar({
   title,
   reading,
@@ -27,13 +30,9 @@ export function EditorTopBar({
   return (
     <div className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-border-subtle bg-surface-sunken/85 px-[26px] py-3 backdrop-blur">
       <div className="flex min-w-0 items-center gap-2 text-[13px] text-text-faint">
-        <button
-          type="button"
-          onClick={onHome}
-          className="text-text-muted hover:text-text"
-        >
+        <Button variant="ghost" onClick={onHome} className="px-1.5 py-0.5">
           Notebooks
-        </button>
+        </Button>
         <span>/</span>
         <span className="truncate font-medium text-text">
           {title || "Untitled notebook"}
@@ -53,18 +52,16 @@ export function EditorTopBar({
           value={layout}
           onChange={(v) => setLayout(v as "document" | "studio")}
         />
-        <button
-          type="button"
+        <Button
+          variant="secondary"
           onClick={onToggleTrace}
-          className={
-            "flex items-center gap-1.5 rounded-lg border px-3 py-[7px] text-[12.5px] font-medium " +
-            (traceOpen
-              ? "border-value-border bg-value-bg text-value"
-              : "border-border bg-surface text-text-muted hover:border-border-strong")
-          }
+          className={cx(
+            traceOpen &&
+              "border-value-border bg-value-bg text-value hover:border-value-border hover:text-value",
+          )}
         >
           ◆ Trace
-        </button>
+        </Button>
         <Seg
           options={[
             { value: "edit", label: "Edit" },
@@ -73,18 +70,15 @@ export function EditorTopBar({
           value={reading ? "read" : "edit"}
           onChange={(v) => onToggleReading(v === "read")}
         />
-        <button
-          type="button"
-          onClick={onShare}
-          className="flex items-center gap-1.5 rounded-lg bg-interactive px-3 py-[7px] text-[12.5px] font-medium text-white hover:bg-interactive-hover"
-        >
+        <Button variant="primary" onClick={onShare}>
           Share
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
 
+// A segmented control built from ghost <Button>s sharing one bordered track.
 function Seg({
   options,
   value,
@@ -99,19 +93,19 @@ function Seg({
       {options.map((o) => {
         const on = o.value === value;
         return (
-          <button
-            type="button"
+          <Button
             key={o.value}
+            variant="ghost"
             onClick={() => onChange(o.value)}
-            className={
-              "rounded-[7px] px-3 py-1.5 text-[12.5px] font-medium " +
-              (on
-                ? "bg-surface text-text shadow-sm"
-                : "text-text-muted hover:text-text")
-            }
+            className={cx(
+              "rounded-[7px] px-3 py-1.5",
+              on
+                ? "bg-surface text-text shadow-sm hover:bg-surface"
+                : "hover:bg-transparent",
+            )}
           >
             {o.label}
-          </button>
+          </Button>
         );
       })}
     </div>

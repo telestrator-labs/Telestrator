@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Button } from "../ui/Button";
 
 // Visual-only share dialog (mockup's share modal). Nothing here is wired to a
 // real sharing/permissions backend — that's M7 — so every control is inert and
@@ -44,15 +45,15 @@ export function ShareModal({
               Readers open a clean, interactive view — no account needed.
             </div>
           </div>
-          <button
+          <Button
             ref={closeRef}
-            type="button"
+            variant="secondary"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg border border-border bg-surface text-text-muted hover:bg-surface-raised"
+            className="h-[30px] w-[30px] flex-none p-0"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         <div className="overflow-auto px-[22px] pb-1">
@@ -83,13 +84,9 @@ export function ShareModal({
                   Reads
                 </span>
               </div>
-              <button
-                type="button"
-                disabled
-                className="rounded-lg bg-interactive px-3 py-[7px] text-[12.5px] font-medium text-white opacity-60"
-              >
+              <Button variant="primary" disabled>
                 Copy
-              </button>
+              </Button>
             </div>
           </Section>
 
@@ -105,13 +102,9 @@ export function ShareModal({
             <span className="text-value">◆</span> Sharing is a preview — no link
             is published yet.
           </span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg bg-interactive px-3 py-[7px] text-[12.5px] font-medium text-white hover:bg-interactive-hover"
-          >
+          <Button variant="primary" onClick={onClose}>
             Done
-          </button>
+          </Button>
         </div>
       </div>
     </div>
