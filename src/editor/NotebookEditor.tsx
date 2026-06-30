@@ -3,6 +3,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { editorExtensions } from "./extensions";
 import { docToNotebook, notebookToDocJSON } from "./bridge";
 import { loadNotebook, saveNotebook } from "./persistence";
+import { useRuntime } from "./RuntimeProvider";
 import {
   createCell,
   createNotebook,
@@ -19,6 +20,7 @@ export function NotebookEditor() {
     createNotebook("Untitled notebook"),
   );
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const runtime = useRuntime();
 
   const editor = useEditor({
     extensions: editorExtensions,
@@ -116,6 +118,10 @@ export function NotebookEditor() {
           </button>
           <button type="button" onClick={() => insertCodeCell("css")}>
             + CSS cell
+          </button>
+          <span className="notebook__sep" aria-hidden />
+          <button type="button" onClick={() => runtime.restart()}>
+            ↻ Restart runtime
           </button>
         </div>
       </header>
