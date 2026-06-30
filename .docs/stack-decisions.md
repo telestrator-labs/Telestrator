@@ -286,6 +286,17 @@ inherited by children, so one share covers a workspace (today's recursive `check
 Supabase RLS expresses that directly with the least rethinking; replicate the property whatever you
 pick.
 
+**M5 outcome (local-first, implemented).** The document is now a **Yjs doc cached to IndexedDB**
+(`y-indexeddb`) — even before collaboration, so M6 is incremental. Tiptap's **Collaboration** extension
+(over `@tiptap/y-tiptap`, the v3 replacement for `y-prosemirror`) binds the editor to a per-notebook
+Y.Doc; StarterKit's `undoRedo` is disabled (Collaboration supplies Yjs-backed undo). Content seeds once
+after sync via a `ydoc.getMap('config')` flag (never the `content` option, which duplicates). A
+**dedicated index Y.Doc** holds the multi-notebook list; each notebook switch remounts a fresh
+editor + Y.Doc + runtime (keyed by docId). The old localStorage persistence (`persistence.ts`) is
+removed; `bridge.ts`/`serialize` are retained for seeding + export (M8). **Flag for M6:** cell `code`
+lives in a node *attr* (opaque CRDT unit, no char-level merge) — real-time collab will likely move cell
+source to a `Y.Text`.
+
 ---
 
 ## 7. App framework & repo shape

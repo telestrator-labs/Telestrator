@@ -1,0 +1,115 @@
+/* App shell: notebook switcher sidebar + main editing area. */
+.app {
+  display: flex;
+  min-height: 100vh;
+  font-family: system-ui, sans-serif;
+}
+
+.app-loading {
+  padding: 40px;
+  color: #8a8a96;
+  font-family: system-ui, sans-serif;
+}
+
+.doc-list {
+  width: 240px;
+  flex: 0 0 240px;
+  border-right: 1px solid #ececf2;
+  padding: 16px 10px;
+  box-sizing: border-box;
+  background: #fafafb;
+}
+
+.doc-list__new {
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid #d8d8e0;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.doc-list__new:hover {
+  background: #eef0ff;
+  border-color: #9aa0e0;
+}
+
+.doc-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doc-list__row {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+}
+
+.doc-list__row.is-active {
+  background: #eef0ff;
+}
+
+.doc-list__item {
+  flex: 1;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 8px;
+  border: 0;
+  background: transparent;
+  color: #2a2a3a;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-list__del {
+  font: inherit;
+  font-size: 12px;
+  border: 0;
+  background: transparent;
+  color: #b8b8c4;
+  cursor: pointer;
+  padding: 4px 8px;
+  opacity: 0;
+}
+
+.doc-list__row:hover .doc-list__del {
+  opacity: 1;
+}
+
+.doc-list__del:hover {
+  color: #c0392b;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+/* The editable notebook title sits in the notebook bar. */
+.notebook__title-input {
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  border: 0;
+  background: transparent;
+  color: #1a1a1a;
+  width: 100%;
+  padding: 2px 0;
+}
+
+.notebook__title-input:focus {
+  outline: none;
+}
+
+/* Tools render as their own row under the title bar. */
+.notebook__tools {
+  margin-bottom: 16px;
+}

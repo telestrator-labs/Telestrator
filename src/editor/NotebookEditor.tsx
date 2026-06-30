@@ -1,73 +1,63 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
+import { Collaboration } from "@tiptap/extension-collaboration";
+import type * as Y from "yjs";
 import { editorExtensions } from "./extensions";
-import { docToNotebook, notebookToDocJSON } from "./bridge";
-import { loadNotebook, saveNotebook } from "./persistence";
+import { notebookToDocJSON } from "./bridge";
 import { useRuntime } from "./RuntimeProvider";
-import {
-  createCell,
-  createNotebook,
-  type NotebookDocument,
-} from "../core/notebook";
+import { createCell, createNotebook } from "../core/notebook";
 import "./editor.css";
 
-const SAVE_DEBOUNCE_MS = 400;
-
-export function NotebookEditor() {
-  // The notebook's stable id/title live outside the ProseMirror doc; keep them
-  // in a ref so debounced saves always reattach the right identity.
-  const notebookRef = useRef<NotebookDocument>(
-    createNotebook("Untitled notebook"),
-  );
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+// The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
+// Collaboration extension binds the editor to the notebook's Y.Doc (owned by
+// NotebookView), and IndexeddbPersistence saves every change automatically — no
+// localStorage round-trip and no per-edit index writes. Content is seeded once,
+// after IndexedDB sync, only if the doc is empty (Collaboration forbids the
+// `content` option, which would duplicate on reload).
+export function NotebookEditor({
+  ydoc,
+  whenSynced,
+}: {
+  ydoc: Y.Doc;
+  whenSynced: Promise<unknown>;
+}) {
   const runtime = useRuntime();
 
   const editor = useEditor({
-    extensions: editorExtensions,
-    content: "",
-    onCreate({ editor }) {
-      const markdown = editor.storage.markdown.manager;
-      const loaded = loadNotebook();
-      const notebook = loaded ?? notebookRef.current;
-      notebookRef.current = notebook;
-      editor.commands.setContent(notebookToDocJSON(markdown, notebook));
-      // Seed storage on first run so a reload finds a document.
-      if (!loaded) saveNotebook(notebook);
-    },
-    onUpdate({ editor }) {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => {
-        // The debounced timer can outlive this editor instance — e.g. React
-        // StrictMode (dev) creates an editor, schedules a save, then destroys it
-        // on remount. Saving against a destroyed editor reads undefined storage.
-        if (editor.isDestroyed) return;
-        const markdown = editor.storage.markdown.manager;
-        const next = docToNotebook(
-          markdown,
-          editor.getJSON(),
-          notebookRef.current,
-        );
-        notebookRef.current = next;
-        saveNotebook(next);
-      }, SAVE_DEBOUNCE_MS);
-    },
+    extensions: [
+      ...editorExtensions,
+      Collaboration.configure({ document: ydoc }),
+    ],
   });
 
+  // Seed initial content once, after IndexedDB has loaded, only if the doc is
+  // empty (so reloads never duplicate). Guard the async callback for StrictMode.
   useEffect(() => {
+    if (!editor) return;
+    let cancelled = false;
+    void whenSynced.then(() => {
+      if (cancelled || editor.isDestroyed) return;
+      const config = ydoc.getMap("config");
+      const fragment = ydoc.getXmlFragment("default");
+      if (!config.get("seeded") && fragment.length === 0) {
+        config.set("seeded", true);
+        const markdown = editor.storage.markdown.manager;
+        editor.commands.setContent(
+          notebookToDocJSON(markdown, createNotebook()),
+        );
+      }
+    });
     return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
+      cancelled = true;
     };
-  }, []);
+  }, [editor, ydoc, whenSynced]);
 
   if (!editor) return null;
 
   const insertCodeCell = (language: "typescript" | "css") => {
     const cell = createCell(language, "");
-    // Insert *after* the current selection (selection.to). This matters when a
-    // code cell is selected: a code cell is an atom, so the editor holds a
-    // NodeSelection on it, and a plain insertContent would *replace* that node.
-    // A trailing paragraph keeps a typing target after the new cell; empty
-    // paragraphs never become cells (the bridge drops empty prose runs).
+    // Insert *after* the current selection so a selected code cell (an atom with
+    // a NodeSelection) is not replaced; a trailing paragraph keeps a typing target.
     const at = editor.state.selection.to;
     editor
       .chain()
@@ -80,52 +70,49 @@ export function NotebookEditor() {
   };
 
   return (
-    <div className="notebook">
-      <header className="notebook__bar">
-        <strong className="notebook__title">{notebookRef.current.title}</strong>
-        <div className="notebook__tools">
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-          >
-            B
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-          >
-            I
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-          >
-            H1
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-          >
-            H2
-          </button>
-          <span className="notebook__sep" aria-hidden />
-          <button type="button" onClick={() => insertCodeCell("typescript")}>
-            + TS cell
-          </button>
-          <button type="button" onClick={() => insertCodeCell("css")}>
-            + CSS cell
-          </button>
-          <span className="notebook__sep" aria-hidden />
-          <button type="button" onClick={() => runtime.restart()}>
-            ↻ Restart runtime
-          </button>
-        </div>
-      </header>
+    <>
+      <div className="notebook__tools">
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        >
+          B
+        </button>
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        >
+          I
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+        >
+          H1
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+        >
+          H2
+        </button>
+        <span className="notebook__sep" aria-hidden />
+        <button type="button" onClick={() => insertCodeCell("typescript")}>
+          + TS cell
+        </button>
+        <button type="button" onClick={() => insertCodeCell("css")}>
+          + CSS cell
+        </button>
+        <span className="notebook__sep" aria-hidden />
+        <button type="button" onClick={() => runtime.restart()}>
+          ↻ Restart runtime
+        </button>
+      </div>
       <EditorContent editor={editor} className="notebook__doc" />
-    </div>
+    </>
   );
 }
