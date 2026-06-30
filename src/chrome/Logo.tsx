@@ -5,7 +5,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 46 40"
-      fill="#0047c1"
+      fill="#654DC4"
       className={className}
       role="img"
       aria-label="Telestrator"

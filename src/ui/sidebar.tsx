@@ -23,7 +23,9 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3rem";
+// Collapsed is a narrow rail; documents show a 2-letter abbreviation badge so it
+// stays navigable (see AppSidebar) rather than an anonymous icon.
+const SIDEBAR_WIDTH_ICON = "3.5rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 const MOBILE_BREAKPOINT = 768;
 
@@ -490,7 +492,7 @@ const sidebarMenuButtonVariants = cva(
     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
     "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
     "disabled:pointer-events-none disabled:opacity-50",
-    "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2",
+    "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-1.5",
     "[&>svg]:size-4 [&>svg]:shrink-0",
   ),
   {

@@ -179,7 +179,7 @@
   --color-text-muted: var(--color-gray-11);
   --color-text-faint: var(--color-gray-9);
   /* action (accent / violet) */
-  --color-action-subtle: var(--color-accent-3);
+  --color-action-subtle: var(--color-accent-4);
   --color-action-border: var(--color-accent-7);
   --color-action: var(--color-accent-9);
   --color-action-hover: var(--color-accent-10);
@@ -201,7 +201,7 @@
    * mapped onto the semantic roles above so the component is fully on-token. */
   --color-sidebar: var(--color-surface-raised);
   --color-sidebar-foreground: var(--color-text);
-  --color-sidebar-border: var(--color-border-subtle);
+  --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-accent-8);
   --color-sidebar-accent: var(--color-action-subtle);
   --color-sidebar-accent-foreground: var(--color-action-text);
