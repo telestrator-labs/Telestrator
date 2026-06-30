@@ -10,8 +10,10 @@ import type { InputCellConfig } from "./inputCellNode";
 const BIND_DEBOUNCE_MS = 120;
 import { Slider } from "../ui/Slider";
 import { Switch } from "../ui/Switch";
-import { Select } from "../ui/Select";
+import { SelectNative } from "../ui/SelectNative";
 import { Input } from "../ui/Input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
+import { StopEditorEvents } from "./StopEditorEvents";
 
 const KINDS: InputKind[] = ["slider", "number", "text", "select", "toggle"];
 
@@ -75,35 +77,59 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
 
   return (
     <NodeViewWrapper
-      className="input-cell overflow-hidden rounded-[10px] border border-border bg-surface-sunken"
+      className="input-cell relative overflow-hidden rounded-[10px] border border-border bg-surface-sunken"
       contentEditable={false}
     >
+      {/* Config lives behind a quiet gear so the cell reads as a knob, not a
+          form — the type/name/range are settings, not the primary content. */}
       {!reading && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-surface-raised px-2.5 py-1.5 font-sans text-xs text-text-muted">
-          <span className="font-medium text-text">input</span>
-          <input
-            aria-label="bound $ key"
-            className="w-28 rounded border border-border-strong bg-surface px-1.5 py-0.5 font-mono text-xs text-text outline-none focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8"
-            value={name}
-            onChange={(e) => updateAttributes({ name: e.target.value })}
-          />
-          <select
-            aria-label="input kind"
-            className="rounded border border-border-strong bg-surface px-1.5 py-0.5 font-sans text-xs text-text"
-            value={kind}
-            onChange={(e) => updateAttributes({ kind: e.target.value })}
-          >
-            {KINDS.map((k) => (
-              <option key={k} value={k}>
-                {k}
-              </option>
-            ))}
-          </select>
-          <ConfigEditor kind={kind} config={config} setConfig={setConfig} />
+        <div className="absolute right-2 top-2 z-10">
+          <StopEditorEvents>
+            <Popover>
+              <PopoverTrigger
+                aria-label="input settings"
+                className="flex size-6 items-center justify-center rounded-md border border-border bg-surface text-text-faint outline-none hover:border-border-strong hover:text-text-muted focus-visible:ring-2 focus-visible:ring-accent-8"
+              >
+                <GearIcon />
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-72 space-y-3 font-sans text-xs"
+              >
+                <Field label="Bound $ key">
+                  <input
+                    aria-label="bound $ key"
+                    className="w-full rounded border border-border-strong bg-surface px-2 py-1 font-mono text-xs text-text outline-none focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8"
+                    value={name}
+                    onChange={(e) => updateAttributes({ name: e.target.value })}
+                  />
+                </Field>
+                <Field label="Type">
+                  <SelectNative
+                    aria-label="input kind"
+                    className="text-xs"
+                    value={kind}
+                    onChange={(e) => updateAttributes({ kind: e.target.value })}
+                  >
+                    {KINDS.map((k) => (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    ))}
+                  </SelectNative>
+                </Field>
+                <ConfigEditor
+                  kind={kind}
+                  config={config}
+                  setConfig={setConfig}
+                />
+              </PopoverContent>
+            </Popover>
+          </StopEditorEvents>
         </div>
       )}
 
-      <div className="px-3 py-3">
+      <div className="px-3 py-3 pr-10">
         <Control
           kind={kind}
           value={value}
@@ -124,6 +150,36 @@ export function InputCellView({ node, updateAttributes }: NodeViewProps) {
         </span>
       </div>
     </NodeViewWrapper>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="font-medium text-text-muted">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function GearIcon() {
+  return (
+    <svg
+      className="size-3.5"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+    >
+      <circle cx="8" cy="8" r="2.2" />
+      <path d="M8 1.5v1.6M8 12.9v1.6M14.5 8h-1.6M3.1 8H1.5M12.6 3.4l-1.1 1.1M4.5 11.5l-1.1 1.1M12.6 12.6l-1.1-1.1M4.5 4.5L3.4 3.4" />
+    </svg>
   );
 }
 
@@ -182,15 +238,21 @@ function Control({
       if (options.length === 0)
         return (
           <p className="font-sans text-sm text-text-muted">
-            Add options in the header (comma-separated).
+            Add options in settings (⚙).
           </p>
         );
       return (
-        <Select
+        <SelectNative
+          aria-label={`${name} value`}
           value={String(value ?? options[0])}
-          options={options}
-          onValueChange={setValue}
-        />
+          onChange={(e) => setValue(e.target.value)}
+        >
+          {options.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </SelectNative>
       );
     }
     case "toggle":

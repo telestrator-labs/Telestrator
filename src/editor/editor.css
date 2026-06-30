@@ -142,19 +142,6 @@
   font-family: var(--font-sans);
 }
 
-/* The language picker, styled as a mono chip. */
-.code-cell__lang {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  padding: 3px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
 .code-cell__run {
   width: 24px;
   height: 24px;
@@ -221,6 +208,61 @@
   border: none;
   border-top: 1px solid var(--color-border-subtle);
   background: transparent;
+}
+
+/* Collapse affordances. */
+.code-cell__caret {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-faint);
+  cursor: pointer;
+}
+
+.code-cell__caret:hover {
+  color: var(--color-text-muted);
+}
+
+.code-cell__expand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  text-align: left;
+}
+
+.code-cell__expand:hover {
+  background: var(--color-surface-sunken);
+}
+
+.code-cell__output-reveal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 12px;
+  border: none;
+  border-top: 1px solid var(--color-border-subtle);
+  background: transparent;
+  color: var(--color-text-faint);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.code-cell__output-reveal:hover {
+  color: var(--color-text-muted);
 }
 
 /* CodeMirror cell editor */
