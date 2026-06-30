@@ -172,11 +172,11 @@
   --color-surface-sunken: var(--color-gray-2);
   --color-surface-raised: var(--color-gray-3);
   --color-surface-active: var(--color-gray-4);
-  /* paper: the document surface for the inset card. It points at --paper (a real
+  /* paper: the document surface for the inset card. Points at --paper (a real
    * custom property, defined per-mode below) rather than directly at --white-a12,
    * because white-alpha has no dark variant — a raw white overlay would stay
    * light when .dark is set. Light = crisp near-white over the gray chrome; dark
-   * = the deepest surface (olive-1 dark) so the document reads as the dark page. */
+   * = a raised gray (olive-2) floating above the near-black shell (see --chrome). */
   --color-paper: var(--paper);
   /* borders / hairlines */
   --color-border-subtle: var(--color-gray-4);
@@ -206,8 +206,10 @@
   --color-danger-text: var(--color-danger-11);
 
   /* sidebar (consumed by the vendored shadcn sidebar in src/ui/sidebar.tsx) —
-   * mapped onto the semantic roles above so the component is fully on-token. */
-  --color-sidebar: var(--color-surface-raised);
+   * mapped onto the semantic roles above so the component is fully on-token.
+   * Bound to --chrome (per-mode) so the whole shell — sidebar, gutter, trace
+   * panel — inverts to near-black in dark while staying olive-3 in light. */
+  --color-sidebar: var(--chrome);
   --color-sidebar-foreground: var(--color-text);
   --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-accent-8);
@@ -226,12 +228,27 @@
 
 /* Per-mode tokens that can't be expressed as a single Radix scale (alpha overlays
  * have no dark variant, so they must be flipped explicitly). See the dark-mode
- * plan in .docs/dark-mode-plan.md. */
+ * plan in .docs/dark-mode-plan.md.
+ *
+ * The two surfaces invert between modes:
+ *   - --chrome: the app shell (sidebar, trace panel, inset gutter). Light = the
+ *     raised gray substrate (olive-3); dark = a near-black overlay (black-a12),
+ *     so the shell is the *darkest* plane.
+ *   - --paper: the inset document surface. Light = crisp near-white over the gray
+ *     chrome (white-a12); dark = a *raised* gray (olive-2) so the document floats
+ *     above the black shell.
+ * Net effect: in dark the depth order flips — document light-on-dark, shell black. */
 :root {
+  /* tell the UA to paint native chrome (scrollbars, form controls) for the mode,
+   * so an overflowing code cell's scrollbar isn't a bright bar on a dark page. */
+  color-scheme: light;
+  --chrome: var(--olive-3);
   --paper: var(--white-a12);
 }
 .dark {
-  --paper: var(--olive-1);
+  color-scheme: dark;
+  --chrome: var(--black-a12);
+  --paper: var(--olive-2);
 }
 
 *,

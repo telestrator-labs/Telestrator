@@ -35,11 +35,21 @@ the actual scope of dark mode.
 
 ### 1. Alpha overlays (no dark variant) — **highest priority**
 `white-alpha` / `black-alpha` are always white / always black; they don't flip.
-- **`--color-paper` (the inset document surface)** — was `var(--white-a12)`, so
-  the document stayed light while everything around it went dark (the reported
-  bug). **Fixed:** `--color-paper` now points at a real `--paper` property
-  flipped per-mode (`:root` → `white-a12`, `.dark` → `olive-1`, the deepest
-  surface). This is the template for the rest.
+- **The surface inversion (`--chrome` + `--paper`)** — `--color-paper` was
+  `var(--white-a12)`, so the document stayed light while everything around it
+  went dark (the reported bug). **Fixed by inverting the depth order in dark**
+  rather than just patching paper: two per-mode properties carry the shell and
+  the document, and they swap which is darker.
+  - `--chrome` (sidebar, inset gutter, trace panel): light `olive-3` → dark
+    `black-a12`. In dark the shell is the *darkest* plane (near-black).
+  - `--paper` (inset document card): light `white-a12` → dark `olive-2`. In dark
+    the document is a *raised* gray that floats above the black shell.
+  - Wiring: `--color-sidebar → var(--chrome)`; the gutter and `TracePanel` use
+    `bg-sidebar`; the inset card stays `bg-paper`. Light is unchanged (chrome was
+    already `surface-raised`/olive-3, paper already white-a12). This is the
+    template for the remaining alpha surfaces.
+  - Also set `color-scheme: light/dark` per-mode so the UA paints native chrome
+    (an overflowing code cell's scrollbar was a bright bar on the dark page).
 - **Inset card ring** `ring-[var(--black-a4)]` (sidebar.tsx) — a black hairline,
   invisible on a dark card. Needs `white-a` in dark (same `--card-ring` per-mode
   trick).
@@ -122,9 +132,7 @@ chrome. Tune during QA; don't pre-optimize.
 
 ## Open decisions for review
 
-- **Document surface in dark:** `--paper` is currently `olive-1` (the deepest
-  surface, so the document is the darkest plane and the chrome reads as raised).
-  Alternative: make the document a *slightly raised* dark (olive-2) with the
-  chrome at olive-1. Pick the relationship you prefer.
+- **Document surface in dark:** ~~`olive-1` (deepest) vs. raised~~ **Decided:**
+  inverted — chrome `black-a12` (darkest), document `olive-2` (raised). See §1.
 - **Default mode:** ship `system` default, or force light until dark is QA'd?
 - **Elevation in dark:** soft white shadow vs. hairline ring vs. both.

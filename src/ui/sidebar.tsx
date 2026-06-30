@@ -143,9 +143,10 @@ export const SidebarProvider = forwardRef<
           }
           className={cx(
             "group/sidebar-wrapper flex min-h-screen w-full",
-            // inset variant: the chrome (sidebar + gutter) is the subtle gray-3;
-            // the floating document card is bright "paper" (see SidebarInset).
-            "has-[[data-variant=inset]]:bg-surface-raised",
+            // inset variant: the gutter shares the shell color (--chrome via
+            // bg-sidebar) — gray-3 in light, near-black in dark — while the
+            // floating document card is bright "paper" (see SidebarInset).
+            "has-[[data-variant=inset]]:bg-sidebar",
             className,
           )}
           {...props}
