@@ -204,6 +204,23 @@ explicit footprint. Which wins depends on the three measurements above, which on
 and the decision is reversible behind the runtime's `$`/`autorun` interface, so it shouldn't block
 M0–M2.
 
+**M3 outcome (spike resolved).** Committed to **`@vue/reactivity`** — not MobX, not signals. It gives
+MobX-identical transparent deep `$.x` Proxy tracking (zero glue: `$ = reactive({})`, plain reads/writes
+become dependencies) at **~7 kB vs MobX's ~18 kB**, and adds what MobX lacks: per-run `onEffectCleanup`
++ `effectScope` teardown and a schedulable re-run hook. `@preact/signals-core` (~2 kB) was the size
+runner-up but needs a hand-written Proxy-over-signals layer and is shallow. The engine lives in
+`src/runtime/` (portable, no DOM/Sandpack) with unit tests for propagation, batching, teardown, and
+loop-detection.
+
+**M3 execution outcome — Sandpack bypassed; verdict deferred to M4.** Sandpack's file→recompile loop
+can't do state-preserving cross-cell re-run (vanilla-ts has no Fast Refresh). The reactive runtime runs
+inside a **plain sandbox iframe** (`sandbox.html` Vite entry) driven by `postMessage` — cell source goes
+in as data, outputs come back; nothing re-bundles, so `$` persists. This is simpler than the Sandpack
+headless message-channel path and avoids its preview/overlay machinery. Sandpack remains a dependency
+for its real payoff — **cell npm imports (M4)** and **export (M8)** — and the keep/drop decision is made
+there. (The M2 stuck-overlay was *not* a duplicate-client version skew: `pnpm why` shows a single
+`@codesandbox/sandpack-client`.)
+
 ---
 
 ## 5. Collaboration

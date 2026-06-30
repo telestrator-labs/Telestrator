@@ -1,9 +1,7 @@
-import { lazy, Suspense, useState } from "react";
+import { useEffect } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import type { Language } from "../core/notebook";
-
-// Sandpack is heavy, so the runner is loaded only when a cell is first run.
-const CellOutput = lazy(() => import("./CellOutput"));
+import { useRuntime, useCellOutput } from "./RuntimeProvider";
 
 // The languages a code cell can hold. Markdown is prose, not a code cell, so it
 // is intentionally excluded here.
@@ -12,25 +10,38 @@ const CODE_LANGUAGES: Array<Exclude<Language, "markdown">> = [
   "css",
 ];
 
-// The React NodeView for a code cell. In M1 the cell is inert; M2 adds a Run
-// button (TypeScript cells only) that mounts a Sandpack runner below the editor.
-// M4 swaps the textarea for CodeMirror.
+const REGISTER_DEBOUNCE_MS = 120;
+
+// The React NodeView for a code cell. As of M3, TypeScript cells participate in
+// the shared reactive runtime: editing one re-runs any cell that reads the `$`
+// values it writes. Each cell registers its source (debounced) and shows its
+// live output (the `$` keys it wrote + console + errors) below the editor.
 export function CodeCellView({ node, updateAttributes }: NodeViewProps) {
   const language = node.attrs.language as string;
   const code = node.attrs.code as string;
-  const runnable = language === "typescript";
+  const id = node.attrs.id as string | null;
+  const runnable = language === "typescript" && !!id;
 
-  // Run state is ephemeral UI — not part of the persisted cell model. `runNonce`
-  // bumps on each Run so CellOutput remounts a fresh sandbox from the latest code.
-  const [ran, setRan] = useState(false);
-  const [runNonce, setRunNonce] = useState(0);
-  const [ranCode, setRanCode] = useState("");
+  const rt = useRuntime();
+  const output = useCellOutput(id ?? "");
 
-  const run = () => {
-    setRanCode(code);
-    setRan(true);
-    setRunNonce((n) => n + 1);
-  };
+  // Register / update this cell in the runtime (debounced); deregister non-TS
+  // cells. Re-runs when code or language changes.
+  useEffect(() => {
+    if (!id) return;
+    if (language !== "typescript") {
+      rt.remove(id);
+      return;
+    }
+    const timer = setTimeout(() => rt.update(id, code), REGISTER_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [rt, id, code, language]);
+
+  // Remove from the runtime when the cell is deleted.
+  useEffect(() => {
+    if (!id) return;
+    return () => rt.remove(id);
+  }, [rt, id]);
 
   return (
     <NodeViewWrapper className="code-cell" contentEditable={false}>
@@ -48,33 +59,66 @@ export function CodeCellView({ node, updateAttributes }: NodeViewProps) {
             </option>
           ))}
         </select>
-        {runnable ? (
-          <button type="button" className="code-cell__run" onClick={run}>
-            ▶ Run
-          </button>
-        ) : (
-          <span className="code-cell__badge">inert</span>
-        )}
+        <span className="code-cell__badge">
+          {runnable ? "reactive · shares $" : "inert"}
+        </span>
       </div>
       <textarea
         className="code-cell__editor"
         value={code}
         spellCheck={false}
         rows={Math.max(3, code.split("\n").length)}
-        placeholder={language === "css" ? "/* css */" : "// typescript"}
+        placeholder={
+          language === "css" ? "/* css */" : "// e.g. $.total = $.price * 2"
+        }
         onChange={(event) => updateAttributes({ code: event.target.value })}
         // Keep keystrokes/selection inside the textarea instead of letting
         // ProseMirror treat them as document edits.
         onMouseDown={(event) => event.stopPropagation()}
         onKeyDown={(event) => event.stopPropagation()}
       />
-      {ran && (
-        <Suspense
-          fallback={<div className="code-cell__loading">Loading runner…</div>}
-        >
-          <CellOutput code={ranCode} nonce={runNonce} />
-        </Suspense>
-      )}
+      {runnable && output && <CellOutputView output={output} />}
     </NodeViewWrapper>
   );
+}
+
+function CellOutputView({
+  output,
+}: {
+  output: NonNullable<ReturnType<typeof useCellOutput>>;
+}) {
+  const valueKeys = Object.keys(output.values);
+  const hasAnything =
+    output.error || output.logs.length > 0 || valueKeys.length > 0;
+  if (!hasAnything) return null;
+
+  return (
+    <div className="code-cell__output">
+      {output.error && <div className="code-cell__error">{output.error}</div>}
+      {output.logs.map((log, i) => (
+        <div key={i} className={`code-cell__log code-cell__log--${log.level}`}>
+          {log.text}
+        </div>
+      ))}
+      {valueKeys.length > 0 && (
+        <div className="code-cell__values">
+          {valueKeys.map((k) => (
+            <span key={k} className="code-cell__value">
+              <span className="code-cell__value-key">${k}</span> ={" "}
+              {formatValue(output.values[k])}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatValue(v: unknown): string {
+  if (typeof v === "string") return JSON.stringify(v);
+  try {
+    return JSON.stringify(v);
+  } catch {
+    return String(v);
+  }
 }
