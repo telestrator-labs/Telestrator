@@ -5,7 +5,13 @@ import type { Language } from "../core/notebook";
 import { useRuntime, useCellOutput } from "./RuntimeProvider";
 import { useReadingMode } from "./ReadingMode";
 import { CodeEditor } from "./CodeEditor";
-import { SelectNative } from "../ui/SelectNative";
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "../ui/Popover";
+import { StopEditorEvents } from "./StopEditorEvents";
 
 // The languages a code cell can hold. Markdown is prose, not a code cell, so it
 // is intentionally excluded here.
@@ -90,18 +96,56 @@ export function CodeCellView({
     <NodeViewWrapper className="code-cell" contentEditable={false}>
       {!reading && (
         <div className="code-cell__header">
-          <SelectNative
-            aria-label="cell language"
-            className="w-auto rounded-md border-border bg-surface-raised py-1 pl-2 pr-7 font-mono text-[11px] text-text-muted shadow-none"
-            value={language}
-            onChange={(e) => updateAttributes({ language: e.target.value })}
-          >
-            {CODE_LANGUAGES.map((lang) => (
-              <option key={lang} value={lang}>
-                {lang}
-              </option>
-            ))}
-          </SelectNative>
+          <StopEditorEvents>
+            <Popover>
+              <PopoverTrigger
+                aria-label="cell language"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2 py-1 font-mono text-[11px] text-text-muted outline-none hover:border-border-strong focus-visible:ring-2 focus-visible:ring-accent-8"
+              >
+                {language}
+                <svg
+                  className="size-3 text-text-faint"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 6l4 4 4-4" />
+                </svg>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-36 p-1">
+                {CODE_LANGUAGES.map((lang) => (
+                  <PopoverClose asChild key={lang}>
+                    <button
+                      type="button"
+                      onClick={() => updateAttributes({ language: lang })}
+                      className={
+                        "flex w-full items-center justify-between rounded px-2 py-1.5 text-left font-mono text-[12px] hover:bg-action-subtle hover:text-action-text " +
+                        (lang === language ? "text-action-text" : "text-text")
+                      }
+                    >
+                      {lang}
+                      {lang === language && (
+                        <svg
+                          className="size-3.5"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M3.5 8.5l3 3 6-7" />
+                        </svg>
+                      )}
+                    </button>
+                  </PopoverClose>
+                ))}
+              </PopoverContent>
+            </Popover>
+          </StopEditorEvents>
           {runnable && (
             <button
               type="button"
