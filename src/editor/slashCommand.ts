@@ -15,28 +15,10 @@ const SlashPluginKey = new PluginKey("slashCommand");
 
 const ITEMS: SlashItem[] = [
   {
-    title: "Heading 1",
-    hint: "#",
-    run: (e, r) =>
-      e.chain().focus().deleteRange(r).setNode("heading", { level: 1 }).run(),
-  },
-  {
-    title: "Heading 2",
-    hint: "##",
-    run: (e, r) =>
-      e.chain().focus().deleteRange(r).setNode("heading", { level: 2 }).run(),
-  },
-  {
-    title: "Quote",
-    run: (e, r) => e.chain().focus().deleteRange(r).toggleBlockquote().run(),
-  },
-  {
-    title: "Divider",
-    run: (e, r) => e.chain().focus().deleteRange(r).setHorizontalRule().run(),
-  },
-  {
     title: "TypeScript cell",
-    hint: "runnable",
+    group: "Live",
+    icon: "TS",
+    desc: "Reactive code, shares $",
     run: (e, r) => {
       e.chain().focus().deleteRange(r).run();
       insertCodeCellAt(e, r.from, "typescript");
@@ -44,6 +26,9 @@ const ITEMS: SlashItem[] = [
   },
   {
     title: "CSS cell",
+    group: "Live",
+    icon: "{}",
+    desc: "Styles for the document",
     run: (e, r) => {
       e.chain().focus().deleteRange(r).run();
       insertCodeCellAt(e, r.from, "css");
@@ -51,11 +36,43 @@ const ITEMS: SlashItem[] = [
   },
   {
     title: "Input (slider)",
-    hint: "$ knob",
+    group: "Live",
+    icon: "◉",
+    desc: "A knob bound to a $ value",
     run: (e, r) => {
       e.chain().focus().deleteRange(r).run();
       insertInputCellAt(e, r.from);
     },
+  },
+  {
+    title: "Heading 1",
+    group: "Prose",
+    icon: "H1",
+    desc: "Big section title",
+    run: (e, r) =>
+      e.chain().focus().deleteRange(r).setNode("heading", { level: 1 }).run(),
+  },
+  {
+    title: "Heading 2",
+    group: "Prose",
+    icon: "H2",
+    desc: "Subsection title",
+    run: (e, r) =>
+      e.chain().focus().deleteRange(r).setNode("heading", { level: 2 }).run(),
+  },
+  {
+    title: "Quote",
+    group: "Prose",
+    icon: "❝",
+    desc: "Blockquote",
+    run: (e, r) => e.chain().focus().deleteRange(r).toggleBlockquote().run(),
+  },
+  {
+    title: "Divider",
+    group: "Prose",
+    icon: "―",
+    desc: "Horizontal rule",
+    run: (e, r) => e.chain().focus().deleteRange(r).setHorizontalRule().run(),
   },
 ];
 

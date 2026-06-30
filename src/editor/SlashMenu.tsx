@@ -10,6 +10,9 @@ import type { Editor, Range } from "@tiptap/core";
 export interface SlashItem {
   title: string;
   hint?: string;
+  group?: string; // category header (shown when it changes down the list)
+  icon?: string; // short glyph rendered in the icon tile
+  desc?: string; // one-line description
   run: (editor: Editor, range: Range) => void;
 }
 
@@ -62,36 +65,59 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(
 
     if (items.length === 0) {
       return (
-        <div className="w-64 rounded-md border border-border bg-surface p-2 font-sans text-sm text-text-muted shadow-md">
+        <div className="w-[300px] rounded-xl border border-border bg-surface p-2 font-sans text-sm text-text-muted shadow-[0_12px_40px_rgb(0_0_0/0.16)]">
           No matches
         </div>
       );
     }
 
     return (
-      <div className="w-64 overflow-hidden rounded-md border border-border bg-surface p-1 font-sans shadow-md">
-        {items.map((item, i) => (
-          <button
-            key={item.title}
-            type="button"
-            // Keep focus in the editor while clicking.
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => command(item)}
-            onMouseEnter={() => setSelected(i)}
-            className={`flex w-full items-center justify-between gap-3 rounded px-2 py-1.5 text-left text-sm ${
-              i === selected
-                ? "bg-interactive-subtle text-interactive-text"
-                : "text-text"
-            }`}
-          >
-            <span>{item.title}</span>
-            {item.hint && (
-              <span className="font-mono text-xs text-gray-10">
-                {item.hint}
-              </span>
-            )}
-          </button>
-        ))}
+      <div className="w-[300px] overflow-hidden rounded-xl border border-border bg-surface p-1.5 font-sans shadow-[0_12px_40px_rgb(0_0_0/0.16)]">
+        {items.map((item, i) => {
+          const newGroup = item.group && item.group !== items[i - 1]?.group;
+          const on = i === selected;
+          return (
+            <div key={item.title}>
+              {newGroup && (
+                <div className="px-2.5 pt-2 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-text-faint">
+                  {item.group}
+                </div>
+              )}
+              <button
+                type="button"
+                // Keep focus in the editor while clicking.
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => command(item)}
+                onMouseEnter={() => setSelected(i)}
+                className={`group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left ${
+                  on ? "bg-interactive-subtle" : ""
+                }`}
+              >
+                <span
+                  className={`flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[7px] font-mono text-[11px] ${
+                    on
+                      ? "bg-accent-5 text-interactive-text"
+                      : "bg-surface-raised text-text-muted"
+                  }`}
+                >
+                  {item.icon ?? "/"}
+                </span>
+                <span className="flex min-w-0 flex-col">
+                  <span
+                    className={`text-[13.5px] font-medium ${on ? "text-interactive-text" : "text-text"}`}
+                  >
+                    {item.title}
+                  </span>
+                  {(item.desc || item.hint) && (
+                    <span className="truncate text-[11.5px] text-text-faint">
+                      {item.desc ?? item.hint}
+                    </span>
+                  )}
+                </span>
+              </button>
+            </div>
+          );
+        })}
       </div>
     );
   },

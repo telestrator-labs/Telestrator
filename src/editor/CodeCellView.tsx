@@ -102,9 +102,31 @@ export function CodeCellView({
               </option>
             ))}
           </select>
-          <span className="code-cell__badge">
-            {runnable ? "reactive · shares $" : "inert"}
-          </span>
+          {runnable && (
+            <button
+              type="button"
+              className="code-cell__run"
+              title="Re-run cell"
+              onClick={runNow}
+            >
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path d="M5 3.5l7 4.5-7 4.5z" />
+              </svg>
+            </button>
+          )}
+          {runnable ? (
+            <span className="code-cell__live">
+              <i />
+              LIVE
+            </span>
+          ) : (
+            <span className="code-cell__badge">inert</span>
+          )}
         </div>
       )}
       {!codeHidden && (
@@ -121,7 +143,7 @@ export function CodeCellView({
       {reading && (
         <button
           type="button"
-          className="px-3 py-1 font-sans text-xs text-interactive-text"
+          className="code-cell__reveal"
           onClick={() => setShowCode((s) => !s)}
         >
           {showCode ? "Hide code" : "Show code"}
@@ -142,9 +164,22 @@ function CellOutputView({
     output.error || output.logs.length > 0 || valueKeys.length > 0;
   if (!hasAnything) return null;
 
+  // An error replaces the output well with a plain-language band, not a raw
+  // stack dump (the telestrator points at the problem).
+  if (output.error) {
+    return (
+      <div className="code-cell__error">
+        <span className="code-cell__error-icon">!</span>
+        <div>
+          This cell couldn’t run.{" "}
+          <span className="code-cell__error-msg">{output.error}</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="code-cell__output">
-      {output.error && <div className="code-cell__error">{output.error}</div>}
       {output.logs.map((log, i) => (
         <div key={i} className={`code-cell__log code-cell__log--${log.level}`}>
           {log.text}
@@ -152,10 +187,13 @@ function CellOutputView({
       ))}
       {valueKeys.length > 0 && (
         <div className="code-cell__values">
+          <span className="code-cell__ok">✓</span>
           {valueKeys.map((k) => (
             <span key={k} className="code-cell__value">
-              <span className="code-cell__value-key">${k}</span> ={" "}
-              {formatValue(output.values[k])}
+              <span className="code-cell__value-key">${k}</span>
+              <span className="code-cell__value-num">
+                {formatValue(output.values[k])}
+              </span>
             </span>
           ))}
         </div>

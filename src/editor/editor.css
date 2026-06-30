@@ -1,130 +1,226 @@
-/* Design-language recolor (no logic change): olive substrate, violet
- * interactive, lime live/run, gold $-value marker; serif prose, sans chrome,
- * mono code/values. Tokens are the Radix scales exposed in src/index.css. */
+/* Design-language surface ("Ink & Signal"): gray substrate, accent interactive,
+ * live (lime) run-state, value (gold) $-markers; serif prose, sans chrome, mono
+ * code. Colors come from the semantic token tier in src/index.css. */
 .notebook {
-  max-width: 760px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 24px 16px 96px;
+  padding: 38px 40px 140px;
   font-family: var(--font-sans);
-  color: var(--olive-12);
+  color: var(--color-text);
+}
+
+.notebook--reading {
+  max-width: 820px;
 }
 
 .notebook__bar {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 0;
-  margin-bottom: 16px;
-  background: var(--olive-1);
-  border-bottom: 1px solid var(--olive-6);
+  margin-bottom: 6px;
 }
 
-.notebook__title {
-  font-size: 14px;
-  color: var(--olive-11);
+.notebook__title-input {
+  font-size: clamp(28px, 3.4vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
 }
 
 .notebook__tools {
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-bottom: 18px;
 }
 
 .notebook__tools button {
   font: inherit;
   font-family: var(--font-sans);
   font-size: 13px;
-  padding: 4px 8px;
-  border: 1px solid var(--olive-7);
-  border-radius: 6px;
-  background: var(--olive-2);
-  color: var(--olive-12);
+  padding: 5px 9px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .notebook__tools button:hover {
-  background: var(--violet-3);
-  border-color: var(--violet-7);
+  background: var(--color-interactive-subtle);
+  border-color: var(--color-interactive-border);
+  color: var(--color-interactive-text);
 }
 
 .notebook__tools button:focus-visible {
-  outline: 2px solid var(--violet-8);
+  outline: 2px solid var(--color-accent-8);
   outline-offset: 1px;
 }
 
 .notebook__sep {
   width: 1px;
   height: 18px;
-  background: var(--olive-6);
+  background: var(--color-border);
   margin: 0 4px;
 }
 
 /* Tiptap document surface — prose reads as a serious technical document. */
 .notebook__doc .tiptap {
   outline: none;
-  line-height: 1.7;
+  line-height: 1.72;
   font-family: var(--font-serif);
   font-size: 18px;
-  color: var(--olive-12);
+  color: var(--color-text);
+  text-wrap: pretty;
+}
+
+.notebook--reading .tiptap {
+  font-size: 19px;
 }
 
 .notebook__doc .tiptap > * + * {
-  margin-top: 0.75em;
+  margin-top: 0.8em;
 }
 
 .notebook__doc h1,
 .notebook__doc h2 {
   font-family: var(--font-sans);
   font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .notebook__doc h1 {
-  font-size: 1.8em;
+  font-size: 1.7em;
+  line-height: 1.1;
 }
 
 .notebook__doc h2 {
-  font-size: 1.4em;
+  font-size: 1.35em;
+}
+
+.notebook__doc blockquote {
+  border-left: 3px solid var(--color-interactive-border);
+  padding-left: 16px;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.notebook__doc hr {
+  border: none;
+  height: 1px;
+  background: var(--color-border);
+  margin: 1.6em 0;
 }
 
 .notebook__doc code {
-  background: var(--olive-3);
+  background: var(--color-surface-raised);
   padding: 0.15em 0.35em;
   border-radius: 4px;
   font-family: var(--font-mono);
   font-size: 0.85em;
 }
 
-/* Code cell node — a quiet "instrument" inset into the narrative. */
+/* Code cell node — an "instrument" inset into the narrative. */
 .code-cell {
-  border: 1px solid var(--olive-6);
-  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
   overflow: hidden;
-  background: var(--olive-2);
+  background: var(--color-surface);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 4px 16px rgb(0 0 0 / 0.03);
+  margin: 22px 0;
 }
 
 .code-cell__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 6px 10px;
-  background: var(--olive-3);
-  border-bottom: 1px solid var(--olive-6);
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border-subtle);
   font-family: var(--font-sans);
 }
 
+/* The language picker, styled as a mono chip. */
 .code-cell__lang {
-  font: inherit;
-  font-family: var(--font-sans);
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.code-cell__run {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.code-cell__run:hover {
+  border-color: var(--color-interactive-border);
+  color: var(--color-interactive-text);
+}
+
+/* Live indicator: lime is the telestrator "on air" signal. */
+.code-cell__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-live-text);
+}
+
+.code-cell__live i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-live);
+  box-shadow: 0 0 0 2px var(--color-live-subtle);
+  animation: code-cell-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes code-cell-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px var(--color-live-subtle);
+  }
+  50% {
+    box-shadow: 0 0 0 5px var(--color-brand-a5);
+  }
 }
 
 .code-cell__badge {
   font-size: 11px;
-  color: var(--olive-11);
+  color: var(--color-text-faint);
+  margin-left: auto;
+}
+
+.code-cell__reveal {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--color-interactive-text);
+  cursor: pointer;
+  padding: 8px 14px;
+  border: none;
+  border-top: 1px solid var(--color-border-subtle);
+  background: transparent;
 }
 
 /* CodeMirror cell editor */
@@ -136,7 +232,7 @@
 .code-cell__cm .cm-scroller {
   font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.65;
 }
 
 .code-cell__cm .cm-editor.cm-focused {
@@ -145,53 +241,98 @@
 
 .code-cell__cm .cm-gutters {
   background: transparent;
-  border-right: 1px solid var(--olive-6);
-  color: var(--olive-9);
+  border-right: 1px solid var(--color-border-subtle);
+  color: var(--color-text-faint);
 }
 
 /* Reactive output: the `$` keys a cell wrote + console + errors. */
 .code-cell__output {
-  border-top: 1px solid var(--olive-6);
-  padding: 8px 12px;
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-sunken);
+  padding: 11px 16px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 12.5px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-.code-cell__error {
-  color: var(--red-11);
-  white-space: pre-wrap;
+.code-cell__ok {
+  color: var(--color-live-text);
+  font-weight: 700;
 }
 
 .code-cell__log {
-  color: var(--olive-11);
+  color: var(--color-text-muted);
   white-space: pre-wrap;
 }
 
 .code-cell__log--warn {
-  color: var(--gold-11);
+  color: var(--color-value);
 }
 
 .code-cell__log--error {
-  color: var(--red-11);
+  color: var(--color-danger-text);
 }
 
 .code-cell__values {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 4px 14px;
-  margin-top: 2px;
+  gap: 6px 8px;
   font-family: var(--font-mono);
 }
 
+/* The $-value marker: gold is the telestrator highlight for live values. */
 .code-cell__value {
-  color: var(--olive-12);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  color: var(--color-value);
+  background: var(--color-value-bg);
+  border-radius: 4px;
+  padding: 1px 7px;
+  box-shadow: inset 0 -2px 0 var(--color-gold-a6);
 }
 
-/* The $-value marker: gold is the telestrator highlight for live values. */
 .code-cell__value-key {
-  color: var(--gold-11);
   font-weight: 600;
+}
+
+.code-cell__value-num {
+  color: var(--color-text);
+}
+
+/* Error well — plain-language, not a raw stack dump. */
+.code-cell__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  border-top: 1px solid var(--color-danger-border);
+  background: var(--color-danger-bg);
+  padding: 14px 16px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text);
+}
+
+.code-cell__error-icon {
+  width: 21px;
+  height: 21px;
+  flex: none;
+  border-radius: 6px;
+  background: var(--color-danger);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.code-cell__error-msg {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--color-danger-text);
+  white-space: pre-wrap;
 }
