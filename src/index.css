@@ -257,6 +257,13 @@
   box-sizing: border-box;
 }
 
+/* Branded text selection (after Radix Themes' --focus-a5 ::selection). Uses the
+ * action hue (violet) at alpha-5 so the highlight tints rather than masks the
+ * text, and flips automatically in dark via the Radix dark-alpha import. */
+::selection {
+  background-color: var(--color-accent-a5);
+}
+
 /* Preflight is intentionally omitted (it fights Tiptap/ProseMirror and
  * CodeMirror), so native controls keep their user-agent chrome — most visibly a
  * default border on every <button> (the rail items, breadcrumb, etc.). Reset
