@@ -1,4 +1,5 @@
 import type { NotebookEntry } from "../editor/docIndex";
+import { Logo } from "./Logo";
 import {
   Sidebar,
   SidebarContent,
@@ -38,7 +39,7 @@ export function AppSidebar({
 }) {
   return (
     <Sidebar variant="inset" collapsible="icon">
-      <SidebarHeader>
+      <SidebarHeader className="pt-14">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -47,8 +48,8 @@ export function AppSidebar({
               tooltip="Telestrator"
               className="group-data-[collapsible=icon]:!p-1"
             >
-              <span className="relative flex size-6 flex-none items-center justify-center overflow-hidden rounded-[7px] bg-gray-12">
-                <span className="size-2.5 rounded-full bg-live shadow-[0_0_0_3px_var(--color-brand-a5)]" />
+              <span className="flex size-6 flex-none items-center justify-center">
+                <Logo className="h-5 w-auto" />
               </span>
               <span className="flex flex-col group-data-[collapsible=icon]:hidden">
                 <span className="text-[15px] font-semibold tracking-tight text-sidebar-foreground">
@@ -61,7 +62,7 @@ export function AppSidebar({
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="flex items-center gap-2 rounded-lg border border-sidebar-border bg-surface-raised px-2.5 py-[7px] text-[13px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
+        <div className="flex items-center gap-2 rounded-lg border border-sidebar-border bg-surface-active px-2.5 py-[7px] text-[13px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
           <SearchIcon />
           <span>Search notebooks…</span>
         </div>
@@ -82,9 +83,11 @@ export function AppSidebar({
                       onClick={() => onOpen(d.id)}
                       tooltip={title}
                     >
-                      <DocIcon />
-                      <span className="truncate">{title}</span>
-                      {/* live/idle status dot, hidden when collapsed to icons */}
+                      <AbbrevBadge title={title} active={active} />
+                      <span className="truncate group-data-[collapsible=icon]:hidden">
+                        {title}
+                      </span>
+                      {/* live/idle status dot, hidden when collapsed to the rail */}
                       <span
                         className={
                           "ml-auto size-[7px] flex-none rounded-full group-data-[collapsible=icon]:hidden " +
@@ -170,20 +173,29 @@ function SearchIcon() {
   );
 }
 
-function DocIcon() {
+// A 2-letter abbreviation of the document title (initials of the first two
+// words, else the first two letters) — the document's "icon" in the collapsed
+// rail, and a quick visual anchor when expanded.
+function abbreviate(title: string): string {
+  const words = title.trim().split(/\s+/).filter(Boolean);
+  const letters =
+    words.length >= 2
+      ? words[0][0] + words[1][0]
+      : (words[0] ?? "").slice(0, 2);
+  return letters.toUpperCase() || "··";
+}
+
+function AbbrevBadge({ title, active }: { title: string; active: boolean }) {
   return (
-    <svg
-      className="size-4 flex-none"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <span
+      aria-hidden
+      className={
+        "flex size-5 flex-none items-center justify-center rounded-[5px] text-[9.5px] font-semibold leading-none " +
+        (active ? "bg-action text-white" : "bg-surface-active text-text-muted")
+      }
     >
-      <path d="M9 2H4.5A1.5 1.5 0 0 0 3 3.5v9A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5V6L9 2z" />
-      <path d="M9 2v4h4" />
-    </svg>
+      {abbreviate(title)}
+    </span>
   );
 }
 

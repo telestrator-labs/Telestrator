@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NotebookView } from "./editor/NotebookView";
 import { AppSidebar } from "./chrome/AppSidebar";
-import { SidebarInset, SidebarProvider } from "./ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { EditorTopBar } from "./chrome/EditorTopBar";
 import { TracePanel } from "./chrome/TracePanel";
 import { ShareModal } from "./chrome/ShareModal";
@@ -117,15 +117,23 @@ export default function App() {
             </div>
           </>
         ) : (
-          <div className="flex-1 overflow-auto">
-            <Dashboard
-              docs={docs}
-              onOpen={openNotebook}
-              onCreateBlank={createBlank}
-              onCreateFromTemplate={createFromTemplate}
-              onDelete={deleteNotebook}
-            />
-          </div>
+          <>
+            {/* Dashboard needs its own header so the sidebar trigger is always
+                reachable (not only in the editor). */}
+            <header className="flex shrink-0 items-center gap-2 border-b border-border-subtle px-[26px] py-3">
+              <SidebarTrigger className="-ml-1" />
+              <span className="text-[13px] font-medium text-text">Home</span>
+            </header>
+            <div className="min-h-0 flex-1 overflow-auto">
+              <Dashboard
+                docs={docs}
+                onOpen={openNotebook}
+                onCreateBlank={createBlank}
+                onCreateFromTemplate={createFromTemplate}
+                onDelete={deleteNotebook}
+              />
+            </div>
+          </>
         )}
       </SidebarInset>
       {shareOpen && selected && (

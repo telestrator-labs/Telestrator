@@ -29,7 +29,7 @@ export function EditorTopBar({
   const [layout, setLayout] = useState<"document" | "studio">("document");
 
   return (
-    <div className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-border-subtle bg-surface-sunken/85 px-[26px] py-3 backdrop-blur">
+    <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border-subtle bg-surface-sunken/85 px-[26px] py-3 backdrop-blur">
       <div className="flex min-w-0 items-center gap-2 text-[13px] text-text-faint">
         <SidebarTrigger className="-ml-1" />
         <Button variant="ghost" onClick={onHome} className="px-1.5 py-0.5">

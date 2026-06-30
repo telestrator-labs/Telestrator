@@ -4,7 +4,7 @@
 // it doesn't imply data it doesn't have.
 export function TracePanel() {
   return (
-    <aside className="sticky top-[57px] h-[calc(100vh-57px)] w-[264px] flex-none overflow-auto border-l border-border-subtle bg-surface px-[18px] py-5">
+    <aside className="h-full w-[264px] flex-none overflow-auto border-l border-border-subtle bg-surface-raised px-[18px] py-5">
       <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-faint">
         On this page
       </div>

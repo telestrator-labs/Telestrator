@@ -9,6 +9,7 @@ import { useReadingMode } from "./ReadingMode";
 import { createNotebook } from "../core/notebook";
 import { insertCodeCellAt, insertInputCellAt } from "./insertCells";
 import { takePendingTemplate } from "../templates";
+import { Toolbar, type ToolbarAction } from "../ui/Toolbar";
 import "./editor.css";
 
 // The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
@@ -74,55 +75,93 @@ export function NotebookEditor({
   const insertInputCell = () =>
     insertInputCellAt(editor, editor.state.selection.to);
 
+  const toolbarGroups: ToolbarAction[][] = [
+    [
+      {
+        key: "bold",
+        title: "Bold",
+        label: <span className="font-semibold">B</span>,
+        active: editor.isActive("bold"),
+        onClick: () => editor.chain().focus().toggleBold().run(),
+      },
+      {
+        key: "italic",
+        title: "Italic",
+        label: <span className="font-serif italic">I</span>,
+        active: editor.isActive("italic"),
+        onClick: () => editor.chain().focus().toggleItalic().run(),
+      },
+      {
+        key: "heading",
+        label: "Heading",
+        active: editor.isActive("heading"),
+        items: [
+          {
+            label: "Heading 1",
+            hint: "#",
+            onSelect: () =>
+              editor.chain().focus().toggleHeading({ level: 1 }).run(),
+          },
+          {
+            label: "Heading 2",
+            hint: "##",
+            onSelect: () =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run(),
+          },
+        ],
+      },
+    ],
+    [
+      {
+        key: "code",
+        label: "Code",
+        items: [
+          {
+            label: "TypeScript cell",
+            hint: "runnable",
+            onSelect: () => insertCodeCell("typescript"),
+          },
+          { label: "CSS cell", onSelect: () => insertCodeCell("css") },
+        ],
+      },
+      { key: "input", label: "Input", onClick: insertInputCell },
+    ],
+    [
+      {
+        key: "restart",
+        label: "Restart",
+        title: "Restart runtime",
+        icon: <RestartIcon />,
+        onClick: () => runtime.restart(),
+      },
+    ],
+  ];
+
   return (
     <>
       {!reading && (
         <div className="notebook__tools">
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-          >
-            B
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-          >
-            I
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-          >
-            H1
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-          >
-            H2
-          </button>
-          <span className="notebook__sep" aria-hidden />
-          <button type="button" onClick={() => insertCodeCell("typescript")}>
-            + TS cell
-          </button>
-          <button type="button" onClick={() => insertCodeCell("css")}>
-            + CSS cell
-          </button>
-          <button type="button" onClick={insertInputCell}>
-            + Input
-          </button>
-          <span className="notebook__sep" aria-hidden />
-          <button type="button" onClick={() => runtime.restart()}>
-            ↻ Restart runtime
-          </button>
+          <Toolbar groups={toolbarGroups} />
         </div>
       )}
       <EditorContent editor={editor} className="notebook__doc" />
     </>
+  );
+}
+
+function RestartIcon() {
+  return (
+    <svg
+      className="size-3.5"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M13 8a5 5 0 1 1-1.46-3.54" />
+      <path d="M13 2.5V5h-2.5" />
+    </svg>
   );
 }

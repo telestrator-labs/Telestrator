@@ -23,7 +23,9 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3rem";
+// Collapsed is a narrow rail; documents show a 2-letter abbreviation badge so it
+// stays navigable (see AppSidebar) rather than an anonymous icon.
+const SIDEBAR_WIDTH_ICON = "3.5rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 const MOBILE_BREAKPOINT = 768;
 
@@ -141,9 +143,9 @@ export const SidebarProvider = forwardRef<
           }
           className={cx(
             "group/sidebar-wrapper flex min-h-screen w-full",
-            // inset variant: keep the chrome (sidebar + gutter) white; the
-            // floating document card carries the gray (surface-sunken) below.
-            "has-[[data-variant=inset]]:bg-surface",
+            // inset variant: the chrome (sidebar + gutter) is the subtle gray-3;
+            // the floating document card is bright "paper" (see SidebarInset).
+            "has-[[data-variant=inset]]:bg-surface-raised",
             className,
           )}
           {...props}
@@ -182,7 +184,7 @@ export const Sidebar = forwardRef<
         <div
           ref={ref}
           className={cx(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+            "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground",
             className,
           )}
           {...props}
@@ -214,7 +216,7 @@ export const Sidebar = forwardRef<
               { "--sidebar-width": SIDEBAR_WIDTH_MOBILE } as React.CSSProperties
             }
             className={cx(
-              "fixed inset-y-0 z-50 flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 ease-in-out",
+              "fixed inset-y-0 z-50 flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground transition-transform duration-200 ease-in-out",
               side === "left" ? "left-0" : "right-0",
               openMobile
                 ? "translate-x-0"
@@ -244,23 +246,23 @@ export const Sidebar = forwardRef<
       >
         <div
           className={cx(
-            "relative h-screen w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear",
+            "relative h-screen w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear",
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
               ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem)]"
-              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]",
+              : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]",
           )}
         />
         <div
           className={cx(
-            "fixed inset-y-0 z-10 hidden h-screen w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex",
+            "fixed inset-y-0 z-10 hidden h-screen w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
             variant === "floating" || variant === "inset"
               ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+1rem+2px)]"
-              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l border-sidebar-border",
+              : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l border-sidebar-border",
             className,
           )}
           {...props}
@@ -352,9 +354,12 @@ export const SidebarInset = forwardRef<
     ref={ref}
     className={cx(
       "relative flex min-h-screen min-w-0 flex-1 flex-col bg-surface-sunken",
-      // inset variant: float the content as a rounded, shadowed card with a
-      // gutter (the peer Sidebar carries data-variant=inset).
-      "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:border md:peer-data-[variant=inset]:border-border-subtle md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+      // inset variant: float the bright "paper" document as a rounded, elevated
+      // card on the gray-3 chrome — a real shadow + hairline ring give the edges
+      // enough contrast to read as lifted (the peer Sidebar carries the variant).
+      "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:rounded-xl",
+      "md:peer-data-[variant=inset]:bg-paper md:peer-data-[variant=inset]:ring-1 md:peer-data-[variant=inset]:ring-[var(--black-a4)] md:peer-data-[variant=inset]:shadow-[0_1px_2px_rgb(0_0_0/0.06),0_12px_28px_rgb(0_0_0/0.10)]",
+      "md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
       className,
     )}
     {...props}
@@ -487,7 +492,7 @@ const sidebarMenuButtonVariants = cva(
     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
     "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
     "disabled:pointer-events-none disabled:opacity-50",
-    "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2",
+    "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-1.5",
     "[&>svg]:size-4 [&>svg]:shrink-0",
   ),
   {
