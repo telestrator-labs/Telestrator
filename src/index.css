@@ -43,6 +43,23 @@
 @import "@radix-ui/colors/white-alpha.css";
 @import "@radix-ui/colors/black-alpha.css";
 
+/* Document avatar hues — a spread of Radix scales used *only* by per-document
+ * badges (see src/chrome/docAvatar.ts), not the semantic token tiers. Soft chips
+ * (step 3 fill / 11 text / 6 ring) so every hue stays legible in both modes;
+ * light + dark variants imported for the automatic flip. */
+@import "@radix-ui/colors/indigo.css";
+@import "@radix-ui/colors/indigo-dark.css";
+@import "@radix-ui/colors/cyan.css";
+@import "@radix-ui/colors/cyan-dark.css";
+@import "@radix-ui/colors/jade.css";
+@import "@radix-ui/colors/jade-dark.css";
+@import "@radix-ui/colors/amber.css";
+@import "@radix-ui/colors/amber-dark.css";
+@import "@radix-ui/colors/tomato.css";
+@import "@radix-ui/colors/tomato-dark.css";
+@import "@radix-ui/colors/plum.css";
+@import "@radix-ui/colors/plum-dark.css";
+
 /* `prose` for the notebook document. The plugin self-contains its styles under
  * .prose, so it needs no Preflight; our customization lives in typography.plugin.ts. */
 @plugin "@tailwindcss/typography";
@@ -213,10 +230,15 @@
   --color-sidebar-foreground: var(--color-text);
   --color-sidebar-border: var(--color-border);
   --color-sidebar-ring: var(--color-accent-8);
-  --color-sidebar-accent: var(--color-action-subtle);
-  --color-sidebar-accent-foreground: var(--color-action-text);
-  --color-sidebar-primary: var(--color-action);
-  --color-sidebar-primary-foreground: #fff;
+  /* Hover: a neutral gray overlay (not the accent tint) so hovering reads as a
+   * quiet highlight. */
+  --color-sidebar-accent: var(--color-gray-a4);
+  --color-sidebar-accent-foreground: var(--color-sidebar-foreground);
+  /* Active: the inverse plane — the text color as background, the surface as
+   * text. Light = near-black pill, white text; dark = near-white pill, dark
+   * text. A high-contrast selection without spending the accent hue. */
+  --color-sidebar-primary: var(--color-text);
+  --color-sidebar-primary-foreground: var(--color-surface);
 
   --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
