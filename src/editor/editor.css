@@ -13,6 +13,12 @@
   max-width: 820px;
 }
 
+/* "Studio" / wide layout — a less-constrained measure for authoring or reading
+ * documents that benefit from the extra width. */
+.notebook--wide {
+  max-width: 1100px;
+}
+
 .notebook__bar {
   display: flex;
   align-items: center;

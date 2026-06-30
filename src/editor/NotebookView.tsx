@@ -13,17 +13,19 @@ export function NotebookView({
   docId,
   title,
   reading = false,
+  wide = false,
 }: {
   docId: string;
   title: string;
   reading?: boolean;
+  wide?: boolean;
 }) {
   const { ydoc, whenSynced } = useNotebookDoc(docId);
 
   return (
     <ReadingModeContext.Provider value={reading}>
       <RuntimeProvider>
-        <div className="notebook">
+        <div className={wide ? "notebook notebook--wide" : "notebook"}>
           <header className="notebook__bar">
             {reading ? (
               <h1 className="notebook__title-input">
