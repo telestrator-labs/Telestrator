@@ -79,7 +79,9 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(
             onClick={() => command(item)}
             onMouseEnter={() => setSelected(i)}
             className={`flex w-full items-center justify-between gap-3 rounded px-2 py-1.5 text-left text-sm ${
-              i === selected ? "bg-interactive-subtle text-interactive-text" : "text-text"
+              i === selected
+                ? "bg-interactive-subtle text-interactive-text"
+                : "text-text"
             }`}
           >
             <span>{item.title}</span>

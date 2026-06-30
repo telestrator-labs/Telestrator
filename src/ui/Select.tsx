@@ -28,7 +28,9 @@ export function Select({
         )}
       >
         <SelectPrimitive.Value placeholder={placeholder} />
-        <SelectPrimitive.Icon className="text-text-muted">▾</SelectPrimitive.Icon>
+        <SelectPrimitive.Icon className="text-text-muted">
+          ▾
+        </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
         <SelectPrimitive.Content

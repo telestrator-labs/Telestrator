@@ -17,9 +17,7 @@ function makeMarkdownManager() {
 
 function cellIds(doc: JSONContent): string[] {
   return (doc.content ?? [])
-    .filter(
-      (n) => n.type === CODE_CELL_NODE || n.type === INPUT_CELL_NODE,
-    )
+    .filter((n) => n.type === CODE_CELL_NODE || n.type === INPUT_CELL_NODE)
     .map((n) => n.attrs?.id as string);
 }
 

@@ -1,106 +1,11 @@
-/* App shell: notebook switcher sidebar + main editing area.
- * Design-language recolor — left stays quiet (olive, no hue) so the document
- * holds attention; chrome is Plex Sans; interactive accents are violet. */
-.app {
-  display: flex;
-  min-height: 100vh;
-  font-family: var(--font-sans);
-}
+/* Notebook title bar + tools row. The app shell (rail, dashboard, editor
+ * chrome) is now Tailwind components under src/chrome and src/dashboard; what
+ * remains here is the in-document title/tools that live inside NotebookView. */
 
 .app-loading {
   padding: 40px;
-  color: var(--olive-11);
+  color: var(--color-text-muted);
   font-family: var(--font-sans);
-}
-
-.doc-list {
-  width: 240px;
-  flex: 0 0 240px;
-  border-right: 1px solid var(--olive-6);
-  padding: 16px 10px;
-  box-sizing: border-box;
-  background: var(--olive-2);
-}
-
-.doc-list__new {
-  width: 100%;
-  font: inherit;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  padding: 8px 10px;
-  margin-bottom: 12px;
-  border: 1px solid var(--olive-7);
-  border-radius: 6px;
-  background: var(--olive-1);
-  color: var(--olive-12);
-  cursor: pointer;
-}
-
-.doc-list__new:hover {
-  background: var(--violet-3);
-  border-color: var(--violet-7);
-}
-
-.doc-list__new:focus-visible {
-  outline: 2px solid var(--violet-8);
-  outline-offset: 1px;
-}
-
-.doc-list ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.doc-list__row {
-  display: flex;
-  align-items: center;
-  border-radius: 6px;
-}
-
-.doc-list__row.is-active {
-  background: var(--violet-3);
-}
-
-.doc-list__item {
-  flex: 1;
-  text-align: left;
-  font: inherit;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  padding: 7px 8px;
-  border: 0;
-  background: transparent;
-  color: var(--olive-12);
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.doc-list__del {
-  font: inherit;
-  font-size: 12px;
-  border: 0;
-  background: transparent;
-  color: var(--olive-9);
-  cursor: pointer;
-  padding: 4px 8px;
-  opacity: 0;
-}
-
-.doc-list__row:hover .doc-list__del {
-  opacity: 1;
-}
-
-.doc-list__del:hover {
-  color: var(--red-11);
-}
-
-.app-main {
-  flex: 1;
-  min-width: 0;
-  overflow-x: hidden;
 }
 
 /* The editable notebook title reads like a manuscript title, set in Plex Sans. */
@@ -111,7 +16,7 @@
   font-weight: 600;
   border: 0;
   background: transparent;
-  color: var(--olive-12);
+  color: var(--color-text);
   width: 100%;
   padding: 2px 0;
 }
@@ -123,31 +28,4 @@
 /* Tools render as their own row under the title bar. */
 .notebook__tools {
   margin-bottom: 16px;
-}
-
-/* Reading mode: fixed Read/Edit toggle (reachable with chrome hidden). */
-.app-mode-toggle {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 50;
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
-  font-size: 12px;
-  padding: 4px 10px;
-  border: 1px solid var(--olive-7);
-  border-radius: 6px;
-  background: var(--olive-1);
-  color: var(--olive-12);
-  cursor: pointer;
-}
-
-.app-mode-toggle:hover {
-  background: var(--violet-3);
-  border-color: var(--violet-8);
-}
-
-/* With the sidebar gone, center the document for reading. */
-.app--reading .app-main {
-  max-width: 820px;
-  margin: 0 auto;
 }

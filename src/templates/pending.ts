@@ -7,7 +7,10 @@ import type { NotebookTemplate } from "./types";
 // branch, so a torn-down StrictMode mount can't eat it before the live one seeds.
 const pending = new Map<string, NotebookTemplate>();
 
-export function setPendingTemplate(id: string, template: NotebookTemplate): void {
+export function setPendingTemplate(
+  id: string,
+  template: NotebookTemplate,
+): void {
   pending.set(id, template);
 }
 
