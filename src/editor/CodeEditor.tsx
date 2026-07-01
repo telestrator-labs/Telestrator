@@ -15,13 +15,97 @@ import {
 import {
   bracketMatching,
   defaultHighlightStyle,
+  HighlightStyle,
   indentOnInput,
   syntaxHighlighting,
 } from "@codemirror/language";
+import { tags as t } from "@lezer/highlight";
 import { javascript } from "@codemirror/lang-javascript";
 import { css } from "@codemirror/lang-css";
 
 type CellLanguage = "typescript" | "css";
+
+const isDark = () => document.documentElement.classList.contains("dark");
+
+// Light keeps CodeMirror's defaultHighlightStyle (reads well on the near-white
+// cell). Dark needs its own palette — the light style washes out on the
+// near-black cell. Rather than collapse most tokens to the default text color,
+// spread them across the Radix hues already imported for the design system so
+// each category is distinguishable: two purples separate declarations from
+// control flow, blue for functions, teal for types, amber for numbers, gold for
+// properties, green for strings, jade for regex/escapes, red for invalid, with
+// muted olive for plain identifiers / operators / comments.
+const darkHighlightStyle = HighlightStyle.define([
+  // Declarations (const/let/function/class/import) vs. control flow
+  // (if/return/await, typeof) — two related purples.
+  {
+    tag: [t.keyword, t.definitionKeyword, t.moduleKeyword],
+    color: "var(--violet-11)",
+  },
+  { tag: [t.controlKeyword, t.operatorKeyword], color: "var(--plum-11)" },
+  // Functions & method calls.
+  {
+    tag: [t.function(t.variableName), t.function(t.propertyName), t.labelName],
+    color: "var(--indigo-11)",
+  },
+  // Types, classes, annotations.
+  {
+    tag: [t.typeName, t.className, t.namespace, t.annotation],
+    color: "var(--cyan-11)",
+  },
+  // Numbers, booleans, constants, this/super.
+  {
+    tag: [
+      t.number,
+      t.bool,
+      t.atom,
+      t.constant(t.variableName),
+      t.special(t.variableName),
+    ],
+    color: "var(--amber-11)",
+  },
+  // Property / attribute names (member access, object keys) — warm gold, our
+  // "value" hue, so `$.rate`-style access reads as data.
+  { tag: [t.propertyName, t.attributeName], color: "var(--gold-11)" },
+  // Strings.
+  {
+    tag: [t.string, t.special(t.string), t.inserted],
+    color: "var(--lime-11)",
+  },
+  // Regex & escapes.
+  { tag: [t.regexp, t.escape], color: "var(--jade-11)" },
+  // Errors / removed.
+  { tag: [t.invalid, t.deleted], color: "var(--tomato-11)" },
+  // Plain identifiers = base text.
+  {
+    tag: [t.variableName, t.definition(t.variableName)],
+    color: "var(--olive-12)",
+  },
+  // Structural punctuation — muted so the colored tokens carry the eye.
+  {
+    tag: [
+      t.operator,
+      t.punctuation,
+      t.separator,
+      t.bracket,
+      t.brace,
+      t.paren,
+      t.squareBracket,
+    ],
+    color: "var(--olive-11)",
+  },
+  // Comments & meta.
+  {
+    tag: [t.comment, t.lineComment, t.blockComment, t.meta],
+    color: "var(--olive-10)",
+    fontStyle: "italic",
+  },
+  { tag: t.strong, fontWeight: "bold" },
+  { tag: t.emphasis, fontStyle: "italic" },
+]);
+
+const highlightFor = (dark: boolean) =>
+  syntaxHighlighting(dark ? darkHighlightStyle : defaultHighlightStyle);
 
 const languageExtension = (language: CellLanguage) =>
   language === "css" ? css() : javascript({ typescript: true });
@@ -68,6 +152,7 @@ export function CodeEditor({
   const host = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const langCompartment = useRef(new Compartment());
+  const highlightCompartment = useRef(new Compartment());
   // Keep the latest callbacks without recreating the editor.
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -148,7 +233,7 @@ export function CodeEditor({
           drawSelection(),
           indentOnInput(),
           bracketMatching(),
-          syntaxHighlighting(defaultHighlightStyle),
+          highlightCompartment.current.of(highlightFor(isDark())),
           cellTheme,
           keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
           langCompartment.current.of(languageExtension(language)),
@@ -170,8 +255,25 @@ export function CodeEditor({
         if (alive) view.focus();
       });
     }
+
+    // Swap the syntax palette when the theme flips (the ThemeProvider toggles
+    // `.dark` on <html>). One observer per cell; cheap and self-contained.
+    let dark = isDark();
+    const themeObserver = new MutationObserver(() => {
+      if (isDark() === dark) return;
+      dark = isDark();
+      view.dispatch({
+        effects: highlightCompartment.current.reconfigure(highlightFor(dark)),
+      });
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     return () => {
       alive = false;
+      themeObserver.disconnect();
       view.destroy();
       viewRef.current = null;
     };
