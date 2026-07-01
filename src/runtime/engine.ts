@@ -31,6 +31,7 @@ interface CellRecord {
   scope: EffectScope;
   runner: ReactiveEffectRunner;
   writes: Set<string>;
+  reads: Set<string>;
   logs: LogEntry[];
   error?: string;
 }
@@ -49,6 +50,7 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
     const output: CellOutput = {
       id: cell.id,
       values: snapshot($, cell.writes),
+      reads: [...cell.reads],
       logs: cell.logs,
       error: cell.error,
     };
@@ -84,11 +86,18 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
     flushing = false;
   };
 
-  // Records the `$` keys a cell writes (for the per-cell output) while leaving
-  // reads to flow through the reactive `$` so dependency tracking still works.
-  const makeRecorder = (writes: Set<string>): Context =>
+  // Records the `$` keys a cell reads and writes (for the per-cell output and
+  // the dependency trace). The `get` trap still returns through the reactive `$`
+  // (`Reflect.get`), so Vue's own dependency tracking — the thing that actually
+  // re-runs dependents — is untouched; we just additionally note the key. Only
+  // top-level `$.key` access is recorded (nested reads go through Vue's inner
+  // proxies, not this one), which is exactly the `$` graph we want.
+  const makeRecorder = (writes: Set<string>, reads: Set<string>): Context =>
     new Proxy($, {
-      get: (_t, key) => Reflect.get($, key),
+      get: (_t, key) => {
+        if (typeof key === "string") reads.add(key);
+        return Reflect.get($, key);
+      },
       set: (_t, key, value) => {
         if (typeof key === "string") writes.add(key);
         return Reflect.set($, key, value);
@@ -101,12 +110,13 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
 
   const makeRunner = (cell: CellRecord) => () => {
     cell.writes.clear();
+    cell.reads.clear();
     cell.logs = [];
     cell.error = undefined;
     const api: CellApi = { onDispose: (fn) => onEffectCleanup(fn) };
     const restoreConsole = captureConsole(cell.logs);
     try {
-      const result = cell.body(makeRecorder(cell.writes), api);
+      const result = cell.body(makeRecorder(cell.writes, cell.reads), api);
       if (result && typeof (result as Promise<unknown>).then === "function") {
         // Async cells: only synchronous reads are tracked (a known limitation of
         // every auto-tracker). Surface async rejections as the cell's error.
@@ -143,6 +153,7 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
       scope: undefined as unknown as EffectScope,
       runner: undefined as unknown as ReactiveEffectRunner,
       writes: new Set(),
+      reads: new Set(),
       logs: [],
     };
     cells.set(id, cell);

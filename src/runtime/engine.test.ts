@@ -153,4 +153,47 @@ describe("reactive engine", () => {
 
     engine.dispose();
   });
+
+  test("a cell reports the $ keys it reads (its dependencies) and writes", () => {
+    const engine = createEngine();
+    engine.setCell("src", ($: Context) => {
+      $.a = 2;
+      $.k = 3;
+    });
+    engine.setCell("derived", ($: Context) => {
+      $.b = ($.a as number) + ($.k as number);
+    });
+
+    const out = engine.getOutput("derived");
+    expect(out?.values).toEqual({ b: 5 });
+    expect(new Set(out?.reads)).toEqual(new Set(["a", "k"]));
+    // A pure producer records no reads.
+    expect(engine.getOutput("src")?.reads).toEqual([]);
+
+    engine.dispose();
+  });
+
+  test("reads are recomputed each run (stale dependencies drop off)", async () => {
+    const engine = createEngine();
+    engine.setCell("src", ($: Context) => {
+      $.a = 1;
+      $.b = 1;
+    });
+    engine.setCell("reader", ($: Context) => {
+      void $.a;
+      void $.b;
+    });
+    expect(new Set(engine.getOutput("reader")?.reads)).toEqual(
+      new Set(["a", "b"]),
+    );
+
+    // Re-register the reader to depend on `a` only — `b` should drop out.
+    engine.setCell("reader", ($: Context) => {
+      void $.a;
+    });
+    await flush();
+    expect(engine.getOutput("reader")?.reads).toEqual(["a"]);
+
+    engine.dispose();
+  });
 });

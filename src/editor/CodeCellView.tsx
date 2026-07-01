@@ -3,6 +3,7 @@ import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { TextSelection } from "@tiptap/pm/state";
 import type { Language } from "../core/notebook";
 import { useRuntime, useCellOutput } from "./RuntimeProvider";
+import { useCellTrace } from "./TraceContext";
 import { useReadingMode } from "./ReadingMode";
 import { CodeEditor } from "./CodeEditor";
 import { shouldFocusCell } from "./pendingFocus";
@@ -41,6 +42,7 @@ export function CodeCellView({
 
   const rt = useRuntime();
   const output = useCellOutput(id ?? "");
+  const trace = useCellTrace(id, output);
   const reading = useReadingMode();
   const [showCode, setShowCode] = useState(false);
   // Edit-mode collapse: the source (header + editor) and the output can each be
@@ -108,26 +110,35 @@ export function CodeCellView({
   return (
     <NodeViewWrapper
       data-slot="code-cell"
+      data-cellid={id ?? undefined}
       data-collapsed={cellCollapsed || undefined}
-      className="my-[22px] overflow-hidden rounded-[11px] border border-border bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.04),0_4px_16px_rgb(0_0_0/0.03)]"
-      contentEditable={false}>
+      className={cx(
+        "my-[22px] overflow-hidden rounded-[11px] border border-border bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.04),0_4px_16px_rgb(0_0_0/0.03)]",
+        trace.className,
+      )}
+      {...trace.hoverProps}
+      contentEditable={false}
+    >
       {!reading && sourceOpen && (
         <div
           data-slot="cell-header"
-          className="flex items-center gap-2.5 border-b border-border-subtle px-3 py-2 font-sans">
+          className="flex items-center gap-2.5 border-b border-border-subtle px-3 py-2 font-sans"
+        >
           <button
             type="button"
             data-slot="cell-caret"
             className="flex size-5 flex-none items-center justify-center text-text-faint hover:text-text-muted"
             title="Collapse cell"
-            onClick={() => setSourceOpen(false)}>
+            onClick={() => setSourceOpen(false)}
+          >
             <Caret open />
           </button>
           <StopEditorEvents>
             <Popover>
               <PopoverTrigger
                 aria-label="cell language"
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2 py-1 font-mono text-[11px] text-text-muted outline-none hover:border-border-strong focus-visible:ring-2 focus-visible:ring-accent-8">
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2 py-1 font-mono text-[11px] text-text-muted outline-none hover:border-border-strong focus-visible:ring-2 focus-visible:ring-accent-8"
+              >
                 {language}
                 <svg
                   className="size-3 text-text-faint"
@@ -136,7 +147,8 @@ export function CodeCellView({
                   stroke="currentColor"
                   strokeWidth={1.5}
                   strokeLinecap="round"
-                  strokeLinejoin="round">
+                  strokeLinejoin="round"
+                >
                   <path d="M4 6l4 4 4-4" />
                 </svg>
               </PopoverTrigger>
@@ -149,7 +161,8 @@ export function CodeCellView({
                       className={
                         "flex w-full items-center justify-between rounded px-2 py-1.5 text-left font-mono text-[12px] hover:bg-action-subtle hover:text-action-text " +
                         (lang === language ? "text-action-text" : "text-text")
-                      }>
+                      }
+                    >
                       {lang}
                       {lang === language && (
                         <svg
@@ -159,7 +172,8 @@ export function CodeCellView({
                           stroke="currentColor"
                           strokeWidth={2}
                           strokeLinecap="round"
-                          strokeLinejoin="round">
+                          strokeLinejoin="round"
+                        >
                           <path d="M3.5 8.5l3 3 6-7" />
                         </svg>
                       )}
@@ -175,12 +189,14 @@ export function CodeCellView({
               data-slot="cell-run"
               title="Re-run cell"
               onClick={runNow}
-              className="flex size-6 items-center justify-center rounded-md bg-action text-brand-contrast transition-colors hover:bg-action-hover">
+              className="flex size-6 items-center justify-center rounded-md bg-action text-brand-contrast transition-colors hover:bg-action-hover"
+            >
               <svg
                 width="11"
                 height="11"
                 viewBox="0 0 16 16"
-                fill="currentColor">
+                fill="currentColor"
+              >
                 <path d="M5 3.5l7 4.5-7 4.5z" />
               </svg>
             </button>
@@ -188,14 +204,16 @@ export function CodeCellView({
           {runnable ? (
             <span
               data-slot="cell-live"
-              className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.04em] text-live-text">
+              className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.04em] text-live-text"
+            >
               <i className="size-2 flex-none rounded-full bg-live shadow-[0_0_0_2px_var(--color-live-subtle)] animate-breathe" />
               LIVE
             </span>
           ) : (
             <span
               data-slot="cell-badge"
-              className="ml-auto text-[11px] text-text-faint">
+              className="ml-auto text-[11px] text-text-faint"
+            >
               inert
             </span>
           )}
@@ -210,7 +228,8 @@ export function CodeCellView({
           data-slot="cell-expand"
           title="Expand cell"
           onClick={() => setSourceOpen(true)}
-          className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-text-muted hover:bg-surface-sunken">
+          className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-text-muted hover:bg-surface-sunken"
+        >
           <Caret />
           <span className="font-mono text-[11px] text-text-muted">
             {language}
@@ -238,7 +257,8 @@ export function CodeCellView({
           type="button"
           data-slot="cell-reveal"
           onClick={() => setShowCode((s) => !s)}
-          className="border-t border-border-subtle px-3.5 py-2 font-sans text-[11.5px] font-medium text-action-text">
+          className="border-t border-border-subtle px-3.5 py-2 font-sans text-[11.5px] font-medium text-action-text"
+        >
           {showCode ? "Hide code" : "Show code"}
         </button>
       )}
@@ -255,7 +275,8 @@ export function CodeCellView({
           type="button"
           data-slot="cell-output-reveal"
           onClick={() => setOutputOpen(true)}
-          className="flex w-full items-center gap-1.5 border-t border-border-subtle px-3 py-1.5 font-mono text-[11.5px] text-text-faint hover:text-text-muted">
+          className="flex w-full items-center gap-1.5 border-t border-border-subtle px-3 py-1.5 font-mono text-[11.5px] text-text-faint hover:text-text-muted"
+        >
           <Caret /> output
         </button>
       )}
@@ -270,7 +291,8 @@ function OutputCaret({ onCollapse }: { onCollapse?: () => void }) {
       type="button"
       title="Collapse output"
       onClick={onCollapse}
-      className="absolute right-2 top-2 flex size-5 items-center justify-center rounded text-text-faint hover:text-text-muted">
+      className="absolute right-2 top-2 flex size-5 items-center justify-center rounded text-text-faint hover:text-text-muted"
+    >
       <Caret open />
     </button>
   );
@@ -288,7 +310,8 @@ function Caret({ open = false }: { open?: boolean }) {
       stroke="currentColor"
       strokeWidth={1.6}
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M4 6l4 4 4-4" />
     </svg>
   );
@@ -302,7 +325,8 @@ function CellMenu({ onDelete }: { onDelete: () => void }) {
       <Popover>
         <PopoverTrigger
           aria-label="Cell actions"
-          className="flex size-6 items-center justify-center rounded text-text-faint outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-accent-8">
+          className="flex size-6 items-center justify-center rounded text-text-faint outline-none hover:text-text-muted focus-visible:ring-2 focus-visible:ring-accent-8"
+        >
           <svg viewBox="0 0 16 16" fill="currentColor" className="size-4">
             <circle cx="3.5" cy="8" r="1.3" />
             <circle cx="8" cy="8" r="1.3" />
@@ -314,7 +338,8 @@ function CellMenu({ onDelete }: { onDelete: () => void }) {
             <button
               type="button"
               onClick={onDelete}
-              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[13px] text-danger-text hover:bg-danger-bg">
+              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[13px] text-danger-text hover:bg-danger-bg"
+            >
               <TrashIcon />
               Delete cell
             </button>
@@ -334,7 +359,8 @@ function TrashIcon() {
       stroke="currentColor"
       strokeWidth={1.4}
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" />
     </svg>
   );
@@ -358,18 +384,21 @@ function CellOutputView({
     return (
       <div
         data-slot="cell-error"
-        className="relative flex items-start gap-[11px] border-t border-danger-border bg-danger-bg px-4 py-3.5 font-sans text-[13.5px] leading-[1.55] text-text">
+        className="relative flex items-start gap-[11px] border-t border-danger-border bg-danger-bg px-4 py-3.5 font-sans text-[13.5px] leading-[1.55] text-text"
+      >
         <OutputCaret onCollapse={onCollapse} />
         <span
           data-slot="cell-error-icon"
-          className="flex size-[21px] flex-none items-center justify-center rounded-md bg-danger font-bold text-white">
+          className="flex size-[21px] flex-none items-center justify-center rounded-md bg-danger font-bold text-white"
+        >
           !
         </span>
         <div>
           This cell couldn’t run.{" "}
           <span
             data-slot="cell-error-msg"
-            className="whitespace-pre-wrap font-mono text-[12.5px] text-danger-text">
+            className="whitespace-pre-wrap font-mono text-[12.5px] text-danger-text"
+          >
             {output.error}
           </span>
         </div>
@@ -380,7 +409,8 @@ function CellOutputView({
   return (
     <div
       data-slot="cell-output"
-      className="relative flex flex-col gap-1.5 border-t border-border bg-surface-raised px-4 py-[11px] font-mono text-[12.5px]">
+      className="relative flex flex-col gap-1.5 border-t border-border bg-surface-raised px-4 py-[11px] font-mono text-[12.5px]"
+    >
       <OutputCaret onCollapse={onCollapse} />
       {output.logs.map((log, i) => (
         <div
@@ -390,14 +420,16 @@ function CellOutputView({
             "whitespace-pre-wrap text-text-muted",
             log.level === "warn" && "text-value",
             log.level === "error" && "text-danger-text",
-          )}>
+          )}
+        >
           {log.text}
         </div>
       ))}
       {valueKeys.length > 0 && (
         <div
           data-slot="cell-values"
-          className="flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono">
+          className="flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono"
+        >
           <span data-slot="cell-ok" className="font-bold text-live-text">
             ✓
           </span>
@@ -405,7 +437,8 @@ function CellOutputView({
             <span
               key={k}
               data-slot="cell-value"
-              className="inline-flex items-baseline gap-[5px] rounded bg-value-bg px-[7px] py-px text-value shadow-[inset_0_-2px_0_var(--color-gold-a6)]">
+              className="inline-flex items-baseline gap-[5px] rounded bg-value-bg px-[7px] py-px text-value shadow-[inset_0_-2px_0_var(--color-gold-a6)]"
+            >
               <span className="font-semibold">${k}</span>
               <span className="text-text">{formatValue(output.values[k])}</span>
             </span>

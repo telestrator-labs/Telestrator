@@ -91,6 +91,7 @@ async function setCell(id: string, code: string) {
       output: {
         id,
         values: {},
+        reads: [],
         logs: [],
         error: e instanceof Error ? `${e.name}: ${e.message}` : String(e),
       },

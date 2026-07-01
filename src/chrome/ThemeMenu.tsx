@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { useTheme } from "../theme/ThemeProvider";
 import type { Theme } from "../theme/theme";
+import { useTraceSettings } from "../editor/traceSettings";
+import { Switch } from "../ui/Switch";
 import {
   Popover,
   PopoverClose,
@@ -20,6 +22,7 @@ const OPTIONS: { value: Theme; label: string; icon: ReactNode }[] = [
 
 export function ThemeMenu({ children }: { children: ReactNode }) {
   const { theme, setTheme } = useTheme();
+  const { hoverEnabled, setHoverEnabled } = useTraceSettings();
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -27,8 +30,22 @@ export function ThemeMenu({ children }: { children: ReactNode }) {
         align="start"
         side="top"
         sideOffset={8}
-        className="w-[--radix-popover-trigger-width] min-w-44 p-1"
+        className="w-[--radix-popover-trigger-width] min-w-52 p-1"
       >
+        <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-faint">
+          Trace
+        </div>
+        {/* Not a PopoverClose — toggling a preference shouldn't dismiss the menu. */}
+        <label className="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13px] text-text-muted hover:bg-surface-raised hover:text-text">
+          <span className="flex size-4 flex-none items-center justify-center text-text-muted">
+            <HoverIcon />
+          </span>
+          <span className="flex-1">Show on hover</span>
+          <Switch checked={hoverEnabled} onCheckedChange={setHoverEnabled} />
+        </label>
+
+        <div className="my-1 h-px bg-border-subtle" />
+
         <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-faint">
           Theme
         </div>
@@ -57,6 +74,26 @@ export function ThemeMenu({ children }: { children: ReactNode }) {
         })}
       </PopoverContent>
     </Popover>
+  );
+}
+
+// A cursor over connected nodes — "reveal the trace on hover".
+function HoverIcon() {
+  return (
+    <svg
+      className="size-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="4" cy="4" r="1.6" />
+      <circle cx="12" cy="6" r="1.6" />
+      <path d="M5.4 4.6 10.6 5.6" />
+      <path d="M8 9.5l4.5 4.5M8 9.5l1 3 1.2-1.5 1.8-.2z" />
+    </svg>
   );
 }
 

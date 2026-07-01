@@ -68,11 +68,19 @@ export function CategoryChart({
   const stackId = stack ? "a" : undefined;
   const curveType = curve ? "monotone" : "linear";
 
+  // These are collected into a `children` array below, so each needs a stable
+  // key (recharts reads them positionally, but React still requires list keys).
   const grid = showGrid ? (
-    <CartesianGrid strokeDasharray="2 4" stroke={GRID} vertical={false} />
+    <CartesianGrid
+      key="grid"
+      strokeDasharray="2 4"
+      stroke={GRID}
+      vertical={false}
+    />
   ) : null;
   const xAxis = (
     <XAxis
+      key="x"
       dataKey={index}
       tick={tick}
       tickLine={false}
@@ -81,16 +89,22 @@ export function CategoryChart({
     />
   );
   const yAxis = (
-    <YAxis tick={tick} tickLine={false} axisLine={false} width={40} />
+    <YAxis key="y" tick={tick} tickLine={false} axisLine={false} width={40} />
   );
   const tooltip = (
     <Tooltip
+      key="tooltip"
       content={<ChartTooltip />}
       cursor={{ stroke: "var(--color-border-strong)", strokeWidth: 1 }}
     />
   );
   const legend = showLegend ? (
-    <Legend content={<ChartLegend />} verticalAlign="top" height={28} />
+    <Legend
+      key="legend"
+      content={<ChartLegend />}
+      verticalAlign="top"
+      height={28}
+    />
   ) : null;
 
   const series = categories.map((cat, i) => {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { NotebookView } from "./editor/NotebookView";
 import { RuntimeProvider } from "./editor/RuntimeProvider";
+import { TraceProvider } from "./editor/TraceContext";
+import { TraceSettingsProvider } from "./editor/traceSettings";
 import { AppSidebar } from "./chrome/AppSidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { EditorTopBar, type NotebookLayout } from "./chrome/EditorTopBar";
@@ -85,75 +87,82 @@ export default function App() {
   const inEditor = view === "editor" && selected;
 
   return (
-    <SidebarProvider className="bg-surface-sunken font-sans text-text">
-      {!reading && (
-        <AppSidebar
-          docs={docs}
-          selectedId={selectedId}
-          onOpen={openNotebook}
-          onNewBlank={createBlank}
-          onHome={goHome}
-          onDelete={deleteNotebook}
-        />
-      )}
-      <SidebarInset className="h-screen overflow-hidden">
-        {inEditor ? (
-          // Runtime is lifted here (keyed per doc) so the top bar can offer the
-          // document-level runtime reset next to the Live indicator, not the
-          // editor toolbar.
-          <RuntimeProvider key={selected.id}>
-            <EditorTopBar
-              title={selected.title}
-              reading={reading}
-              onToggleReading={setReading}
-              onHome={goHome}
-              traceOpen={traceOpen}
-              onToggleTrace={() => setTraceOpen((o) => !o)}
-              onShare={() => setShareOpen(true)}
-              layout={layout}
-              onLayoutChange={setLayout}
-              wide={wide}
-              onToggleWide={() => setWide((w) => !w)}
-            />
-            <div className="flex min-h-0 flex-1">
-              <div className="min-w-0 flex-1 overflow-auto">
-                <NotebookView
-                  key={selected.id}
-                  reading={reading}
-                  wide={wide}
-                  docId={selected.id}
+    <TraceSettingsProvider>
+      <SidebarProvider className="bg-surface-sunken font-sans text-text">
+        {!reading && (
+          <AppSidebar
+            docs={docs}
+            selectedId={selectedId}
+            onOpen={openNotebook}
+            onNewBlank={createBlank}
+            onHome={goHome}
+            onDelete={deleteNotebook}
+          />
+        )}
+        <SidebarInset className="h-screen overflow-hidden">
+          {inEditor ? (
+            // Runtime is lifted here (keyed per doc) so the top bar can offer the
+            // document-level runtime reset next to the Live indicator, not the
+            // editor toolbar.
+            <RuntimeProvider key={selected.id}>
+              <TraceProvider pinned={traceOpen && !reading}>
+                <EditorTopBar
                   title={selected.title}
+                  reading={reading}
+                  onToggleReading={setReading}
+                  onHome={goHome}
+                  traceOpen={traceOpen}
+                  onToggleTrace={() => setTraceOpen((o) => !o)}
+                  onShare={() => setShareOpen(true)}
+                  layout={layout}
+                  onLayoutChange={setLayout}
+                  wide={wide}
+                  onToggleWide={() => setWide((w) => !w)}
+                />
+                <div className="flex min-h-0 flex-1">
+                  <div
+                    data-slot="notebook-scroll"
+                    className="relative min-w-0 flex-1 overflow-auto"
+                  >
+                    <NotebookView
+                      key={selected.id}
+                      reading={reading}
+                      wide={wide}
+                      docId={selected.id}
+                      title={selected.title}
+                    />
+                  </div>
+                  {traceOpen && !reading && <TracePanel />}
+                </div>
+              </TraceProvider>
+            </RuntimeProvider>
+          ) : (
+            <>
+              {/* Dashboard needs its own header so the sidebar trigger is always
+                reachable (not only in the editor). */}
+              <header className="flex shrink-0 items-center gap-2 border-b border-border-subtle px-[26px] py-3">
+                <SidebarTrigger className="-ml-1" />
+                <span className="text-[13px] font-medium text-text">Home</span>
+              </header>
+              <div className="min-h-0 flex-1 overflow-auto">
+                <Dashboard
+                  docs={docs}
+                  onOpen={openNotebook}
+                  onCreateBlank={createBlank}
+                  onCreateFromTemplate={createFromTemplate}
+                  onDelete={deleteNotebook}
                 />
               </div>
-              {traceOpen && !reading && <TracePanel />}
-            </div>
-          </RuntimeProvider>
-        ) : (
-          <>
-            {/* Dashboard needs its own header so the sidebar trigger is always
-                reachable (not only in the editor). */}
-            <header className="flex shrink-0 items-center gap-2 border-b border-border-subtle px-[26px] py-3">
-              <SidebarTrigger className="-ml-1" />
-              <span className="text-[13px] font-medium text-text">Home</span>
-            </header>
-            <div className="min-h-0 flex-1 overflow-auto">
-              <Dashboard
-                docs={docs}
-                onOpen={openNotebook}
-                onCreateBlank={createBlank}
-                onCreateFromTemplate={createFromTemplate}
-                onDelete={deleteNotebook}
-              />
-            </div>
-          </>
+            </>
+          )}
+        </SidebarInset>
+        {shareOpen && selected && (
+          <ShareModal
+            title={selected.title}
+            onClose={() => setShareOpen(false)}
+          />
         )}
-      </SidebarInset>
-      {shareOpen && selected && (
-        <ShareModal
-          title={selected.title}
-          onClose={() => setShareOpen(false)}
-        />
-      )}
-    </SidebarProvider>
+      </SidebarProvider>
+    </TraceSettingsProvider>
   );
 }
