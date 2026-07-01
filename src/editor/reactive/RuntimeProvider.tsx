@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createIframeHost } from "@/sandbox/iframeHost";
 import { setValueEntries } from "@/editor/cells/valueRef/valueKeys";
+import { isReservedKey, walkPath } from "@/editor/cells/valueRef/valueRef";
 import type { CellOutput, RuntimeHost } from "@/runtime";
 
 // The reactive dependency graph, derived from every cell's latest output: which
@@ -35,7 +36,11 @@ function computeGraph(outputs: Map<string, CellOutput>): TraceGraph {
   const writers = new Map<string, string>();
   const readersByKey = new Map<string, Set<string>>();
   for (const out of outputs.values()) {
-    for (const k of Object.keys(out.values)) writers.set(k, out.id);
+    // Reserved keys (`__chart_*`, `__chip_*`) back charts/chips; they're not
+    // authorable `$` values, so they never become value nodes — but the cell's
+    // real *reads* (below) still count, so a chart/chip is a reader in the trace.
+    for (const k of Object.keys(out.values))
+      if (!isReservedKey(k)) writers.set(k, out.id);
     for (const k of out.reads) {
       let set = readersByKey.get(k);
       if (!set) readersByKey.set(k, (set = new Set()));
@@ -208,22 +213,56 @@ export function useTraceGraph(): TraceGraph {
   );
 }
 
-// The current value of a `$` key, for an inline prose chip. Resolves the writing
-// cell via the graph, then reads that cell's latest output — so it re-renders
-// exactly when the writer re-emits. `undefined` until something writes the key.
-export function useValue(key: string): unknown {
+// The current value at a `$` *path*, for an inline prose chip. `segments` is the
+// path after `$` — `["styles","vars","gap"]` for `$.styles.vars.gap`, or `["rate"]`
+// for a bare `$.rate`. Resolves the head key's writer via the graph, reads that
+// cell's latest output (so it re-renders exactly when the writer re-emits), then
+// walks the remaining segments over the snapshot. `undefined` until the head key
+// is written or if any hop is missing.
+export function usePathValue(segments: string[]): unknown {
   const graph = useTraceGraph();
-  const writerId = graph.values.get(key)?.writer;
+  const head = segments[0];
+  const writerId = head ? graph.values.get(head)?.writer : undefined;
   const output = useCellOutput(writerId ?? "");
-  return writerId ? output?.values[key] : undefined;
+  if (!writerId) return undefined;
+  return walkPath(output?.values[head], segments.slice(1));
+}
+
+// The current value of a single top-level `$` key (thin wrapper over usePathValue).
+export function useValue(key: string): unknown {
+  return usePathValue(key ? [key] : []);
 }
 
 // Whether a cell is *live*: it reads or writes at least one valid `$` value (a
-// value with a writer in the graph). Drives the cell's LIVE badge — an empty or
-// non-reactive cell isn't "live" just because it can run.
+// value with a writer in the graph). An empty or non-reactive cell isn't "live"
+// just because it can run.
 export function useIsLive(id: string | null): boolean {
   const graph = useTraceGraph();
   return !!id && graph.valuesTouching(id).length > 0;
+}
+
+// A cell's role in the `$` graph, for its badge:
+//   • "state"    — writes `$` but reads none: a source (a root/input value).
+//   • "derived"  — reads *and* writes `$`: a computed value (recomputes on its
+//                  inputs and feeds downstream).
+//   • "reactive" — reads `$` but writes none: a consumer that recomputes/renders
+//                  (an effect/view) without publishing back.
+// null when the cell touches no valid `$` value (inert). Reading is what makes a
+// cell recompute, so "derived"/"reactive" both run; "state" is a static source.
+export type CellRole = "state" | "derived" | "reactive";
+export function useCellRole(id: string | null): CellRole | null {
+  const graph = useTraceGraph();
+  if (!id) return null;
+  let reads = false;
+  let writes = false;
+  for (const { writer, readers } of graph.values.values()) {
+    if (writer === id) writes = true;
+    if (readers.includes(id)) reads = true;
+  }
+  if (reads && writes) return "derived";
+  if (reads) return "reactive";
+  if (writes) return "state";
+  return null;
 }
 
 // Whether the document is live: any cell has written a valid `$` value. Drives

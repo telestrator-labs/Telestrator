@@ -252,7 +252,7 @@ export function ChartView({
       {!reading && (
         <div className="flex items-center gap-2 border-t border-border px-3 py-1.5 font-mono text-xs text-text-muted">
           <span
-            className="inline-block h-2 w-2 shrink-0 rounded-full bg-live"
+            className="inline-block h-2 w-2 shrink-0 rounded-full bg-reactive"
             aria-hidden
           />
           <span className="shrink-0 text-text-faint">reads&nbsp;$</span>

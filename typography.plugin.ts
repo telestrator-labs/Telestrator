@@ -6,8 +6,9 @@ import { type Config } from "tailwindcss";
 // `@config` in src/index.css; the @tailwindcss/typography plugin is registered
 // there with `@plugin`. The `invert` block is the dark-mode hook for later.
 //
-// Note: inline `code` references the exposed `$` variables, so it wears the gold
-// "signal" scheme (matching the cell-output $-value chips).
+// Note: the gold "signal" scheme is reserved for live `$`-value chips (the
+// `.value-ref` spans). Plain inline `code` is static text, so it wears a neutral
+// muted scheme — a quiet gray pill — to keep gold meaningful.
 export default {
   theme: {
     extend: {
@@ -23,7 +24,7 @@ export default {
             "--tw-prose-hr": "var(--color-border-subtle)",
             "--tw-prose-quotes": "var(--color-text-muted)",
             "--tw-prose-quote-borders": "var(--color-action-border)",
-            "--tw-prose-code": "var(--color-value)",
+            "--tw-prose-code": "var(--color-accent-11)",
           },
         },
         DEFAULT: {
@@ -38,7 +39,7 @@ export default {
             "--tw-prose-hr": "var(--color-border-subtle)",
             "--tw-prose-quotes": "var(--color-text-muted)",
             "--tw-prose-quote-borders": "var(--color-action-border)",
-            "--tw-prose-code": "var(--color-value)",
+            "--tw-prose-code": "var(--color-accent-11)",
 
             // Base — serif manuscript body.
             color: "var(--tw-prose-body)",
@@ -49,10 +50,18 @@ export default {
             maxWidth: "none",
             "> * + *": { marginTop: "0.8em" },
             p: { marginTop: "0", marginBottom: "0.8em" },
+            // A code cell gets extra room *after* it before prose resumes: the
+            // tight 0.8em rhythm reads cramped against a heavy code block, and the
+            // design language wants a more relaxed, casual cadence around cells.
+            // Tiptap wraps each block node view in `.react-renderer.node-<type>`
+            // (the direct prose child), so `.node-codeCell` targets code cells
+            // specifically. Overrides the rhythm above for whatever follows a code
+            // cell (same specificity, later in source).
+            "> .node-codeCell + *": { marginTop: "1.9em" },
 
             // Headings — sans, tight.
             "h1, h2, h3": {
-              fontFamily: "var(--font-sans)",
+              fontFamily: "var(--font-serif)",
               color: "var(--tw-prose-headings)",
               fontWeight: "600",
               letterSpacing: "-0.02em",
@@ -82,16 +91,20 @@ export default {
             },
             strong: { color: "var(--tw-prose-bold)", fontWeight: "600" },
 
-            // Inline code — the gold $-signal scheme.
+            // Inline code — accent (violet) text on a raised neutral pill. The
+            // pill is `surface-active` (a step above `--paper`, which is now
+            // gray-2 / black-a12, not white) so it stays legible on the document
+            // surface. Code that references a reactive `$` value is re-tinted gold
+            // by the CodeSignal decoration (`.code--signal`, styled in
+            // editor/app.css), keeping gold reserved for reactive variables.
             code: {
-              color: "var(--color-value)",
-              backgroundColor: "var(--color-value-bg)",
+              color: "var(--color-accent-11)",
+              backgroundColor: "var(--color-surface-active)",
               fontFamily: "var(--font-mono)",
               fontSize: "0.85em",
               fontWeight: "500",
               borderRadius: "4px",
               padding: "0.15em 0.35em",
-              boxShadow: "inset 0 -2px 0 var(--color-gold-a6)",
             },
             "code::before": { content: '""' },
             "code::after": { content: '""' },

@@ -80,7 +80,7 @@ export function ShareModal({
                 <span className="flex-1 truncate font-mono text-[12.5px] text-text-muted">
                   telestrator.app/n/{slug(title)}
                 </span>
-                <span className="flex-none rounded-full border border-brand-5 bg-live-subtle px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] text-live-text">
+                <span className="flex-none rounded-full border border-reactive-border bg-reactive-subtle px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.05em] text-reactive-text">
                   Reads
                 </span>
               </div>
@@ -99,7 +99,7 @@ export function ShareModal({
 
         <div className="flex items-center justify-between gap-3 border-t border-border-subtle bg-surface-sunken px-[22px] py-[13px]">
           <span className="flex items-center gap-1.5 text-[12px] text-text-faint">
-            <span className="text-value">◆</span> Sharing is a preview — no link
+            <span className="text-reactive-text">◆</span> Sharing is a preview — no link
             is published yet.
           </span>
           <Button variant="primary" onClick={onClose}>

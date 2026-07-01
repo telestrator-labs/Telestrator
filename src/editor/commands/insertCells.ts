@@ -74,18 +74,35 @@ export function insertKnowledgeCheckAt(editor: Editor, at: number): void {
     .run();
 }
 
-// An inline `$`-value reference chip, dropped at the cursor mid-sentence. Unlike
-// the block cells, no trailing paragraph — it flows inside prose. A trailing
-// space keeps typing natural after the chip.
+// An inline `$`-value reference chip, dropped at the cursor mid-sentence. `expr`
+// is the full `$`-expression (`$.rate`, `$.styles.vars.gap`). Unlike the block
+// cells, no trailing paragraph — it flows inside prose; a trailing space keeps
+// typing natural after the chip.
 export function insertValueRefAt(
   editor: Editor,
   at: number,
-  name: string,
+  expr: string,
 ): void {
   editor
     .chain()
     .insertContentAt(at, [
-      { type: "valueRef", attrs: { name } },
+      { type: "valueRef", attrs: { expr } },
+      { type: "text", text: " " },
+    ])
+    .focus()
+    .run();
+}
+
+// A computed chip — starts empty (its NodeView opens the expression editor
+// straight away) with a stable id so it can register a hidden evaluation cell.
+export function insertComputedValueRefAt(editor: Editor, at: number): void {
+  editor
+    .chain()
+    .insertContentAt(at, [
+      {
+        type: "valueRef",
+        attrs: { mode: "compute", id: generateId(), expr: "" },
+      },
       { type: "text", text: " " },
     ])
     .focus()

@@ -168,3 +168,53 @@
 .value-ref--ripple {
   animation: var(--animate-value-ripple);
 }
+
+/* Computed chip: the whole expression is the "key". The trigger and each `$.*`
+   reference stay inline; the reference sub-spans get their own hover affordance
+   so each one traces to its own writer/readers independently. */
+.value-ref__expr {
+  cursor: pointer;
+  outline: none;
+}
+.value-ref__expr:focus-visible {
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--color-accent-8);
+}
+.value-ref__ref {
+  border-radius: 3px;
+  padding: 0 1px;
+  transition: background 0.1s;
+}
+.value-ref__ref:hover {
+  background: var(--color-gold-a5);
+}
+.value-ref__placeholder {
+  font-style: italic;
+  opacity: 0.7;
+}
+/* A computed chip whose expression can't evaluate — tint toward the danger hue
+   and show a compact "!" in place of the value (full error on hover / in the
+   popover). */
+.value-ref--error {
+  color: var(--color-danger-text);
+  background: var(--color-danger-bg);
+  box-shadow: inset 0 -2px 0 var(--color-danger-border);
+}
+.value-ref__val--error {
+  font-weight: 700;
+  cursor: help;
+}
+
+/* Inline code that references a reactive `$` value (tagged by codeSignal.ts) keeps
+ * the gold "signal" scheme; plain code stays neutral (typography.plugin.ts).
+ * ProseMirror may attach the decoration class to the <code> itself, to an inner
+ * span, or to an outer wrapper span — so, placement-agnostically, always re-tint
+ * the one <code> pill gold (its padding/radius come from the base rule, so there's
+ * never a doubled pill). */
+.prose code.code--signal,
+.prose code:has(.code--signal),
+.prose .code--signal code {
+  color: var(--color-reactive-text);
+  background: var(--color-reactive-bg);
+  box-shadow: inset 0 -2px 0 var(--color-gold-a6);
+}

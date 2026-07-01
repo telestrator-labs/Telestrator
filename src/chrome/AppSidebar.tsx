@@ -54,8 +54,7 @@ export function AppSidebar({
               size="lg"
               onClick={onHome}
               tooltip="Telestrator"
-              className="group-data-[collapsible=icon]:p-1!"
-            >
+              className="group-data-[collapsible=icon]:p-1!">
               <span className="flex size-6 flex-none items-center justify-center">
                 <Logo className="h-5 w-auto" />
               </span>
@@ -64,7 +63,7 @@ export function AppSidebar({
                   Telestrator
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.12em] text-sidebar-foreground/60">
-                  Reactive notebook
+                  Reactive notebooks
                 </span>
               </span>
             </SidebarMenuButton>
@@ -89,18 +88,19 @@ export function AppSidebar({
                     <SidebarMenuButton
                       isActive={active}
                       onClick={() => onOpen(d.id)}
-                      tooltip={title}
-                    >
+                      tooltip={title}>
                       <DocBadge id={d.id} title={title} />
                       <span className="truncate group-data-[collapsible=icon]:hidden">
                         {title}
                       </span>
-                      {/* live/idle status dot — fades out when the actions "⋯"
-                          takes its place on hover / while its menu is open. */}
+                      {/* active/idle status dot — a selection indicator, not a
+                          reactivity one, so it uses accent (violet), not the
+                          reactive gold. Fades out when the actions "⋯" takes its
+                          place on hover / while its menu is open. */}
                       <span
                         className={
                           "ml-auto size-[7px] flex-none rounded-full transition-opacity group-data-[collapsible=icon]:hidden group-hover/menu-item:opacity-0 " +
-                          (active ? "bg-live" : "bg-gray-6")
+                          (active ? "bg-accent-9" : "bg-gray-6")
                         }
                       />
                     </SidebarMenuButton>
@@ -116,8 +116,7 @@ export function AppSidebar({
                             <SidebarMenuSubButton
                               role="button"
                               tabIndex={0}
-                              title={`${s} (coming soon)`}
-                            >
+                              title={`${s} (coming soon)`}>
                               {s}
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -131,8 +130,7 @@ export function AppSidebar({
                 <SidebarMenuButton
                   onClick={onNewBlank}
                   tooltip="New notebook"
-                  className="border border-dashed border-sidebar-border text-sidebar-foreground/70"
-                >
+                  className="border border-dashed border-sidebar-border text-sidebar-foreground/70">
                   <PlusIcon />
                   <span className="truncate">New notebook</span>
                 </SidebarMenuButton>
@@ -149,8 +147,7 @@ export function AppSidebar({
               <SidebarMenuButton
                 size="lg"
                 tooltip="Your workspace"
-                className="group-data-[collapsible=icon]:p-1!"
-              >
+                className="group-data-[collapsible=icon]:p-1!">
                 <span className="flex size-6 flex-none items-center justify-center rounded-full bg-accent-5 text-[11px] font-semibold text-action-text">
                   You
                 </span>
@@ -181,8 +178,7 @@ function SearchIcon() {
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.6}
-    >
+      strokeWidth={1.6}>
       <circle cx="7" cy="7" r="4.5" />
       <path d="M11 11l3 3" />
     </svg>
@@ -199,8 +195,7 @@ function ChevronUpDownIcon() {
       stroke="currentColor"
       strokeWidth={1.5}
       strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+      strokeLinejoin="round">
       <path d="M5 6.5L8 3.5l3 3M5 9.5l3 3 3-3" />
     </svg>
   );
@@ -213,8 +208,7 @@ function PlusIcon() {
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.7}
-    >
+      strokeWidth={1.7}>
       <path d="M8 3v10M3 8h10" />
     </svg>
   );

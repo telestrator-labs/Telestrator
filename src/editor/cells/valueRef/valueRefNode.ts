@@ -11,6 +11,16 @@ import { ValueRefView } from "@/editor/cells/valueRef/ValueRefView";
 export const VALUE_REF_NODE = "valueRef";
 
 export interface ValueRefAttributes {
+  // A `$`-expression: a plain path (`$.rate`, `$.styles.vars.gap`) or a computed
+  // expression (`$.rate * $.qty`). Legacy chips stored a bare key in `name`.
+  expr: string;
+  // Stable id — only computed chips need one (they register a hidden runtime cell
+  // keyed by it); empty for plain-path chips.
+  id: string;
+  // "path" (default) resolves host-side; "compute" evaluates in the sandbox.
+  mode: "path" | "compute";
+  // Deprecated: a bare top-level key. Read as a fallback so pre-`expr` docs still
+  // resolve; new chips write `expr`.
   name: string;
 }
 
@@ -26,10 +36,31 @@ export const ValueRef = Node.create({
 
   addAttributes() {
     return {
+      expr: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("data-expr") ?? "",
+        renderHTML: (attrs) =>
+          attrs.expr ? { "data-expr": attrs.expr } : {},
+      },
+      id: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("data-id") ?? "",
+        renderHTML: (attrs) => (attrs.id ? { "data-id": attrs.id } : {}),
+      },
+      mode: {
+        default: "path",
+        parseHTML: (element) =>
+          element.getAttribute("data-mode") === "compute"
+            ? "compute"
+            : "path",
+        renderHTML: (attrs) =>
+          attrs.mode === "compute" ? { "data-mode": "compute" } : {},
+      },
       name: {
         default: "",
         parseHTML: (element) => element.getAttribute("data-name") ?? "",
-        renderHTML: (attrs) => ({ "data-name": attrs.name }),
+        renderHTML: (attrs) =>
+          attrs.name ? { "data-name": attrs.name } : {},
       },
     };
   },
