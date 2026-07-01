@@ -24,7 +24,7 @@ export default {
             "--tw-prose-hr": "var(--color-border-subtle)",
             "--tw-prose-quotes": "var(--color-text-muted)",
             "--tw-prose-quote-borders": "var(--color-action-border)",
-            "--tw-prose-code": "var(--color-text-muted)",
+            "--tw-prose-code": "var(--color-accent-11)",
           },
         },
         DEFAULT: {
@@ -39,7 +39,7 @@ export default {
             "--tw-prose-hr": "var(--color-border-subtle)",
             "--tw-prose-quotes": "var(--color-text-muted)",
             "--tw-prose-quote-borders": "var(--color-action-border)",
-            "--tw-prose-code": "var(--color-text-muted)",
+            "--tw-prose-code": "var(--color-accent-11)",
 
             // Base — serif manuscript body.
             color: "var(--tw-prose-body)",
@@ -83,13 +83,15 @@ export default {
             },
             strong: { color: "var(--tw-prose-bold)", fontWeight: "600" },
 
-            // Inline code — a neutral muted pill. Code that references a reactive
-            // `$` value is re-tinted gold by the CodeSignal decoration
-            // (`.code--signal`, styled in editor/app.css), keeping gold reserved
-            // for reactive variables.
+            // Inline code — accent (violet) text on a raised neutral pill. The
+            // pill is `surface-active` (a step above `--paper`, which is now
+            // gray-2 / black-a12, not white) so it stays legible on the document
+            // surface. Code that references a reactive `$` value is re-tinted gold
+            // by the CodeSignal decoration (`.code--signal`, styled in
+            // editor/app.css), keeping gold reserved for reactive variables.
             code: {
-              color: "var(--color-text-muted)",
-              backgroundColor: "var(--color-surface-raised)",
+              color: "var(--color-accent-11)",
+              backgroundColor: "var(--color-surface-active)",
               fontFamily: "var(--font-mono)",
               fontSize: "0.85em",
               fontWeight: "500",
