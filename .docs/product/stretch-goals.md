@@ -15,6 +15,12 @@
 - **Chart block.** A first-class viz cell wrapping an npm chart lib, reading `$` and re-rendering
   reactively — so "input → chart" needs no boilerplate. *Maya · the most common explorable shape ·
   depends on: input cells + a sanctioned viz lib.*
+- **Knowledge-check block.** A first-class node for lesson checks: the author fills in a question, an
+  answer kind (multiple-choice / numeric / short-text), the expected answer + tolerance, and feedback —
+  instead of hand-wiring an input cell plus a grading code cell (the manual pattern in
+  `src/templates/bitsTutorial.ts`). Easier *and* more powerful: hints, reveal-answer, and per-doc
+  progress/scoring. *Maya (educator)/Riley (learner) · lessons are a core explorable shape · depends on:
+  input cells (✅) + reactive runtime (M3 ✅); a NodeView alongside codeCell/inputCell.*
 - **Comments & annotations.** Inline comments on prose/cells (the telestrator metaphor extended to
   collaborators literally drawing on the doc). *Maya/Sam · co-authoring & review · depends on: collab (M6).*
 - **`export const x → $.x` sugar.** Let cells *export* values into `$` instead of assigning, matching
