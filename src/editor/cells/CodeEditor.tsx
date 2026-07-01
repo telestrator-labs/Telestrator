@@ -31,6 +31,7 @@ import {
   tsHoverWorker,
 } from "@valtown/codemirror-ts";
 import { getTsWorker } from "@/editor/cells/tsEnv";
+import { tsHoverTooltip } from "@/editor/cells/tsHoverTooltip";
 
 type CellLanguage = "typescript" | "css";
 
@@ -306,7 +307,7 @@ export function CodeEditor({
               tsSyncWorker(),
               tsLinterWorker(),
               autocompletion({ override: [tsAutocompleteWorker()] }),
-              tsHoverWorker(),
+              tsHoverWorker({ renderTooltip: tsHoverTooltip }),
             ]),
           });
         })

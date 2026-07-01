@@ -218,3 +218,139 @@
   background: var(--color-reactive-bg);
   box-shadow: inset 0 -2px 0 var(--color-gold-a6);
 }
+
+/* TypeScript hover — the "type popover". CodeMirror anchors it against the
+ * hovered token; we render our own content (tsHoverTooltip.ts) and style it here
+ * so it reads like the design system. Neutralize CM's default tooltip chrome and
+ * let `.ts-hover` own the surface. */
+.cm-tooltip:has(.ts-hover),
+.cm-tooltip:has(.cm-diagnostic) {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+/* CM draws a divider between stacked hover sections (e.g. type + error on the
+ * same token); our cards stand on their own, so drop it. */
+.cm-tooltip:has(.ts-hover) .cm-tooltip-section,
+.cm-tooltip:has(.cm-diagnostic) .cm-tooltip-section {
+  border-top: none;
+}
+.ts-hover {
+  max-width: 460px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 10px 34px rgb(0 0 0 / 0.18);
+}
+.ts-hover__sig {
+  padding: 7px 10px;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--olive-12);
+}
+.ts-hover__doc {
+  border-top: 1px solid var(--color-border-subtle);
+  padding: 7px 10px;
+  white-space: pre-wrap;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+.ts-hover__doc a {
+  color: var(--color-action-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.ts-hover__doc strong {
+  font-weight: 600;
+  color: var(--color-text);
+}
+.ts-hover__doc code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--color-surface-active);
+  color: var(--olive-12);
+}
+
+/* TS lint diagnostics — the "error popover". A self-contained card (matching the
+ * type popover) so it stays styled whether it shows alone or stacked with the
+ * type popover, where CM makes the shared container transparent. Severity reads
+ * from a subtle tinted fill + matching text, not a heavy accent border. */
+/* Scoped under `.cm-tooltip` to outrank CodeMirror's own `.cm-diagnostic`
+ * base-theme rule (which sets a heavy 5px `border-left`). */
+.cm-tooltip .cm-diagnostic {
+  max-width: 460px;
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 10px 34px rgb(0 0 0 / 0.18);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text);
+  white-space: pre-wrap;
+}
+.cm-tooltip .cm-diagnostic + .cm-diagnostic {
+  margin-top: 6px;
+}
+/* Severity reads from the outer border + a soft tinted fill — no accent bar. */
+.cm-tooltip .cm-diagnostic-error {
+  border-color: var(--color-danger-border);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+.cm-tooltip .cm-diagnostic-warning {
+  border-color: var(--amber-6);
+  background: var(--amber-3);
+  color: var(--amber-11);
+}
+.cm-tooltip .cm-diagnostic-info {
+  border-color: var(--color-accent-a6);
+  background: var(--color-accent-a3);
+  color: var(--color-accent-11);
+}
+/* Syntax palette for the signature — mirrors the editor's highlight tokens
+ * (raw Radix scales, like CodeEditor's darkHighlightStyle). */
+.ts-hover .quick-info-keyword {
+  color: var(--violet-11);
+}
+.ts-hover .quick-info-functionName,
+.ts-hover .quick-info-methodName {
+  color: var(--indigo-11);
+}
+.ts-hover .quick-info-aliasName,
+.ts-hover .quick-info-className,
+.ts-hover .quick-info-interfaceName,
+.ts-hover .quick-info-enumName,
+.ts-hover .quick-info-typeParameterName,
+.ts-hover .quick-info-typeAliasName {
+  color: var(--cyan-11);
+}
+.ts-hover .quick-info-propertyName {
+  color: var(--gold-11);
+}
+.ts-hover .quick-info-stringLiteral {
+  color: var(--lime-11);
+}
+.ts-hover .quick-info-numericLiteral {
+  color: var(--amber-11);
+}
+.ts-hover .quick-info-punctuation,
+.ts-hover .quick-info-operator,
+.ts-hover .quick-info-space {
+  color: var(--olive-11);
+}
+.ts-hover .quick-info-localName,
+.ts-hover .quick-info-parameterName {
+  color: var(--olive-12);
+}
