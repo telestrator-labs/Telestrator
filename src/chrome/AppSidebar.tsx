@@ -1,5 +1,6 @@
 import type { NotebookEntry } from "../editor/docIndex";
 import { DocBadge } from "./DocBadge";
+import { DocActionsMenu } from "./DocActionsMenu";
 import { ThemeMenu } from "./ThemeMenu";
 import { Logo } from "./Logo";
 import {
@@ -92,14 +93,16 @@ export function AppSidebar({
                       <span className="truncate group-data-[collapsible=icon]:hidden">
                         {title}
                       </span>
-                      {/* live/idle status dot, hidden when collapsed to the rail */}
+                      {/* live/idle status dot — fades out when the actions "⋯"
+                          takes its place on hover / while its menu is open. */}
                       <span
                         className={
-                          "ml-auto size-[7px] flex-none rounded-full group-data-[collapsible=icon]:hidden " +
+                          "ml-auto size-[7px] flex-none rounded-full transition-opacity group-data-[collapsible=icon]:hidden group-hover/menu-item:opacity-0 " +
                           (active ? "bg-live" : "bg-gray-6")
                         }
                       />
                     </SidebarMenuButton>
+                    <DocActionsMenu title={title} />
                     {/* Sub-document stubs for the open notebook. */}
                     {active && (
                       <SidebarMenuSub>
