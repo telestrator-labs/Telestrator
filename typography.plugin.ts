@@ -50,6 +50,14 @@ export default {
             maxWidth: "none",
             "> * + *": { marginTop: "0.8em" },
             p: { marginTop: "0", marginBottom: "0.8em" },
+            // A code cell gets extra room *after* it before prose resumes: the
+            // tight 0.8em rhythm reads cramped against a heavy code block, and the
+            // design language wants a more relaxed, casual cadence around cells.
+            // Tiptap wraps each block node view in `.react-renderer.node-<type>`
+            // (the direct prose child), so `.node-codeCell` targets code cells
+            // specifically. Overrides the rhythm above for whatever follows a code
+            // cell (same specificity, later in source).
+            "> .node-codeCell + *": { marginTop: "1.9em" },
 
             // Headings — sans, tight.
             "h1, h2, h3": {
