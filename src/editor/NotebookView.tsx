@@ -1,7 +1,7 @@
 import { NotebookEditor } from "./NotebookEditor";
-import { useNotebookDoc } from "./useNotebookDoc";
-import { ReadingModeContext } from "./ReadingMode";
-import { TraceOverlay } from "./TraceOverlay";
+import { useNotebookDoc } from "@/editor/persistence/useNotebookDoc";
+import { ReadingModeContext } from "@/editor/shared/ReadingMode";
+import { TraceOverlay } from "@/editor/trace/TraceOverlay";
 import { cx } from "../ui/cx";
 
 // One open notebook. Mounted keyed by docId, so switching notebooks fully

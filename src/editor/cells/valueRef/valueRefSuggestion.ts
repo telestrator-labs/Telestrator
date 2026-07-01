@@ -2,9 +2,13 @@ import { Extension } from "@tiptap/core";
 import { PluginKey } from "@tiptap/pm/state";
 import Suggestion from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
-import { SlashMenu, type SlashItem, type SlashMenuRef } from "./SlashMenu";
-import { insertValueRefAt } from "./insertCells";
-import { getValueEntries } from "./valueKeys";
+import {
+  SlashMenu,
+  type SlashItem,
+  type SlashMenuRef,
+} from "@/editor/commands/SlashMenu";
+import { insertValueRefAt } from "@/editor/commands/insertCells";
+import { getValueEntries } from "@/editor/cells/valueRef/valueKeys";
 
 // `$`-triggered autocomplete for inline value chips. Typing `$` at a word
 // boundary opens a picker of the notebook's live `$` keys (with current values);

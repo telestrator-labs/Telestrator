@@ -1,21 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { TextSelection } from "@tiptap/pm/state";
-import type { Language } from "../core/notebook";
-import { useRuntime, useCellOutput, useIsLive } from "./RuntimeProvider";
-import { cssRegistry } from "./cssRegistry";
-import { useCellTrace } from "./TraceContext";
-import { useReadingMode } from "./ReadingMode";
-import { CodeEditor } from "./CodeEditor";
-import { shouldFocusCell } from "./pendingFocus";
+import type { Language } from "@/core/notebook";
+import {
+  useRuntime,
+  useCellOutput,
+  useIsLive,
+} from "@/editor/reactive/RuntimeProvider";
+import { cssRegistry } from "@/editor/reactive/cssRegistry";
+import { useCellTrace } from "@/editor/trace/TraceContext";
+import { useReadingMode } from "@/editor/shared/ReadingMode";
+import { CodeEditor } from "@/editor/cells/CodeEditor";
+import { shouldFocusCell } from "@/editor/shared/pendingFocus";
 import {
   Popover,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "../ui/Popover";
-import { StopEditorEvents } from "./StopEditorEvents";
-import { cx } from "../ui/cx";
+} from "@/ui/Popover";
+import { StopEditorEvents } from "@/editor/shared/StopEditorEvents";
+import { cx } from "@/ui/cx";
 
 // The languages a code cell can hold. Markdown is prose, not a code cell, so it
 // is intentionally excluded here.

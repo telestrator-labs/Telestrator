@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Button } from "../ui/Button";
 import { SidebarTrigger } from "../ui/sidebar";
-import { useRuntime, useDocumentLive } from "../editor/RuntimeProvider";
+import { useRuntime, useDocumentLive } from "@/editor/reactive/RuntimeProvider";
 import { cx } from "../ui/cx";
 
 export type NotebookLayout = "document" | "studio";

@@ -1,6 +1,6 @@
 import type { Editor } from "@tiptap/core";
-import { createCell, generateId } from "../core/notebook";
-import { requestCellFocus } from "./pendingFocus";
+import { createCell, generateId } from "@/core/notebook";
+import { requestCellFocus } from "@/editor/shared/pendingFocus";
 
 // Shared cell-insertion helpers so the toolbar buttons and the slash menu
 // produce identical cells from one source of truth. `at` is the document

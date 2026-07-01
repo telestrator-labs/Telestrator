@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { useRuntime, useCellOutput } from "./RuntimeProvider";
-import { useCellTrace } from "./TraceContext";
-import { useReadingMode } from "./ReadingMode";
-import { cx } from "../ui/cx";
+import { useRuntime, useCellOutput } from "@/editor/reactive/RuntimeProvider";
+import { useCellTrace } from "@/editor/trace/TraceContext";
+import { useReadingMode } from "@/editor/shared/ReadingMode";
+import { cx } from "@/ui/cx";
 import {
   chartCellCode,
   chartOutputKey,
@@ -11,17 +11,17 @@ import {
   resolveSeries,
   type ChartConfig,
   type ChartType,
-} from "./chart";
-import { CategoryChart } from "../ui/chart/CategoryChart";
-import { SelectNative } from "../ui/SelectNative";
-import { Switch } from "../ui/Switch";
+} from "@/editor/cells/chart/chart";
+import { CategoryChart } from "@/ui/chart/CategoryChart";
+import { SelectNative } from "@/ui/SelectNative";
+import { Switch } from "@/ui/Switch";
 import {
   Popover,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "../ui/Popover";
-import { StopEditorEvents } from "./StopEditorEvents";
+} from "@/ui/Popover";
+import { StopEditorEvents } from "@/editor/shared/StopEditorEvents";
 
 // Debounce runtime re-registration so editing the expression doesn't re-transpile
 // on every keystroke (mirrors InputCellView's BIND_DEBOUNCE_MS).

@@ -7,9 +7,9 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { createIframeHost } from "../sandbox/iframeHost";
-import { setValueEntries } from "./valueKeys";
-import type { CellOutput, RuntimeHost } from "../runtime";
+import { createIframeHost } from "@/sandbox/iframeHost";
+import { setValueEntries } from "@/editor/cells/valueRef/valueKeys";
+import type { CellOutput, RuntimeHost } from "@/runtime";
 
 // The reactive dependency graph, derived from every cell's latest output: which
 // cell writes each `$` value and which cells read it. This is the data "the

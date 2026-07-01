@@ -1,26 +1,30 @@
 import { useEffect, useRef } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { useRuntime } from "./RuntimeProvider";
-import { useCellTrace } from "./TraceContext";
-import { useReadingMode } from "./ReadingMode";
-import { cx } from "../ui/cx";
-import { bindingCode, coerceValue, type InputKind } from "./binding";
-import type { InputCellConfig } from "./inputCellNode";
+import { useRuntime } from "@/editor/reactive/RuntimeProvider";
+import { useCellTrace } from "@/editor/trace/TraceContext";
+import { useReadingMode } from "@/editor/shared/ReadingMode";
+import { cx } from "@/ui/cx";
+import {
+  bindingCode,
+  coerceValue,
+  type InputKind,
+} from "@/editor/cells/input/binding";
+import type { InputCellConfig } from "@/editor/cells/input/inputCellNode";
 
 // Debounce runtime re-registration so a slider drag doesn't spam the sandbox
 // with re-transpiles (mirrors CodeCellView's REGISTER_DEBOUNCE_MS).
 const BIND_DEBOUNCE_MS = 120;
-import { Slider } from "../ui/Slider";
-import { Switch } from "../ui/Switch";
-import { SelectNative } from "../ui/SelectNative";
-import { Input } from "../ui/Input";
+import { Slider } from "@/ui/Slider";
+import { Switch } from "@/ui/Switch";
+import { SelectNative } from "@/ui/SelectNative";
+import { Input } from "@/ui/Input";
 import {
   Popover,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "../ui/Popover";
-import { StopEditorEvents } from "./StopEditorEvents";
+} from "@/ui/Popover";
+import { StopEditorEvents } from "@/editor/shared/StopEditorEvents";
 
 const KINDS: InputKind[] = ["slider", "number", "text", "select", "toggle"];
 

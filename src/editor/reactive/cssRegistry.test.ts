@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "vitest";
-import { cssRegistry, OUTPUT_CLASS } from "./cssRegistry";
+import { cssRegistry, OUTPUT_CLASS } from "@/editor/reactive/cssRegistry";
 
 const styleFor = (id: string) =>
   document.head.querySelector<HTMLStyleElement>(

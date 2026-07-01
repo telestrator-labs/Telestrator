@@ -1,7 +1,7 @@
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { useValue } from "./RuntimeProvider";
-import { useTrace, usePulse } from "./TraceContext";
-import { cx } from "../ui/cx";
+import { useValue } from "@/editor/reactive/RuntimeProvider";
+import { useTrace, usePulse } from "@/editor/trace/TraceContext";
+import { cx } from "@/ui/cx";
 
 // The NodeView for an inline `$`-value reference — a gold chip in the prose that
 // shows the key and its *current* value, updating live as inputs change, and

@@ -1,5 +1,5 @@
-import { useTraceGraph } from "../editor/RuntimeProvider";
-import { useTrace } from "../editor/TraceContext";
+import { useTraceGraph } from "@/editor/reactive/RuntimeProvider";
+import { useTrace } from "@/editor/trace/TraceContext";
 
 // The right context panel: a live read-out of the reactive dependency graph —
 // which `$` value feeds which cells — assembled from the runtime's per-cell

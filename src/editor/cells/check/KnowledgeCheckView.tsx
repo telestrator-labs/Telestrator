@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { useRuntime } from "./RuntimeProvider";
-import { useCellTrace } from "./TraceContext";
-import { useReadingMode } from "./ReadingMode";
+import { useRuntime } from "@/editor/reactive/RuntimeProvider";
+import { useCellTrace } from "@/editor/trace/TraceContext";
+import { useReadingMode } from "@/editor/shared/ReadingMode";
 import {
   bindingCode,
   gradeAnswer,
   type AnswerKind,
   type KnowledgeCheckConfig,
-} from "./knowledgeCheck";
-import { SelectNative } from "../ui/SelectNative";
-import { Switch } from "../ui/Switch";
+} from "@/editor/cells/check/knowledgeCheck";
+import { SelectNative } from "@/ui/SelectNative";
+import { Switch } from "@/ui/Switch";
 import {
   Sheet,
   SheetClose,
@@ -20,9 +20,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "../ui/Sheet";
-import { StopEditorEvents } from "./StopEditorEvents";
-import { cx } from "../ui/cx";
+} from "@/ui/Sheet";
+import { StopEditorEvents } from "@/editor/shared/StopEditorEvents";
+import { cx } from "@/ui/cx";
 
 const BIND_DEBOUNCE_MS = 120;
 

@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { ValueRefView } from "./ValueRefView";
+import { ValueRefView } from "@/editor/cells/valueRef/ValueRefView";
 
 // An inline `$`-value reference in prose — the "live value in the sentence". A
 // single inline atom holding the `$` key it points at (`name`); the NodeView

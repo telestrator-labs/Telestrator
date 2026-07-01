@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { ChartView } from "./ChartView";
-import type { ChartConfig, ChartType } from "./chart";
+import { ChartView } from "@/editor/cells/chart/ChartView";
+import type { ChartConfig, ChartType } from "@/editor/cells/chart/chart";
 
 // A chart block: a first-class viz cell. The mirror of an input cell — where an
 // input writes a `$` value, a chart *reads* one (an author expression over `$`)

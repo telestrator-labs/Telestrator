@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { NotebookView } from "./editor/NotebookView";
-import { RuntimeProvider } from "./editor/RuntimeProvider";
-import { TraceProvider } from "./editor/TraceContext";
-import { TraceSettingsProvider } from "./editor/traceSettings";
+import { RuntimeProvider } from "@/editor/reactive/RuntimeProvider";
+import { TraceProvider } from "@/editor/trace/TraceContext";
+import { TraceSettingsProvider } from "@/editor/trace/traceSettings";
 import { AppSidebar } from "./chrome/AppSidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { EditorTopBar, type NotebookLayout } from "./chrome/EditorTopBar";
@@ -21,7 +21,7 @@ import {
   subscribe,
   whenReady,
   type NotebookEntry,
-} from "./editor/docIndex";
+} from "@/editor/persistence/docIndex";
 import "./editor/app.css";
 
 // Subscribe to the document index (a dedicated Yjs doc in IndexedDB). Selection

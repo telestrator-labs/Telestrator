@@ -6,11 +6,11 @@ import {
   type Language,
   type NotebookDocument,
 } from "../core/notebook";
-import { CODE_CELL_NODE } from "./codeCellNode";
-import { INPUT_CELL_NODE } from "./inputCellNode";
-import { KNOWLEDGE_CHECK_NODE } from "./knowledgeCheckNode";
-import { CHART_NODE } from "./chartNode";
-import { VALUE_REF_NODE } from "./valueRefNode";
+import { CODE_CELL_NODE } from "@/editor/cells/code/codeCellNode";
+import { INPUT_CELL_NODE } from "@/editor/cells/input/inputCellNode";
+import { KNOWLEDGE_CHECK_NODE } from "@/editor/cells/check/knowledgeCheckNode";
+import { CHART_NODE } from "@/editor/cells/chart/chartNode";
+import { VALUE_REF_NODE } from "@/editor/cells/valueRef/valueRefNode";
 
 // The bridge between the editor's ProseMirror document and the framework-
 // agnostic core `NotebookDocument`. The mapping (TypeCell-style):

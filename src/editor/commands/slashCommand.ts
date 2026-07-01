@@ -2,13 +2,17 @@ import { Extension, type Editor, type Range } from "@tiptap/core";
 import { PluginKey } from "@tiptap/pm/state";
 import Suggestion from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
-import { SlashMenu, type SlashItem, type SlashMenuRef } from "./SlashMenu";
+import {
+  SlashMenu,
+  type SlashItem,
+  type SlashMenuRef,
+} from "@/editor/commands/SlashMenu";
 import {
   insertCodeCellAt,
   insertInputCellAt,
   insertKnowledgeCheckAt,
   insertChartAt,
-} from "./insertCells";
+} from "@/editor/commands/insertCells";
 
 // `/`-command insertion. A thin Extension wrapping @tiptap/suggestion: typing "/"
 // at a textblock start (or after whitespace) opens a filterable popup; choosing

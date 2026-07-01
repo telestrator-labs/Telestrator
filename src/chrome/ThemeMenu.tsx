@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useTheme } from "../theme/ThemeProvider";
 import type { Theme } from "../theme/theme";
-import { useTraceSettings } from "../editor/traceSettings";
+import { useTraceSettings } from "@/editor/trace/traceSettings";
 import { Switch } from "../ui/Switch";
 import {
   Popover,
