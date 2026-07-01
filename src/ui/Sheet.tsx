@@ -77,11 +77,13 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cx(sheetVariants({ side }), className)}
-        {...props}>
+        {...props}
+      >
         {children}
         <SheetPrimitive.Close
           aria-label="Close"
-          className="absolute right-3.5 top-3.5 rounded-md p-0.5 text-text-faint opacity-80 outline-none transition hover:text-text focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-accent-8">
+          className="absolute right-3.5 top-3.5 rounded-md p-0.5 text-text-faint opacity-80 outline-none transition hover:text-text focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-accent-8"
+        >
           <XGlyph />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>
@@ -152,7 +154,8 @@ function XGlyph() {
       strokeWidth={1.6}
       strokeLinecap="round"
       strokeLinejoin="round"
-      aria-hidden>
+      aria-hidden
+    >
       <path d="M4 4l8 8M12 4l-8 8" />
     </svg>
   );

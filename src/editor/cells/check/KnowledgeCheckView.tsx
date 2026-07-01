@@ -135,7 +135,7 @@ export function KnowledgeCheckView({
       {/* Warm authoring header — hidden for the reader. */}
       {!reading && (
         <div className="flex items-center gap-2.5 border-b border-value-border bg-value-bg px-3 py-2">
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-value-border bg-gold-9 py-0.75 pl-1.5 pr-2 font-mono text-[11px] font-medium text-value-contrast">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-transparent bg-gold-9 py-0.75 pl-1.5 pr-2 font-mono text-[11px] font-medium text-value-contrast">
             <CheckChipGlyph />
             check
           </span>
@@ -321,7 +321,7 @@ export function KnowledgeCheckView({
               type="button"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => setHintOpen((o) => !o)}
-              className="font-sans! inline-flex items-center gap-1.5 rounded-[9px] border border-value-border bg-value-bg px-3 py-2 text-[12.5px] font-medium text-value hover:bg-gold-4">
+              className="font-sans! inline-flex items-center gap-1.5 rounded-[9px] border border-transparent bg-value-bg px-3 py-2 text-[12.5px] font-medium text-value hover:bg-gold-4">
               {hintOpen ? "Hide hint" : "Show hint"}
             </button>
           )}

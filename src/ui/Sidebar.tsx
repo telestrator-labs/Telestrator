@@ -149,7 +149,8 @@ export const SidebarProvider = forwardRef<
             "has-[[data-variant=inset]]:bg-sidebar",
             className,
           )}
-          {...props}>
+          {...props}
+        >
           {children}
         </div>
       </SidebarContext.Provider>
@@ -187,7 +188,8 @@ export const Sidebar = forwardRef<
             "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground",
             className,
           )}
-          {...props}>
+          {...props}
+        >
           {children}
         </div>
       );
@@ -224,7 +226,8 @@ export const Sidebar = forwardRef<
                   : "translate-x-full",
               className,
             )}
-            {...props}>
+            {...props}
+          >
             {children}
           </div>
         </>
@@ -240,7 +243,8 @@ export const Sidebar = forwardRef<
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
-        data-side={side}>
+        data-side={side}
+      >
         <div
           className={cx(
             "relative h-screen w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 ease-linear",
@@ -262,14 +266,16 @@ export const Sidebar = forwardRef<
               : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l border-sidebar-border",
             className,
           )}
-          {...props}>
+          {...props}
+        >
           <div
             data-sidebar="sidebar"
             className={cx(
               "flex h-full w-full flex-col bg-sidebar",
               variant === "floating" &&
                 "rounded-lg border border-sidebar-border shadow-sm",
-            )}>
+            )}
+          >
             {children}
           </div>
         </div>
@@ -298,7 +304,8 @@ export const SidebarTrigger = forwardRef<
         "inline-flex h-8 w-8 items-center justify-center rounded-lg text-text-muted outline-none hover:bg-surface-active hover:text-text focus-visible:ring-2 focus-visible:ring-sidebar-ring",
         className,
       )}
-      {...props}>
+      {...props}
+    >
       <svg
         width="16"
         height="16"
@@ -307,7 +314,8 @@ export const SidebarTrigger = forwardRef<
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
-        strokeLinejoin="round">
+        strokeLinejoin="round"
+      >
         <rect width="18" height="18" x="3" y="3" rx="2" />
         <path d="M9 3v18" />
       </svg>
