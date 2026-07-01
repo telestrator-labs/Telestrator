@@ -10,16 +10,16 @@ export function Sparkline({
 }) {
   const bars = barsFromSeed(seed, 11);
   return (
-    <div className="flex h-[104px] items-end gap-1 border-b border-border-subtle bg-gradient-to-b from-surface-sunken to-surface px-[18px] py-4">
+    <div className="flex h-26 items-end gap-1 border-b border-border-subtle bg-linear-to-b from-surface-sunken to-surface px-4.5 py-4">
       {bars.map((h, i) => (
         <div
           key={i}
           className={
             "min-w-0 flex-1 rounded-t-[3px] " +
             (accent && i === bars.length - 2
-              ? "bg-live"
+              ? "bg-gold-9"
               : accent
-                ? "bg-accent-6"
+                ? "bg-action"
                 : "bg-gray-6")
           }
           style={{ height: `${h}%` }}

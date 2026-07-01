@@ -96,8 +96,7 @@ export function InputCellView({
   return (
     <NodeViewWrapper
       className="input-cell relative overflow-hidden rounded-[10px] border border-border bg-surface-sunken"
-      contentEditable={false}
-    >
+      contentEditable={false}>
       {/* Config lives behind a quiet gear so the cell reads as a knob, not a
           form — the type/name/range are settings, not the primary content. */}
       {!reading && (
@@ -106,18 +105,16 @@ export function InputCellView({
             <Popover>
               <PopoverTrigger
                 aria-label="input settings"
-                className="flex size-6 items-center justify-center rounded-md border border-border bg-surface text-text-faint outline-none hover:border-border-strong hover:text-text-muted focus-visible:ring-2 focus-visible:ring-accent-8"
-              >
+                className="flex size-6 items-center justify-center rounded-md border border-border bg-surface text-text-faint outline-none hover:border-border-strong hover:text-text-muted focus-visible:ring-2 focus-visible:ring-brand-8">
                 <GearIcon />
               </PopoverTrigger>
               <PopoverContent
                 align="end"
-                className="w-72 space-y-3 font-sans text-xs"
-              >
+                className="w-72 space-y-3 font-sans text-xs">
                 <Field label="Bound $ key">
                   <input
                     aria-label="bound $ key"
-                    className="w-full rounded border border-border-strong bg-surface px-2 py-1 font-mono text-xs text-text outline-none focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8"
+                    className="w-full rounded border border-border-strong bg-surface px-2 py-1 font-mono text-xs text-text outline-none focus-visible:border-brand-8 focus-visible:ring-2 focus-visible:ring-brand-8"
                     value={name}
                     onChange={(e) => updateAttributes({ name: e.target.value })}
                   />
@@ -127,8 +124,9 @@ export function InputCellView({
                     aria-label="input kind"
                     className="text-xs"
                     value={kind}
-                    onChange={(e) => updateAttributes({ kind: e.target.value })}
-                  >
+                    onChange={(e) =>
+                      updateAttributes({ kind: e.target.value })
+                    }>
                     {KINDS.map((k) => (
                       <option key={k} value={k}>
                         {k}
@@ -146,8 +144,7 @@ export function InputCellView({
                     <button
                       type="button"
                       onClick={deleteSelf}
-                      className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-danger-text hover:bg-danger-bg"
-                    >
+                      className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-danger-text hover:bg-danger-bg">
                       <TrashIcon />
                       Delete input
                     </button>
@@ -207,8 +204,7 @@ function TrashIcon() {
       stroke="currentColor"
       strokeWidth={1.4}
       strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+      strokeLinejoin="round">
       <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" />
     </svg>
   );
@@ -224,8 +220,7 @@ function GearIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round"
-    >
+      strokeLinecap="round">
       <path d="M2 5h6M11 5h3M2 11h3M8 11h6" />
       <circle cx="9.5" cy="5" r="1.6" fill="currentColor" stroke="none" />
       <circle cx="6.5" cy="11" r="1.6" fill="currentColor" stroke="none" />
@@ -295,8 +290,7 @@ function Control({
         <SelectNative
           aria-label={`${name} value`}
           value={String(value ?? options[0])}
-          onChange={(e) => setValue(e.target.value)}
-        >
+          onChange={(e) => setValue(e.target.value)}>
           {options.map((opt) => (
             <option key={opt} value={opt}>
               {opt}

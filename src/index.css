@@ -205,11 +205,12 @@
   --color-text-muted: var(--color-gray-11);
   --color-text-faint: var(--color-gray-9);
   /* action (accent / violet) */
-  --color-action-subtle: var(--color-accent-4);
-  --color-action-border: var(--color-accent-7);
-  --color-action: var(--color-accent-9);
-  --color-action-hover: var(--color-accent-10);
-  --color-action-text: var(--color-accent-11);
+  --color-action-subtle: var(--color-brand-4);
+  --color-action-border: var(--color-brand-7);
+  --color-action: var(--color-brand-9);
+  --color-action-hover: var(--color-brand-10);
+  --color-action-text: var(--color-brand-11);
+  --color-action-text-contrast: var(--color-brand-contrast);
   /* live / run state (brand / lime) */
   --color-live-subtle: var(--color-accent-3);
   --color-live: var(--color-accent-9);
@@ -338,6 +339,6 @@
     box-shadow: 0 0 0 2px var(--color-live-subtle);
   }
   50% {
-    box-shadow: 0 0 0 5px var(--color-brand-a5);
+    box-shadow: 0 0 0 5px var(--color-accent-a5);
   }
 }
