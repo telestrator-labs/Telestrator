@@ -145,7 +145,7 @@ export function CodeCellView({
       data-cellid={id ?? undefined}
       data-collapsed={cellCollapsed || undefined}
       className={cx(
-        "my-[22px] overflow-hidden rounded-[11px] border border-border bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.04),0_4px_16px_rgb(0_0_0/0.03)]",
+        "my-[22px] overflow-hidden rounded-[11px] border border-border-strong bg-surface-sunken  shadow-[0_1px_2px_rgb(0_0_0/0.04),0_4px_16px_rgb(0_0_0/0.03)]",
         trace.className,
       )}
       {...trace.hoverProps}
@@ -216,20 +216,21 @@ export function CodeCellView({
             </Popover>
           </StopEditorEvents>
           {/* css cells can bind their classes/vars to `$name` (first-class CSS
-              values). Empty = styles only. */}
+              values). Empty = styles only. Styled as a peer to the language chip:
+              one bordered pill, a gold `$` prefix, and a reset (borderless) input. */}
           {language === "css" && (
             <StopEditorEvents>
               <label
-                className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-raised pl-2 pr-1 font-mono text-[11px] text-text-muted focus-within:border-brand-8"
-                title="Publish this cell's classes/vars to a $ value"
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-raised px-2 py-1 font-mono text-[11px] text-text-muted focus-within:border-border-strong focus-within:ring-2 focus-within:ring-accent-8"
+                title="Publish this cell's classes/vars to a $ value (leave empty for styles only)"
               >
-                <span className="text-gold-11">$</span>
+                <span className="font-semibold text-gold-11">$</span>
                 <input
                   aria-label="bound $ key"
                   value={name}
-                  placeholder="styles"
+                  placeholder="name"
                   onChange={(e) => updateAttributes({ name: e.target.value })}
-                  className="w-20 bg-transparent py-1 font-mono text-[11px] text-text outline-none placeholder:text-text-faint"
+                  className="w-16 appearance-none border-0 bg-transparent p-0 font-mono text-[11px] text-text outline-none placeholder:text-text-faint"
                 />
               </label>
             </StopEditorEvents>
@@ -475,7 +476,7 @@ function CellOutputView({
         <div
           data-slot="cell-output"
           className={cx(
-            "flex flex-col gap-1.5 bg-surface-raised px-4 py-[11px] font-mono text-[12.5px]",
+            "flex flex-col gap-1.5 bg-surface px-4 py-[11px] font-mono text-[12.5px]",
             output.view && "border-t border-border",
           )}
         >
@@ -536,7 +537,7 @@ function ViewMount({ id, runKey }: { id: string; runKey: unknown }) {
     <div
       ref={ref}
       data-slot="cell-view"
-      className="telestrator-output bg-surface-raised px-4 py-3 font-sans text-text"
+      className="telestrator-output bg-surface px-4 py-3 font-sans text-text"
     />
   );
 }
