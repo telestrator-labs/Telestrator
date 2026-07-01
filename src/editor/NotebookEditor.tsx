@@ -137,6 +137,20 @@ export function NotebookEditor({
 
   return (
     <>
+      {/* Title first: the document's single H1-level heading and the top of the
+       * information hierarchy. The template body no longer repeats it. */}
+      <header className="notebook__bar">
+        {reading ? (
+          <h1 className="notebook__title">{title || "Untitled notebook"}</h1>
+        ) : (
+          <input
+            className="notebook__title"
+            defaultValue={title}
+            placeholder="Untitled notebook"
+            onChange={(e) => renameNotebook(docId, e.target.value)}
+          />
+        )}
+      </header>
       {!reading && (
         <div className="notebook__tools">
           {/* Inner wrapper: the sticky bar's background spans the full content
@@ -161,20 +175,6 @@ export function NotebookEditor({
           </div>
         </div>
       )}
-      <header className="notebook__bar">
-        {reading ? (
-          <h1 className="notebook__title-input">
-            {title || "Untitled notebook"}
-          </h1>
-        ) : (
-          <input
-            className="notebook__title-input"
-            defaultValue={title}
-            placeholder="Untitled notebook"
-            onChange={(e) => renameNotebook(docId, e.target.value)}
-          />
-        )}
-      </header>
       <EditorContent editor={editor} className="notebook__doc" />
     </>
   );

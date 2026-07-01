@@ -22,16 +22,26 @@
 .notebook__bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 14px;
 }
 
-.notebook__title-input {
-  font-size: clamp(28px, 3.4vw, 38px);
+/* The document title — the top of the hierarchy, above the sticky toolbar. An
+ * <input> in edit mode / <h1> in reading mode; both share this heading style. */
+.notebook__title {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  outline: none;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: clamp(28px, 3.4vw, 36px);
   font-weight: 600;
   letter-spacing: -0.025em;
-  line-height: 1.1;
+  line-height: 1.15;
+}
+
+.notebook__title::placeholder {
+  color: var(--color-text-faint);
 }
 
 /* The formatting/insert toolbar sticks just under the editor top bar; the

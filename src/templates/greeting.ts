@@ -11,7 +11,7 @@ export const greeting: NotebookTemplate = {
     doc(
       md(
         m,
-        "# Greeting, composed\n\nThree kinds of knob — a text field, a dropdown, and a switch — feed one reactive cell.",
+        "Three kinds of knob — a text field, a dropdown, and a switch — feed one reactive cell.",
       ),
       inputCell({ name: "who", kind: "text", value: "world" }),
       inputCell({
