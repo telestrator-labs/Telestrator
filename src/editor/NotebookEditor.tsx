@@ -133,22 +133,32 @@ export function NotebookEditor({
       },
       { key: "input", label: "Input", onClick: insertInputCell },
     ],
-    [
-      {
-        key: "restart",
-        label: "Restart",
-        title: "Restart runtime",
-        icon: <RestartIcon />,
-        onClick: () => runtime.restart(),
-      },
-    ],
   ];
 
   return (
     <>
       {!reading && (
         <div className="notebook__tools">
-          <Toolbar groups={toolbarGroups} />
+          {/* Inner wrapper: the sticky bar's background spans the full content
+           * width (so scrolling prose never bleeds through), while the controls
+           * stay within a capped measure — left cluster for formatting/insert,
+           * Restart anchored right — so the wide layout doesn't fling them apart. */}
+          <div className="notebook__tools-inner">
+            <Toolbar groups={toolbarGroups} />
+            <Toolbar
+              groups={[
+                [
+                  {
+                    key: "restart",
+                    label: "Restart",
+                    title: "Restart runtime",
+                    icon: <RestartIcon />,
+                    onClick: () => runtime.restart(),
+                  },
+                ],
+              ]}
+            />
+          </div>
         </div>
       )}
       <header className="notebook__bar">

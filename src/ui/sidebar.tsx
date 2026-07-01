@@ -300,7 +300,8 @@ export const SidebarTrigger = forwardRef<
         toggleSidebar();
       }}
       className={cx(
-        "inline-flex h-8 w-8 items-center justify-center rounded-lg text-sidebar-foreground/80 outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+        // Neutral/ghost: muted icon, gray hover — not the accent fill.
+        "inline-flex h-8 w-8 items-center justify-center rounded-lg text-text-muted outline-none hover:bg-surface-active hover:text-text focus-visible:ring-2 focus-visible:ring-sidebar-ring",
         className,
       )}
       {...props}
@@ -491,7 +492,7 @@ const sidebarMenuButtonVariants = cva(
   cx(
     "peer/menu-button flex w-full items-center gap-2.5 overflow-hidden rounded-[7px] p-2 text-left text-[13.5px] outline-none transition-colors",
     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-    "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
+    "data-[active=true]:bg-sidebar-primary data-[active=true]:font-medium data-[active=true]:text-sidebar-primary-foreground",
     "disabled:pointer-events-none disabled:opacity-50",
     "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-1.5",
     "[&>svg]:size-4 [&>svg]:shrink-0",
@@ -622,7 +623,7 @@ export const SidebarMenuSubButton = forwardRef<
       className={cx(
         "flex h-7 min-w-0 items-center gap-2 overflow-hidden rounded-[7px] px-2 text-[13px] text-sidebar-foreground/80 outline-none transition-colors",
         "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
+        "data-[active=true]:bg-sidebar-primary data-[active=true]:font-medium data-[active=true]:text-sidebar-primary-foreground",
         className,
       )}
       {...props}

@@ -1,4 +1,5 @@
 import type { NotebookEntry } from "../editor/docIndex";
+import { DocBadge } from "../chrome/DocBadge";
 import { Sparkline } from "./Sparkline";
 
 // A card for an existing notebook. Opens on click; the ✕ deletes (stops
@@ -25,7 +26,7 @@ export function NotebookCard({
       <Sparkline seed={entry.id} />
       <div className="px-4 pt-3 pb-[15px]">
         <div className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-text">
-          <span className="h-[7px] w-[7px] flex-none rounded-full bg-gray-6" />
+          <DocBadge id={entry.id} title={entry.title || "Untitled notebook"} />
           <span className="truncate">{entry.title || "Untitled notebook"}</span>
         </div>
         <div className="mt-2 flex items-center justify-between text-[12px] text-text-faint">
