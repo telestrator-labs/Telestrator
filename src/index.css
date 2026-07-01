@@ -214,6 +214,11 @@
   --color-live-subtle: var(--color-brand-3);
   --color-live: var(--color-brand-9);
   --color-live-text: var(--color-brand-11);
+  /* Foreground for content on the solid brand (lime-9). Lime is a "bright"
+     Radix scale, so its accessible text is dark in *both* modes (unlike most
+     scales, which take white on step 9) — hence a fixed value, not a flip.
+     #1d211c is Radix `olive-12` (light), pinned so it doesn't invert in dark. */
+  --color-brand-contrast: #1d211c;
   /* signal / $-value markers (gold) */
   --color-value-bg: var(--color-gold-3);
   --color-value-border: var(--color-gold-6);

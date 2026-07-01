@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Button } from "../ui/Button";
 import { SidebarTrigger } from "../ui/sidebar";
 import { useRuntime } from "../editor/RuntimeProvider";
@@ -69,8 +70,8 @@ export function EditorTopBar({
       <div className="flex items-center gap-2">
         <Seg
           options={[
-            { value: "document", label: "Document" },
-            { value: "studio", label: "Studio" },
+            { value: "document", label: "Document", icon: <DocumentIcon /> },
+            { value: "studio", label: "Studio", icon: <StudioIcon /> },
           ]}
           value={layout}
           onChange={(v) => onLayoutChange(v as NotebookLayout)}
@@ -92,11 +93,13 @@ export function EditorTopBar({
           variant="secondary"
           onClick={onToggleTrace}
           className={cx(
+            "gap-1.5",
             traceOpen &&
               "border-value-border bg-value-bg text-value hover:border-value-border hover:text-value",
           )}
         >
-          ◆ Trace
+          <TraceIcon />
+          Trace
         </Button>
         <Seg
           options={[
@@ -106,7 +109,13 @@ export function EditorTopBar({
           value={reading ? "read" : "edit"}
           onChange={(v) => onToggleReading(v === "read")}
         />
-        <Button variant="primary" onClick={onShare}>
+        {/* Inverse (ink-on-surface) fill — the bar's one high-commitment action. */}
+        <Button
+          variant="secondary"
+          onClick={onShare}
+          className="gap-1.5 border-transparent bg-text text-surface hover:border-transparent hover:bg-text-muted hover:text-surface"
+        >
+          <ShareIcon />
           Share
         </Button>
       </div>
@@ -159,12 +168,14 @@ function RestartIcon() {
 }
 
 // A segmented control built from ghost <Button>s sharing one bordered track.
+// The active option is filled with the brand (lime) and takes its dark contrast
+// foreground, so the current view reads at a glance.
 function Seg({
   options,
   value,
   onChange,
 }: {
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string; icon?: ReactNode }>;
   value: string;
   onChange: (value: string) => void;
 }) {
@@ -178,16 +189,93 @@ function Seg({
             variant="ghost"
             onClick={() => onChange(o.value)}
             className={cx(
-              "rounded-[7px] px-3 py-1.5",
+              "gap-1.5 rounded-[7px] px-3 py-1.5",
               on
-                ? "bg-surface text-text shadow-sm hover:bg-surface"
+                ? "bg-brand-9 text-brand-contrast shadow-sm hover:bg-brand-9 hover:text-brand-contrast"
                 : "hover:bg-transparent",
             )}
           >
+            {o.icon}
             {o.label}
           </Button>
         );
       })}
     </div>
+  );
+}
+
+// Leading icons. Document = a page; Studio = an author's panel/sliders view.
+function DocumentIcon() {
+  return (
+    <svg
+      className="size-[15px]"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 1.75h5L12.25 5v9.25H4z" />
+      <path d="M9 1.75V5h3.25" />
+      <path d="M6 8.5h4M6 11h4" />
+    </svg>
+  );
+}
+
+function StudioIcon() {
+  return (
+    <svg
+      className="size-[15px]"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2.75 4.5h10.5M2.75 11.5h10.5" />
+      <circle cx="6" cy="4.5" r="1.6" fill="currentColor" stroke="none" />
+      <circle cx="10.5" cy="11.5" r="1.6" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+// Trace = the reactive dependency graph (what feeds what): connected nodes.
+function TraceIcon() {
+  return (
+    <svg
+      className="size-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 4.5l3.5 3.5M8.5 8L12 11.5M8 8l3.5-3.5" />
+      <circle cx="3.5" cy="4" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12.5" cy="4" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="12.5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function ShareIcon() {
+  return (
+    <svg
+      className="size-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="3.5" r="1.75" />
+      <circle cx="4" cy="8" r="1.75" />
+      <circle cx="12" cy="12.5" r="1.75" />
+      <path d="M5.6 7.1l4.8-2.6M5.6 8.9l4.8 2.6" />
+    </svg>
   );
 }
