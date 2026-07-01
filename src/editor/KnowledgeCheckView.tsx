@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { useRuntime } from "./RuntimeProvider";
+import { useCellTrace } from "./TraceContext";
 import { useReadingMode } from "./ReadingMode";
 import {
   bindingCode,
@@ -65,6 +66,10 @@ export function KnowledgeCheckView({
   const passed = checked && grade.correct;
   const shown = checked || revealed; // reveal the answer inline
 
+  // Participate in the trace: a named check writes `$[name]`, so it's a graph
+  // node. `passed` is the published signal (pulse when it flips).
+  const trace = useCellTrace(id, passed);
+
   const setAnswer = (next: unknown) => {
     if (checked) return;
     updateAttributes({ value: next });
@@ -119,11 +124,15 @@ export function KnowledgeCheckView({
   return (
     <NodeViewWrapper
       data-slot="knowledge-check"
+      data-cellid={id ?? undefined}
       className={cx(
         "my-5.5 overflow-hidden rounded-xl bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.04),0_4px_16px_rgb(0_0_0/0.03)]",
         reading ? "border border-border-subtle" : "border border-border",
+        trace.className,
       )}
-      contentEditable={false}>
+      {...trace.hoverProps}
+      contentEditable={false}
+    >
       {/* Warm authoring header — hidden for the reader. */}
       {!reading && (
         <div className="flex items-center gap-2.5 border-b border-value-border bg-value-bg px-3 py-2">
@@ -137,7 +146,8 @@ export function KnowledgeCheckView({
           {name && (
             <span
               data-slot="check-bindtag"
-              className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px] text-value">
+              className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px] text-value"
+            >
               writes <b className="font-semibold">${name}</b>
             </span>
           )}
@@ -151,7 +161,8 @@ export function KnowledgeCheckView({
               <Sheet modal={false}>
                 <SheetTrigger
                   aria-label="check settings"
-                  className="flex size-6 items-center justify-center rounded-md border border-gold-6 bg-surface text-gold-11 outline-none hover:border-gold-8 focus-visible:ring-2 focus-visible:ring-accent-8">
+                  className="flex size-6 items-center justify-center rounded-md border border-gold-6 bg-surface text-gold-11 outline-none hover:border-gold-8 focus-visible:ring-2 focus-visible:ring-accent-8"
+                >
                   <GearIcon />
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[min(92vw,384px)]">
@@ -180,7 +191,8 @@ export function KnowledgeCheckView({
                         value={answerKind}
                         onChange={(e) =>
                           updateAttributes({ answerKind: e.target.value })
-                        }>
+                        }
+                      >
                         {(Object.keys(KIND_LABEL) as AnswerKind[]).map((k) => (
                           <option key={k} value={k}>
                             {KIND_LABEL[k]}
@@ -246,7 +258,8 @@ export function KnowledgeCheckView({
                       <button
                         type="button"
                         onClick={deleteSelf}
-                        className="flex w-full items-center justify-center gap-2 rounded-md border border-danger-border px-2 py-2 text-danger-text hover:bg-danger-bg">
+                        className="flex w-full items-center justify-center gap-2 rounded-md border border-danger-border px-2 py-2 text-danger-text hover:bg-danger-bg"
+                      >
                         <TrashIcon />
                         Delete check
                       </button>
@@ -262,7 +275,8 @@ export function KnowledgeCheckView({
       <div className="px-4 py-4">
         <p
           data-slot="check-question"
-          className="font-serif text-[19px] leading-[1.45] text-text [text-wrap:pretty]">
+          className="font-serif text-[19px] leading-[1.45] text-text [text-wrap:pretty]"
+        >
           {question || (
             <span className="text-text-faint">
               Write a question in settings (⚙)…
@@ -304,7 +318,8 @@ export function KnowledgeCheckView({
             onMouseDown={(e) => e.stopPropagation()}
             onClick={check}
             disabled={!grade.answered || checked}
-            className="inline-flex font-sans! items-center gap-2 rounded-[9px] border border-accent-8 bg-accent-9 px-4 py-2.25 text-[13.5px] font-semibold text-white transition-colors hover:bg-accent-10 disabled:cursor-not-allowed disabled:border-border-subtle disabled:bg-surface-active disabled:text-text-faint">
+            className="inline-flex font-sans! items-center gap-2 rounded-[9px] border border-accent-8 bg-accent-9 px-4 py-2.25 text-[13.5px] font-semibold text-white transition-colors hover:bg-accent-10 disabled:cursor-not-allowed disabled:border-border-subtle disabled:bg-surface-active disabled:text-text-faint"
+          >
             <CheckGlyph />
             {checked ? "Checked" : "Check answer"}
           </button>
@@ -313,7 +328,8 @@ export function KnowledgeCheckView({
               type="button"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => setHintOpen((o) => !o)}
-              className="font-sans! inline-flex items-center gap-1.5 rounded-[9px] border border-value-border bg-value-bg px-3 py-2 text-[12.5px] font-medium text-value hover:bg-gold-4">
+              className="font-sans! inline-flex items-center gap-1.5 rounded-[9px] border border-value-border bg-value-bg px-3 py-2 text-[12.5px] font-medium text-value hover:bg-gold-4"
+            >
               {hintOpen ? "Hide hint" : "Show hint"}
             </button>
           )}
@@ -323,7 +339,8 @@ export function KnowledgeCheckView({
                 type="button"
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={reveal}
-                className="font-medium  text-text-muted underline decoration-1 underline-offset-2 hover:text-accent-11">
+                className="font-medium  text-text-muted underline decoration-1 underline-offset-2 hover:text-accent-11"
+              >
                 Reveal
               </button>
             )}
@@ -343,7 +360,8 @@ export function KnowledgeCheckView({
         {name && (
           <div
             data-slot="check-binding"
-            className="mt-3.5 flex flex-wrap items-center gap-2.5 rounded-[9px] border border-border-subtle bg-surface-sunken px-3 py-2.5 font-mono text-[12.5px] text-text-muted">
+            className="mt-3.5 flex flex-wrap items-center gap-2.5 rounded-[9px] border border-border-subtle bg-surface-sunken px-3 py-2.5 font-mono text-[12.5px] text-text-muted"
+          >
             <span className="inline-flex items-center gap-1.5 font-semibold text-live-text">
               <span className="size-2 rounded-full bg-live shadow-[0_0_0_2px_var(--color-live-subtle)]" />
               LIVE
@@ -357,7 +375,8 @@ export function KnowledgeCheckView({
                   : passed
                     ? "bg-live-subtle text-live-text"
                     : "bg-danger-bg text-danger-text",
-              )}>
+              )}
+            >
               {!checked ? "—" : String(passed)}
             </span>
             <span className="ml-auto font-sans text-[11.5px] text-text-faint">
@@ -412,7 +431,8 @@ function FlowStep({
         first
           ? "pl-0.5"
           : "before:absolute before:bottom-0.5 before:left-0 before:top-2 before:w-px before:bg-border-subtle",
-      )}>
+      )}
+    >
       <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-text-faint">
         {k}
       </span>
@@ -438,13 +458,15 @@ function Feedback({
         passed
           ? "border-brand-5 bg-brand-3 text-brand-11"
           : "border-danger-border bg-danger-bg text-danger-text",
-      )}>
+      )}
+    >
       <span
         aria-hidden
         className={cx(
           "grid size-5 flex-none place-items-center rounded-md text-[13px] font-bold",
           passed ? "bg-brand-10 text-brand-contrast" : "bg-danger text-white",
-        )}>
+        )}
+      >
         {passed ? "✓" : "!"}
       </span>
       <span>
@@ -513,7 +535,8 @@ function AnswerControl({
                 state === "wrong" &&
                   "border-danger-border bg-danger-bg ring-1 ring-inset ring-danger-border",
                 state === "muted" && "border-border-subtle opacity-50",
-              )}>
+              )}
+            >
               <span
                 aria-hidden
                 className={cx(
@@ -525,7 +548,8 @@ function AnswerControl({
                       : selected
                         ? "border-accent-9 bg-accent-9"
                         : "border-border-strong",
-                )}>
+                )}
+              >
                 {state === "correct"
                   ? "✓"
                   : state === "wrong"
@@ -615,7 +639,8 @@ function ConfigEditor({
                 correctChoice:
                   e.target.value === "" ? undefined : Number(e.target.value),
               })
-            }>
+            }
+          >
             <option value="">— pick the correct option —</option>
             {options.map((opt, i) => (
               <option key={i} value={i}>
@@ -718,7 +743,8 @@ function CheckGlyph() {
       stroke="currentColor"
       strokeWidth={2}
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M3.5 8.5l3 3 6-7" />
     </svg>
   );
@@ -732,7 +758,8 @@ function GearIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
-      strokeLinecap="round">
+      strokeLinecap="round"
+    >
       <path d="M2 5h6M11 5h3M2 11h3M8 11h6" />
       <circle cx="9.5" cy="5" r="1.6" fill="currentColor" stroke="none" />
       <circle cx="6.5" cy="11" r="1.6" fill="currentColor" stroke="none" />
@@ -749,7 +776,8 @@ function TrashIcon() {
       stroke="currentColor"
       strokeWidth={1.4}
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M3 4.5h10M6.5 4.5V3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1M5 4.5l.5 8a1 1 0 0 0 1 .9h3a1 1 0 0 0 1-.9l.5-8" />
     </svg>
   );

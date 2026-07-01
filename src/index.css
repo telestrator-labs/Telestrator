@@ -331,6 +331,10 @@
  * utility used by the dot in CodeCellView. */
 @theme {
   --animate-breathe: code-cell-breathe 2.4s ease-in-out infinite;
+  /* Trace: a one-shot lime pulse when a cell re-runs, and the "ink" draw-on for
+   * provenance connectors. Both are signal-shaped and non-looping. */
+  --animate-cell-pulse: cell-pulse 0.5s ease;
+  --animate-conn-in: conn-in 0.34s ease;
 }
 
 @keyframes code-cell-breathe {
@@ -340,5 +344,34 @@
   }
   50% {
     box-shadow: 0 0 0 5px var(--color-accent-a5);
+  }
+}
+
+@keyframes cell-pulse {
+  0% {
+    box-shadow:
+      0 0 0 1px var(--color-brand-9),
+      0 0 22px var(--color-brand-a6);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+@keyframes conn-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Motion is restrained and signal-shaped: honor reduced-motion by making the
+ * pulse/draw-on instant rather than animated (design-language Motion §). */
+@media (prefers-reduced-motion: reduce) {
+  .animate-cell-pulse,
+  .trace-conn {
+    animation: none !important;
   }
 }

@@ -60,7 +60,8 @@ export function EditorTopBar({
             title="Restart runtime"
             aria-label="Restart runtime"
             onClick={() => runtime.restart()}
-            className="ml-0.5 grid size-4 place-items-center rounded-full text-live-text/80 outline-none hover:bg-live/20 hover:text-live-text focus-visible:ring-2 focus-visible:ring-brand-8">
+            className="ml-0.5 grid size-4 place-items-center rounded-full text-live-text/80 outline-none hover:bg-live/20 hover:text-live-text focus-visible:ring-2 focus-visible:ring-brand-8"
+          >
             <RestartIcon />
           </button>
         </span>
@@ -83,8 +84,9 @@ export function EditorTopBar({
           className={cx(
             "px-2",
             wide &&
-              "border-action-border bg-action-subtle text-action-text hover:border-action-border hover:text-action-text",
-          )}>
+              "border-accent-7 bg-accent-3 text-accent-11 hover:border-accent-7 hover:text-accent-11",
+          )}
+        >
           <ExpandIcon wide={wide} />
         </Button>
         <Button
@@ -95,7 +97,8 @@ export function EditorTopBar({
             "gap-1.5",
             traceOpen &&
               "border-transparent bg-gold-9 text-white hover:border-transparent hover:bg-gold-10 hover:text-white",
-          )}>
+          )}
+        >
           <TraceIcon />
           Trace
         </Button>
@@ -111,7 +114,8 @@ export function EditorTopBar({
         <Button
           variant="secondary"
           onClick={onShare}
-          className="gap-1.5 border-transparent bg-text text-surface hover:border-transparent hover:bg-text-muted hover:text-surface">
+          className="gap-1.5 border-transparent bg-text text-surface hover:border-transparent hover:bg-text-muted hover:text-surface"
+        >
           <ShareIcon />
           Share
         </Button>
@@ -128,7 +132,8 @@ function ExpandIcon({ wide }: { wide: boolean }) {
       viewBox="0 0 256 256"
       fill="currentColor"
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       {wide ? (
         <>
           <path d="M216.49,56.48,177,96h19a12,12,0,0,1,0,24H148a12,12,0,0,1-12-12V60a12,12,0,0,1,24,0V79l39.51-39.52a12,12,0,0,1,17,17ZM108,136H60a12,12,0,0,0,0,24H79L39.51,199.51a12,12,0,0,0,17,17L96,177v19a12,12,0,0,0,24,0V148A12,12,0,0,0,108,136Z"></path>
@@ -151,7 +156,8 @@ function RestartIcon() {
       stroke="currentColor"
       strokeWidth={1.6}
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M13 8a5 5 0 1 1-1.46-3.54" />
       <path d="M13 2.5V5h-2.5" />
     </svg>
@@ -184,7 +190,8 @@ function Seg({
               on
                 ? "bg-surface text-text shadow-sm hover:bg-surface"
                 : "hover:bg-transparent",
-            )}>
+            )}
+          >
             {o.icon}
             {o.label}
           </Button>
@@ -202,7 +209,8 @@ function DocumentIcon() {
       viewBox="0 0 256 256"
       fill="currentColor"
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M28,64A12,12,0,0,1,40,52H216a12,12,0,0,1,0,24H40A12,12,0,0,1,28,64Zm12,52H168a12,12,0,0,0,0-24H40a12,12,0,0,0,0,24Zm176,16H40a12,12,0,0,0,0,24H216a12,12,0,0,0,0-24Zm-48,40H40a12,12,0,0,0,0,24H168a12,12,0,0,0,0-24Z"></path>
     </svg>
   );
@@ -215,7 +223,8 @@ function StudioIcon() {
       viewBox="0 0 256 256"
       fill="currentColor"
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M216,36H40A20,20,0,0,0,20,56V200a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V56A20,20,0,0,0,216,36ZM44,60H76V196H44ZM212,196H100V60H212Z"></path>
     </svg>
   );
@@ -229,7 +238,8 @@ function TraceIcon() {
       viewBox="0 0 256 256"
       fill="currentColor"
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M200,164a36.07,36.07,0,0,0-33.94,24H72a28,28,0,0,1,0-56h96a44,44,0,0,0,0-88H72a12,12,0,0,0,0,24h96a20,20,0,0,1,0,40H72a52,52,0,0,0,0,104h94.06A36,36,0,1,0,200,164Zm0,48a12,12,0,1,1,12-12A12,12,0,0,1,200,212Z"></path>
     </svg>
   );
@@ -242,7 +252,8 @@ function ShareIcon() {
       viewBox="0 0 256 256"
       fill="currentColor"
       strokeLinecap="round"
-      strokeLinejoin="round">
+      strokeLinejoin="round"
+    >
       <path d="M176,156a43.78,43.78,0,0,0-29.09,11L106.1,140.8a44.07,44.07,0,0,0,0-25.6L146.91,89a43.83,43.83,0,1,0-13-20.17L93.09,95a44,44,0,1,0,0,65.94L133.9,187.2A44,44,0,1,0,176,156Zm0-120a20,20,0,1,1-20,20A20,20,0,0,1,176,36ZM64,148a20,20,0,1,1,20-20A20,20,0,0,1,64,148Zm112,72a20,20,0,1,1,20-20A20,20,0,0,1,176,220Z"></path>
     </svg>
   );

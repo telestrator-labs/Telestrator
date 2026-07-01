@@ -1,6 +1,7 @@
 import { NotebookEditor } from "./NotebookEditor";
 import { useNotebookDoc } from "./useNotebookDoc";
 import { ReadingModeContext } from "./ReadingMode";
+import { TraceOverlay } from "./TraceOverlay";
 import { cx } from "../ui/cx";
 
 // One open notebook. Mounted keyed by docId, so switching notebooks fully
@@ -26,10 +27,13 @@ export function NotebookView({
       <div
         data-slot="notebook"
         className={cx(
-          "mx-auto px-10 pb-[140px] pt-[38px] font-sans text-text",
+          "relative mx-auto px-10 pb-[140px] pt-[38px] font-sans text-text",
           wide ? "max-w-[1100px]" : "max-w-[720px]",
         )}
       >
+        {/* The trace draws over the measure; the SVG has overflow:visible so
+            value nodes park in the left margin. Inert until a value is active. */}
+        <TraceOverlay />
         <NotebookEditor
           docId={docId}
           ydoc={ydoc}

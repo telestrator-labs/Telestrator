@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { useRuntime, useCellOutput } from "./RuntimeProvider";
+import { useCellTrace } from "./TraceContext";
 import { useReadingMode } from "./ReadingMode";
+import { cx } from "../ui/cx";
 import {
   chartCellCode,
   chartOutputKey,
@@ -49,6 +51,7 @@ export function ChartView({
   const regTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const output = useCellOutput(id ?? "");
+  const trace = useCellTrace(id, output);
   const rows = useMemo(
     () => (id ? coerceRows(output?.values?.[chartOutputKey(id)]) : []),
     [output, id],
@@ -95,10 +98,13 @@ export function ChartView({
 
   return (
     <NodeViewWrapper
-      className={
-        "chart-cell relative overflow-hidden rounded-[10px] border bg-surface-sunken " +
-        (reading ? "border-border-subtle" : "border-border")
-      }
+      data-cellid={id ?? undefined}
+      className={cx(
+        "chart-cell relative overflow-hidden rounded-[10px] border bg-surface-sunken",
+        reading ? "border-border-subtle" : "border-border",
+        trace.className,
+      )}
+      {...trace.hoverProps}
       contentEditable={false}
     >
       {!reading && (

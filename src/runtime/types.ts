@@ -27,6 +27,7 @@ export interface LogEntry {
 export interface CellOutput {
   id: string;
   values: Record<string, unknown>; // the `$` keys this run wrote
+  reads: string[]; // the `$` keys this run read (its dependencies — feeds the trace)
   logs: LogEntry[];
   error?: string;
 }
