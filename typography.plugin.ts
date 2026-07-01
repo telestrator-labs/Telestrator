@@ -6,8 +6,9 @@ import { type Config } from "tailwindcss";
 // `@config` in src/index.css; the @tailwindcss/typography plugin is registered
 // there with `@plugin`. The `invert` block is the dark-mode hook for later.
 //
-// Note: inline `code` references the exposed `$` variables, so it wears the gold
-// "signal" scheme (matching the cell-output $-value chips).
+// Note: the gold "signal" scheme is reserved for live `$`-value chips (the
+// `.value-ref` spans). Plain inline `code` is static text, so it wears a neutral
+// muted scheme — a quiet gray pill — to keep gold meaningful.
 export default {
   theme: {
     extend: {
@@ -23,7 +24,7 @@ export default {
             "--tw-prose-hr": "var(--color-border-subtle)",
             "--tw-prose-quotes": "var(--color-text-muted)",
             "--tw-prose-quote-borders": "var(--color-action-border)",
-            "--tw-prose-code": "var(--color-value)",
+            "--tw-prose-code": "var(--color-text-muted)",
           },
         },
         DEFAULT: {
@@ -38,7 +39,7 @@ export default {
             "--tw-prose-hr": "var(--color-border-subtle)",
             "--tw-prose-quotes": "var(--color-text-muted)",
             "--tw-prose-quote-borders": "var(--color-action-border)",
-            "--tw-prose-code": "var(--color-value)",
+            "--tw-prose-code": "var(--color-text-muted)",
 
             // Base — serif manuscript body.
             color: "var(--tw-prose-body)",
@@ -82,16 +83,18 @@ export default {
             },
             strong: { color: "var(--tw-prose-bold)", fontWeight: "600" },
 
-            // Inline code — the gold $-signal scheme.
+            // Inline code — a neutral muted pill. Code that references a reactive
+            // `$` value is re-tinted gold by the CodeSignal decoration
+            // (`.code--signal`, styled in editor/app.css), keeping gold reserved
+            // for reactive variables.
             code: {
-              color: "var(--color-value)",
-              backgroundColor: "var(--color-value-bg)",
+              color: "var(--color-text-muted)",
+              backgroundColor: "var(--color-surface-raised)",
               fontFamily: "var(--font-mono)",
               fontSize: "0.85em",
               fontWeight: "500",
               borderRadius: "4px",
               padding: "0.15em 0.35em",
-              boxShadow: "inset 0 -2px 0 var(--color-gold-a6)",
             },
             "code::before": { content: '""' },
             "code::after": { content: '""' },

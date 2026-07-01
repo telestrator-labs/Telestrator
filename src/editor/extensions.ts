@@ -8,6 +8,7 @@ import { ValueRef } from "@/editor/cells/valueRef/valueRefNode";
 import { SlashCommand } from "@/editor/commands/slashCommand";
 import { ValueRefSuggestion } from "@/editor/cells/valueRef/valueRefSuggestion";
 import { AddBlock } from "@/editor/commands/addBlock";
+import { CodeSignal } from "@/editor/codeSignal";
 
 // The single source of truth for the editor's schema. Shared by the live editor
 // (NotebookEditor) and the headless bridge test so they can never drift.
@@ -22,6 +23,7 @@ import { AddBlock } from "@/editor/commands/addBlock";
 //   - ValueRef:   an inline `$`-value reference chip in prose (live value)
 //   - SlashCommand: `/` menu to insert blocks/cells at the cursor
 //   - ValueRefSuggestion: `$` autocomplete to drop a value chip inline
+//   - CodeSignal: tints inline `code` gold when it references a `$` value
 export const editorExtensions = [
   StarterKit.configure({ undoRedo: false }),
   Markdown,
@@ -33,4 +35,5 @@ export const editorExtensions = [
   SlashCommand,
   ValueRefSuggestion,
   AddBlock,
+  CodeSignal,
 ];
