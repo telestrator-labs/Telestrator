@@ -47,6 +47,7 @@ const cellTheme = EditorView.theme({
 export function CodeEditor({
   value,
   language,
+  autoFocus,
   onChange,
   onArrowOut,
   onDeleteEmpty,
@@ -55,6 +56,8 @@ export function CodeEditor({
 }: {
   value: string;
   language: CellLanguage;
+  // Focus the editor on mount (set for a freshly inserted cell).
+  autoFocus?: boolean;
   onChange: (code: string) => void;
   // Escape affordances so the cursor flows between the code island and prose.
   onArrowOut?: (dir: "up" | "down") => void;
@@ -70,6 +73,8 @@ export function CodeEditor({
   onChangeRef.current = onChange;
   const cbRef = useRef({ onArrowOut, onDeleteEmpty, onEscape, onRun });
   cbRef.current = { onArrowOut, onDeleteEmpty, onEscape, onRun };
+  // Read once at mount via a ref so toggling it later never recreates the view.
+  const autoFocusRef = useRef(autoFocus);
 
   // Create the EditorView once.
   useEffect(() => {
@@ -155,7 +160,18 @@ export function CodeEditor({
       }),
     });
     viewRef.current = view;
+    // Move focus into the cell when it was just inserted (empty doc → cursor at
+    // the start), instead of leaving it in the prose after the cell. Defer to the
+    // next frame so we win over any focus-return that happens on the same tick —
+    // e.g. the toolbar/slash Radix popover returning focus to its trigger on close.
+    let alive = true;
+    if (autoFocusRef.current) {
+      requestAnimationFrame(() => {
+        if (alive) view.focus();
+      });
+    }
     return () => {
+      alive = false;
       view.destroy();
       viewRef.current = null;
     };
