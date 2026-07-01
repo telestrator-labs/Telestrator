@@ -110,11 +110,28 @@ const highlightFor = (dark: boolean) =>
 const languageExtension = (language: CellLanguage) =>
   language === "css" ? css() : javascript({ typescript: true });
 
-// Nudge CodeMirror's selection/cursor to the design-language violet accent so
-// the cell island matches the rest of the chrome. Colors reference the Radix
-// tokens exposed in src/index.css. (Syntax highlighting keeps the CM default.)
+// The cell editor's look — the CodeMirror-idiomatic home for what used to live in
+// editor.css as `.code-cell__cm .cm-*` rules (you can't put Tailwind classes on
+// CM's internal DOM). Transparent surface so the cell shell shows through, mono
+// type, a quiet gutter, and the design-language violet cursor/selection. Colors
+// reference the Radix tokens in src/index.css.
 const cellTheme = EditorView.theme({
-  "&": { color: "var(--olive-12)" },
+  "&": {
+    color: "var(--olive-12)",
+    backgroundColor: "transparent",
+    maxHeight: "360px",
+  },
+  "&.cm-focused": { outline: "none" },
+  ".cm-scroller": {
+    fontFamily: "var(--font-mono)",
+    fontSize: "13px",
+    lineHeight: "1.65",
+  },
+  ".cm-gutters": {
+    backgroundColor: "transparent",
+    borderRight: "1px solid var(--color-border-subtle)",
+    color: "var(--color-text-faint)",
+  },
   ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--violet-11)" },
   "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection":
     {
@@ -303,7 +320,7 @@ export function CodeEditor({
 
   return (
     <div
-      className="code-cell__cm"
+      data-slot="cell-editor"
       ref={host}
       onMouseDown={(e) => e.stopPropagation()}
     />

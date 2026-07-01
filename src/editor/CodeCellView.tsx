@@ -107,14 +107,20 @@ export function CodeCellView({
 
   return (
     <NodeViewWrapper
-      className={cx("code-cell", cellCollapsed && "code-cell--collapsed")}
+      data-slot="code-cell"
+      data-collapsed={cellCollapsed || undefined}
+      className="my-[22px] overflow-hidden rounded-[11px] border border-border bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.04),0_4px_16px_rgb(0_0_0/0.03)]"
       contentEditable={false}
     >
       {!reading && sourceOpen && (
-        <div className="code-cell__header">
+        <div
+          data-slot="cell-header"
+          className="flex items-center gap-2.5 border-b border-border-subtle px-3 py-2 font-sans"
+        >
           <button
             type="button"
-            className="code-cell__caret"
+            data-slot="cell-caret"
+            className="flex size-5 flex-none items-center justify-center text-text-faint hover:text-text-muted"
             title="Collapse cell"
             onClick={() => setSourceOpen(false)}
           >
@@ -173,9 +179,10 @@ export function CodeCellView({
           {runnable && (
             <button
               type="button"
-              className="code-cell__run"
+              data-slot="cell-run"
               title="Re-run cell"
               onClick={runNow}
+              className="flex size-6 items-center justify-center rounded-md bg-action text-white transition-colors hover:bg-action-hover"
             >
               <svg
                 width="11"
@@ -188,12 +195,20 @@ export function CodeCellView({
             </button>
           )}
           {runnable ? (
-            <span className="code-cell__live">
-              <i />
+            <span
+              data-slot="cell-live"
+              className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.04em] text-live-text"
+            >
+              <i className="size-2 flex-none rounded-full bg-live shadow-[0_0_0_2px_var(--color-live-subtle)] animate-breathe" />
               LIVE
             </span>
           ) : (
-            <span className="code-cell__badge">inert</span>
+            <span
+              data-slot="cell-badge"
+              className="ml-auto text-[11px] text-text-faint"
+            >
+              inert
+            </span>
           )}
           <CellMenu onDelete={deleteSelf} />
         </div>
@@ -203,9 +218,10 @@ export function CodeCellView({
       {cellCollapsed && (
         <button
           type="button"
-          className="code-cell__expand"
+          data-slot="cell-expand"
           title="Expand cell"
           onClick={() => setSourceOpen(true)}
+          className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-text-muted hover:bg-surface-sunken"
         >
           <Caret />
           <span className="font-mono text-[11px] text-text-muted">
@@ -232,8 +248,9 @@ export function CodeCellView({
       {reading && (
         <button
           type="button"
-          className="code-cell__reveal"
+          data-slot="cell-reveal"
           onClick={() => setShowCode((s) => !s)}
+          className="border-t border-border-subtle px-3.5 py-2 font-sans text-[11.5px] font-medium text-action-text"
         >
           {showCode ? "Hide code" : "Show code"}
         </button>
@@ -249,8 +266,9 @@ export function CodeCellView({
       {!reading && hasOutput && !outputOpen && (
         <button
           type="button"
-          className="code-cell__output-reveal"
+          data-slot="cell-output-reveal"
           onClick={() => setOutputOpen(true)}
+          className="flex w-full items-center gap-1.5 border-t border-border-subtle px-3 py-1.5 font-mono text-[11.5px] text-text-faint hover:text-text-muted"
         >
           <Caret /> output
         </button>
@@ -357,34 +375,65 @@ function CellOutputView({
   // stack dump (the telestrator points at the problem).
   if (output.error) {
     return (
-      <div className="code-cell__error relative">
+      <div
+        data-slot="cell-error"
+        className="relative flex items-start gap-[11px] border-t border-danger-border bg-danger-bg px-4 py-3.5 font-sans text-[13.5px] leading-[1.55] text-text"
+      >
         <OutputCaret onCollapse={onCollapse} />
-        <span className="code-cell__error-icon">!</span>
+        <span
+          data-slot="cell-error-icon"
+          className="flex size-[21px] flex-none items-center justify-center rounded-md bg-danger font-bold text-white"
+        >
+          !
+        </span>
         <div>
           This cell couldn’t run.{" "}
-          <span className="code-cell__error-msg">{output.error}</span>
+          <span
+            data-slot="cell-error-msg"
+            className="whitespace-pre-wrap font-mono text-[12.5px] text-danger-text"
+          >
+            {output.error}
+          </span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="code-cell__output relative">
+    <div
+      data-slot="cell-output"
+      className="relative flex flex-col gap-1.5 border-t border-border bg-surface-raised px-4 py-[11px] font-mono text-[12.5px]"
+    >
       <OutputCaret onCollapse={onCollapse} />
       {output.logs.map((log, i) => (
-        <div key={i} className={`code-cell__log code-cell__log--${log.level}`}>
+        <div
+          key={i}
+          data-slot="cell-log"
+          className={cx(
+            "whitespace-pre-wrap text-text-muted",
+            log.level === "warn" && "text-value",
+            log.level === "error" && "text-danger-text",
+          )}
+        >
           {log.text}
         </div>
       ))}
       {valueKeys.length > 0 && (
-        <div className="code-cell__values">
-          <span className="code-cell__ok">✓</span>
+        <div
+          data-slot="cell-values"
+          className="flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono"
+        >
+          <span data-slot="cell-ok" className="font-bold text-live-text">
+            ✓
+          </span>
           {valueKeys.map((k) => (
-            <span key={k} className="code-cell__value">
-              <span className="code-cell__value-key">${k}</span>
-              <span className="code-cell__value-num">
-                {formatValue(output.values[k])}
-              </span>
+            <span
+              key={k}
+              data-slot="cell-value"
+              className="inline-flex items-baseline gap-[5px] rounded bg-value-bg px-[7px] py-px text-value shadow-[inset_0_-2px_0_var(--color-gold-a6)]"
+            >
+              <span className="font-semibold">${k}</span>
+              <span className="text-text">{formatValue(output.values[k])}</span>
             </span>
           ))}
         </div>

@@ -8,7 +8,6 @@ import { useReadingMode } from "./ReadingMode";
 import { createNotebook } from "../core/notebook";
 import { takePendingTemplate } from "../templates";
 import { renameNotebook } from "./docIndex";
-import "./editor.css";
 
 // The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
 // Collaboration extension binds the editor to the notebook's Y.Doc (owned by
@@ -36,8 +35,11 @@ export function NotebookEditor({
     ],
     // `prose` goes on the editable itself so its direct children (paragraphs,
     // headings, cell nodes) get the typography styling; max-w-none lets the
-    // .notebook column own the measure.
-    editorProps: { attributes: { class: "prose max-w-none" } },
+    // .notebook column own the measure; outline-none drops the focus ring; the
+    // named group lets the add-block affordance reveal on editor focus.
+    editorProps: {
+      attributes: { class: "prose max-w-none outline-none group/tiptap" },
+    },
   });
 
   // Seed initial content once, after IndexedDB has loaded, only if the doc is
@@ -76,19 +78,28 @@ export function NotebookEditor({
       {/* Title first: the document's single H1-level heading and the top of the
        * information hierarchy. Blocks are added via `/` or the empty-line add
        * affordance — no formatting toolbar. */}
-      <header className="notebook__bar">
+      <header
+        data-slot="notebook-title-bar"
+        className="mb-3.5 flex items-center"
+      >
         {reading ? (
-          <h1 className="notebook__title">{title || "Untitled notebook"}</h1>
+          <h1
+            data-slot="notebook-title"
+            className="w-full font-serif text-[clamp(28px,3.4vw,36px)] font-semibold leading-[1.15] tracking-[-0.025em] text-text"
+          >
+            {title || "Untitled notebook"}
+          </h1>
         ) : (
           <input
-            className="notebook__title"
+            data-slot="notebook-title"
+            className="w-full border-0 bg-transparent font-sans text-[clamp(28px,3.4vw,36px)] font-semibold leading-[1.15] tracking-[-0.025em] text-text outline-none placeholder:text-text-faint"
             defaultValue={title}
             placeholder="Untitled notebook"
             onChange={(e) => renameNotebook(docId, e.target.value)}
           />
         )}
       </header>
-      <EditorContent editor={editor} className="notebook__doc" />
+      <EditorContent editor={editor} data-slot="notebook-doc" />
     </>
   );
 }

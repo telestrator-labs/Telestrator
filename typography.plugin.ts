@@ -29,7 +29,7 @@ export default {
         DEFAULT: {
           css: {
             // Roles → semantic tokens (so dark mode is a token flip later).
-            "--tw-prose-body": "var(--color-text)",
+            "--tw-prose-body": "var(--color-text-muted)",
             "--tw-prose-headings": "var(--color-text)",
             "--tw-prose-links": "var(--color-action-text)",
             "--tw-prose-bold": "var(--color-text)",

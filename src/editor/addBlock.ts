@@ -28,8 +28,10 @@ export const AddBlock = Extension.create({
               return null;
             }
 
+            // `relative` gives the empty paragraph a positioning context for the
+            // overlaid affordance.
             const line = Decoration.node($from.before(), $from.after(), {
-              class: "is-empty-line",
+              class: "relative",
             });
             const affordance = Decoration.widget(
               $from.start(),
@@ -44,18 +46,27 @@ export const AddBlock = Extension.create({
             return DecorationSet.create(state.doc, [line, affordance]);
 
             function buildAffordance() {
+              // Tailwind utilities (not editor.css): the rules are click-through
+              // and hidden until the row is hovered (group) or the editor is
+              // focused (group-focus-within/tiptap — see NotebookEditor).
               const el = document.createElement("div");
-              el.className = "add-block";
+              el.dataset.slot = "add-block";
               el.contentEditable = "false";
+              el.className =
+                "group pointer-events-none absolute inset-0 flex select-none items-center gap-2.5";
 
+              const rule =
+                "h-px flex-1 bg-border-subtle opacity-0 transition-opacity group-hover:opacity-100 group-focus-within/tiptap:opacity-100";
               const ruleL = document.createElement("span");
-              ruleL.className = "add-block__rule";
+              ruleL.className = rule;
               const ruleR = document.createElement("span");
-              ruleR.className = "add-block__rule";
+              ruleR.className = rule;
 
               const btn = document.createElement("button");
               btn.type = "button";
-              btn.className = "add-block__btn";
+              btn.dataset.slot = "add-block-btn";
+              btn.className =
+                "pointer-events-auto grid size-[22px] flex-none place-items-center rounded-md border border-border bg-surface text-base leading-none text-text-faint transition-colors hover:border-action-border hover:bg-action-subtle hover:text-action-text";
               btn.title = "Add block (or type /)";
               btn.setAttribute("aria-label", "Add block");
               btn.textContent = "+";

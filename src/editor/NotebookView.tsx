@@ -1,6 +1,7 @@
 import { NotebookEditor } from "./NotebookEditor";
 import { useNotebookDoc } from "./useNotebookDoc";
 import { ReadingModeContext } from "./ReadingMode";
+import { cx } from "../ui/cx";
 
 // One open notebook. Mounted keyed by docId, so switching notebooks fully
 // remounts this — giving a fresh Y.Doc + IndexedDB persistence (useNotebookDoc)
@@ -22,7 +23,13 @@ export function NotebookView({
 
   return (
     <ReadingModeContext.Provider value={reading}>
-      <div className={wide ? "notebook notebook--wide" : "notebook"}>
+      <div
+        data-slot="notebook"
+        className={cx(
+          "mx-auto px-10 pb-[140px] pt-[38px] font-sans text-text",
+          wide ? "max-w-[1100px]" : "max-w-[720px]",
+        )}
+      >
         <NotebookEditor
           docId={docId}
           ydoc={ydoc}
