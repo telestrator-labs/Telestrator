@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createIframeHost } from "@/sandbox/iframeHost";
 import { setValueEntries } from "@/editor/cells/valueRef/valueKeys";
+import { isReservedKey, walkPath } from "@/editor/cells/valueRef/valueRef";
 import type { CellOutput, RuntimeHost } from "@/runtime";
 
 // The reactive dependency graph, derived from every cell's latest output: which
@@ -35,7 +36,11 @@ function computeGraph(outputs: Map<string, CellOutput>): TraceGraph {
   const writers = new Map<string, string>();
   const readersByKey = new Map<string, Set<string>>();
   for (const out of outputs.values()) {
-    for (const k of Object.keys(out.values)) writers.set(k, out.id);
+    // Reserved keys (`__chart_*`, `__chip_*`) back charts/chips; they're not
+    // authorable `$` values, so they never become value nodes — but the cell's
+    // real *reads* (below) still count, so a chart/chip is a reader in the trace.
+    for (const k of Object.keys(out.values))
+      if (!isReservedKey(k)) writers.set(k, out.id);
     for (const k of out.reads) {
       let set = readersByKey.get(k);
       if (!set) readersByKey.set(k, (set = new Set()));
@@ -208,14 +213,24 @@ export function useTraceGraph(): TraceGraph {
   );
 }
 
-// The current value of a `$` key, for an inline prose chip. Resolves the writing
-// cell via the graph, then reads that cell's latest output — so it re-renders
-// exactly when the writer re-emits. `undefined` until something writes the key.
-export function useValue(key: string): unknown {
+// The current value at a `$` *path*, for an inline prose chip. `segments` is the
+// path after `$` — `["styles","vars","gap"]` for `$.styles.vars.gap`, or `["rate"]`
+// for a bare `$.rate`. Resolves the head key's writer via the graph, reads that
+// cell's latest output (so it re-renders exactly when the writer re-emits), then
+// walks the remaining segments over the snapshot. `undefined` until the head key
+// is written or if any hop is missing.
+export function usePathValue(segments: string[]): unknown {
   const graph = useTraceGraph();
-  const writerId = graph.values.get(key)?.writer;
+  const head = segments[0];
+  const writerId = head ? graph.values.get(head)?.writer : undefined;
   const output = useCellOutput(writerId ?? "");
-  return writerId ? output?.values[key] : undefined;
+  if (!writerId) return undefined;
+  return walkPath(output?.values[head], segments.slice(1));
+}
+
+// The current value of a single top-level `$` key (thin wrapper over usePathValue).
+export function useValue(key: string): unknown {
+  return usePathValue(key ? [key] : []);
 }
 
 // Whether a cell is *live*: it reads or writes at least one valid `$` value (a

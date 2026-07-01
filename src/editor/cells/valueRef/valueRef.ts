@@ -1,0 +1,83 @@
+// Pure, framework-agnostic helpers for the inline `$`-value chip. A chip holds a
+// `$`-expression (`node.attrs.expr`) that is either a plain *path* (`$.rate`,
+// `$.styles.vars.gap`) resolved host-side against the value snapshot, or a
+// *computed* expression (`$.rate * $.qty`) evaluated in the sandbox via a hidden
+// generated cell — the same trick the chart block uses (see chart.ts).
+
+// A plain path off `$`: `$.a`, `$.styles.vars.gap`. Only dotted identifier access
+// (no operators, calls, brackets), so it can be walked over the value snapshot
+// with no `eval`. Anything richer is a "computed" expression.
+const PLAIN_PATH = /^\$(?:\.[A-Za-z_$][\w$]*)+$/;
+
+export function isPlainPath(expr: string): boolean {
+  return PLAIN_PATH.test(expr.trim());
+}
+
+// The segments of a plain path *after* `$` — `$.styles.vars.gap` → `["styles",
+// "vars", "gap"]`. Returns null when the expression isn't a plain path.
+export function pathSegments(expr: string): string[] | null {
+  const e = expr.trim();
+  if (!isPlainPath(e)) return null;
+  return e.slice(2).split("."); // drop the leading "$."
+}
+
+// Walk a dotted path over a root value, guarding each hop. Returns undefined the
+// moment a segment is missing or the current value is nullish.
+export function walkPath(root: unknown, segments: string[]): unknown {
+  let v = root;
+  for (const seg of segments) {
+    if (v == null) return undefined;
+    v = (v as Record<string, unknown>)[seg];
+  }
+  return v;
+}
+
+// The reserved `$` key a computed chip publishes its evaluated result under.
+// Namespaced by node id so it never collides with an author key and two chips
+// don't clobber each other (mirrors chartOutputKey).
+export function chipOutputKey(id: string): string {
+  return `__chip_${id}`;
+}
+
+// Internal keys that back charts/chips — never surfaced as authorable `$` values
+// (filtered from the trace graph so they don't pollute the `$` picker or the
+// document-live count).
+const RESERVED_KEY = /^__(chart|chip)_/;
+export function isReservedKey(key: string): boolean {
+  return RESERVED_KEY.test(key);
+}
+
+// The generated runtime cell for a computed chip: evaluate the author's
+// `$`-reading expression and publish it under the chip's reserved key.
+// Parenthesized so an object literal is a value, not a block; an empty expression
+// publishes `undefined` so the cell stays valid and the chip shows nothing.
+export function chipCellCode(id: string, expr: string): string {
+  const key = JSON.stringify(chipOutputKey(id));
+  const e = expr.trim() || "undefined";
+  return `$[${key}] = (${e});`;
+}
+
+export interface ExprToken {
+  text: string;
+  // Present on a `$.<path>` reference token; the top-level `$` key it reads (so
+  // the chip can hover-trace it). Absent on literal segments (operators, numbers).
+  head?: string;
+}
+
+// Split an expression into alternating literal / `$.<path>` reference tokens so a
+// computed chip can render each reference as its own hoverable span. The head key
+// (for tracing) is the first path segment: `$.styles.vars.gap` → head `styles`.
+export function tokenizeExpr(expr: string): ExprToken[] {
+  const re = /\$\.[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*/g;
+  const tokens: ExprToken[] = [];
+  let last = 0;
+  for (const m of expr.matchAll(re)) {
+    const start = m.index ?? 0;
+    if (start > last) tokens.push({ text: expr.slice(last, start) });
+    const head = m[0].slice(2).split(".")[0];
+    tokens.push({ text: m[0], head });
+    last = start + m[0].length;
+  }
+  if (last < expr.length) tokens.push({ text: expr.slice(last) });
+  return tokens;
+}

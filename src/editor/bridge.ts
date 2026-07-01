@@ -98,8 +98,11 @@ export function docToNotebook(
 // paragraph containing chips serializes cleanly to markdown.
 function valueRefsToText(node: JSONContent): JSONContent {
   if (node.type === VALUE_REF_NODE) {
+    const expr = ((node.attrs?.expr as string) ?? "").trim();
+    // Fall back to the legacy bare-key `name` attr for pre-`expr` docs.
     const name = (node.attrs?.name as string) ?? "";
-    return { type: "text", text: `$.${name}` };
+    const text = expr || (name ? `$.${name}` : "$");
+    return { type: "text", text };
   }
   if (node.content) {
     return { ...node, content: node.content.map(valueRefsToText) };
