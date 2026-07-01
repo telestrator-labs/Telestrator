@@ -117,7 +117,7 @@ export function InputCellView({
             <Popover>
               <PopoverTrigger
                 aria-label="input settings"
-                className="flex size-6 items-center justify-center rounded-md border border-transparent bg-surface text-text-faint outline-none hover:border-border-strong hover:text-text-muted focus-visible:ring-2 focus-visible:ring-brand-8">
+                className="flex size-6 items-center justify-center rounded-full border border-transparent bg-transparent hover:bg-surface text-text-faint outline-none hover:border-border-strong hover:text-text-muted focus-visible:ring-2 focus-visible:ring-brand-8 data-[state=open]:bg-surface data-[state=open]:ring dark:data-[state=open]:ring-white-a5">
                 <GearIcon />
               </PopoverTrigger>
               <PopoverContent
@@ -228,14 +228,10 @@ function GearIcon() {
   return (
     <svg
       className="size-3.5"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
+      viewBox="0 0 256 256"
+      fill="currentColor"
       strokeLinecap="round">
-      <path d="M2 5h6M11 5h3M2 11h3M8 11h6" />
-      <circle cx="9.5" cy="5" r="1.6" fill="currentColor" stroke="none" />
-      <circle cx="6.5" cy="11" r="1.6" fill="currentColor" stroke="none" />
+      <path d="M144,128a16,16,0,1,1-16-16A16,16,0,0,1,144,128ZM60,112a16,16,0,1,0,16,16A16,16,0,0,0,60,112Zm136,0a16,16,0,1,0,16,16A16,16,0,0,0,196,112Z" />
     </svg>
   );
 }

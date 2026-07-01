@@ -36,7 +36,7 @@ const PopoverContent = forwardRef<
           onFocusOutside?.(e);
         }}
         className={cx(
-          "z-50 w-72 rounded-xl border border-border bg-surface p-3 text-text shadow-[0_12px_40px_rgb(0_0_0/0.16)] outline-none",
+          "z-50 w-72 rounded-xl border border-border bg-paper p-3 text-text shadow-[0_12px_40px_rgb(0_0_0/0.16)] outline-none",
           className,
         )}
         {...props}

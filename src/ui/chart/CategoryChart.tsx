@@ -35,7 +35,7 @@ const SERIES_COLORS = [
 ];
 
 const AXIS_TEXT = "var(--color-text-muted)";
-const GRID = "var(--color-border-subtle)";
+const GRID = "var(--color-border)";
 const AXIS_LINE = "var(--color-border)";
 
 export interface CategoryChartProps {
