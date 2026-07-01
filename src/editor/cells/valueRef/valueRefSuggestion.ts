@@ -44,7 +44,10 @@ const dropChip =
 
 function items({ query }: { query: string }): SlashItem[] {
   const entries = getValueEntries();
-  const q = query.toLowerCase();
+  // Authors type the reference as they'd write it in code — `$.rate` — so the
+  // leading dot is part of the query. Strip it so `$.rate` and `$rate` both match.
+  const key = query.replace(/^\./, "");
+  const q = key.toLowerCase();
   const matches = entries.filter((e) => e.key.toLowerCase().includes(q));
 
   const list: SlashItem[] = matches.map((e) => ({
@@ -57,14 +60,14 @@ function items({ query }: { query: string }): SlashItem[] {
 
   // Let the author reference a key nothing writes yet (identifier-shaped queries
   // only, so a literal "$5" doesn't offer a bogus chip).
-  const exact = entries.some((e) => e.key === query);
-  if (query && !exact && IDENT.test(query)) {
+  const exact = entries.some((e) => e.key === key);
+  if (key && !exact && IDENT.test(key)) {
     list.push({
-      title: `$.${query}`,
+      title: `$.${key}`,
       group: matches.length ? "New" : "Values",
       icon: "+",
       desc: "reference this key",
-      run: dropChip(query),
+      run: dropChip(key),
     });
   }
   return list;

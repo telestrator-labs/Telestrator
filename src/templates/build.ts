@@ -27,8 +27,15 @@ export function md(markdown: MarkdownManager, src: string): JSONContent[] {
   return markdown.parse(src).content ?? [];
 }
 
-export function codeCell(language: CodeLanguage, code: string): JSONContent {
-  return { type: CODE_CELL_NODE, attrs: { id: generateId(), language, code } };
+export function codeCell(
+  language: CodeLanguage,
+  code: string,
+  name = "",
+): JSONContent {
+  return {
+    type: CODE_CELL_NODE,
+    attrs: { id: generateId(), language, code, name },
+  };
 }
 
 export function inputCell(opts: {

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "../ui/Button";
-import { SidebarTrigger } from "../ui/sidebar";
+import { SidebarTrigger } from "../ui/Sidebar.tsx";
 import { useRuntime, useDocumentLive } from "@/editor/reactive/RuntimeProvider";
 import { cx } from "../ui/cx";
 

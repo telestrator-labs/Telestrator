@@ -1,4 +1,4 @@
-import { SidebarMenuAction } from "../ui/sidebar";
+import { SidebarMenuAction } from "../ui/Sidebar.tsx";
 import {
   Popover,
   PopoverClose,

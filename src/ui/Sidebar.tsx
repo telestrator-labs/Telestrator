@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { tv, type VariantProps } from "tailwind-variants";
 import { cx } from "./cx";
 
 // Vendored from shadcn/ui's sidebar (MIT), trimmed and re-themed to our design
@@ -17,7 +17,7 @@ import { cx } from "./cx";
 // shortcut, the CSS-var width system, and the gap/fixed collapse trick. What's
 // dropped to avoid pulling in the whole ecosystem: the mobile Sheet (replaced by
 // a lightweight fixed overlay), Radix Tooltip (collapsed labels use `title`),
-// and Skeleton. Deps added: @radix-ui/react-slot + class-variance-authority.
+// and Skeleton. Deps added: @radix-ui/react-slot + tailwind-variants.
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -356,11 +356,11 @@ export const SidebarInset = forwardRef<
     ref={ref}
     className={cx(
       "relative flex min-h-screen min-w-0 flex-1 flex-col bg-surface-sunken",
-      // inset variant: float the bright "paper" document as a rounded, elevated
-      // card on the gray-3 chrome — a real shadow + hairline ring give the edges
+      // inset variant: float the opaque "paper" document as a rounded, elevated
+      // card on the gray-1 chrome — a real shadow + hairline ring give the edges
       // enough contrast to read as lifted (the peer Sidebar carries the variant).
       "md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:h-[calc(100svh-1rem)] md:peer-data-[variant=inset]:rounded-xl",
-      "md:peer-data-[variant=inset]:bg-paper md:peer-data-[variant=inset]:ring-1 md:peer-data-[variant=inset]:ring-[var(--black-a4)] md:peer-data-[variant=inset]:shadow-[0_1px_2px_rgb(0_0_0/0.06),0_12px_28px_rgb(0_0_0/0.10)]",
+      "md:peer-data-[variant=inset]:bg-paper md:peer-data-[variant=inset]:ring-1 md:peer-data-[variant=inset]:ring-gray-6 md:peer-data-[variant=inset]:shadow-[0_1px_2px_rgb(0_0_0/0.06),0_12px_28px_rgb(0_0_0/0.10)]",
       "md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
       className,
     )}
@@ -488,8 +488,8 @@ export const SidebarMenuItem = forwardRef<
 ));
 SidebarMenuItem.displayName = "SidebarMenuItem";
 
-const sidebarMenuButtonVariants = cva(
-  cx(
+const sidebarMenuButtonVariants = tv({
+  base: cx(
     "peer/menu-button flex w-full items-center gap-2.5 overflow-hidden rounded-[7px] p-2 text-left text-[13.5px] outline-none transition-colors",
     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring",
     "data-[active=true]:bg-sidebar-primary data-[active=true]:font-medium data-[active=true]:text-sidebar-primary-foreground",
@@ -497,22 +497,20 @@ const sidebarMenuButtonVariants = cva(
     "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-1.5",
     "[&>svg]:size-4 [&>svg]:shrink-0",
   ),
-  {
-    variants: {
-      variant: {
-        default: "text-sidebar-foreground/90",
-        outline:
-          "border border-sidebar-border bg-sidebar text-sidebar-foreground/90",
-      },
-      size: {
-        default: "h-8",
-        sm: "h-7 text-[13px]",
-        lg: "h-12",
-      },
+  variants: {
+    variant: {
+      default: "text-sidebar-foreground/90",
+      outline:
+        "border border-sidebar-border bg-sidebar text-sidebar-foreground/90",
     },
-    defaultVariants: { variant: "default", size: "default" },
+    size: {
+      default: "h-8",
+      sm: "h-7 text-[13px]",
+      lg: "h-12",
+    },
   },
-);
+  defaultVariants: { variant: "default", size: "default" },
+});
 
 export const SidebarMenuButton = forwardRef<
   HTMLButtonElement,

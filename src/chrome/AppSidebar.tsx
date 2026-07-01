@@ -18,7 +18,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-} from "../ui/sidebar";
+} from "../ui/Sidebar.tsx";
 
 // Placeholder sub-documents shown under the open notebook. Sub-documents aren't
 // a real model concept yet — these are stubs to exercise the nested sidebar
@@ -54,7 +54,7 @@ export function AppSidebar({
               size="lg"
               onClick={onHome}
               tooltip="Telestrator"
-              className="group-data-[collapsible=icon]:!p-1"
+              className="group-data-[collapsible=icon]:p-1!"
             >
               <span className="flex size-6 flex-none items-center justify-center">
                 <Logo className="h-5 w-auto" />
@@ -70,7 +70,7 @@ export function AppSidebar({
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="flex items-center gap-2 rounded-lg border border-sidebar-border bg-surface-active px-2.5 py-[7px] text-[13px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
+        <div className="flex items-center gap-2 rounded-lg border border-sidebar-border bg-surface-active px-2.5 py-1.75 text-[13px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
           <SearchIcon />
           <span>Search notebooks…</span>
         </div>
@@ -149,7 +149,7 @@ export function AppSidebar({
               <SidebarMenuButton
                 size="lg"
                 tooltip="Your workspace"
-                className="group-data-[collapsible=icon]:!p-1"
+                className="group-data-[collapsible=icon]:p-1!"
               >
                 <span className="flex size-6 flex-none items-center justify-center rounded-full bg-accent-5 text-[11px] font-semibold text-action-text">
                   You
@@ -177,7 +177,7 @@ export function AppSidebar({
 function SearchIcon() {
   return (
     <svg
-      className="size-[15px] flex-none"
+      className="size-3.75 flex-none"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"

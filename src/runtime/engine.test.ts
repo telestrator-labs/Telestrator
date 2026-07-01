@@ -222,4 +222,24 @@ describe("reactive engine", () => {
 
     engine.dispose();
   });
+
+  test("a React element export flags output.view and stays raw in $", () => {
+    const engine = createEngine();
+    // Duck-typed React element (React 18 brand).
+    const el = {
+      $$typeof: Symbol.for("react.element"),
+      type: "div",
+      props: {},
+    };
+    engine.setCell("jsx", () => el);
+    expect(engine.getOutput("jsx")?.view).toBe(true);
+    expect(engine.getValue("jsx")).toBe(el);
+
+    engine.setCell("write", ($: Context) => {
+      $.el = el;
+    });
+    expect(engine.context.el).toBe(el); // not proxied
+
+    engine.dispose();
+  });
 });

@@ -11,9 +11,18 @@ const SCOPE = `.${OUTPUT_CLASS}`;
 const styles = new Map<string, HTMLStyleElement>();
 
 // Prefix each comma-separated selector part with the output scope:
-// `.card, h1` → `.telestrator-output .card, .telestrator-output h1`.
+// `.card, h1` → `.telestrator-output .card, .telestrator-output h1`. A root-ish
+// selector (`:root`/`html`/`body`) is *replaced* by the output scope (not nested
+// under it) so custom properties / base styles a css cell declares land on the
+// output container and cascade to the mounted view.
 function scopeSelector(selector: string): string {
-  return selector.replace(/([^,]+,?)/g, `${SCOPE} $1 `).trim();
+  return selector
+    .split(",")
+    .map((part) => {
+      const p = part.trim();
+      return /^(:root|html|body)$/i.test(p) ? SCOPE : `${SCOPE} ${p}`;
+    })
+    .join(", ");
 }
 
 // Walk a rule list and scope style rules; recurse into @media/@supports. Rules
@@ -29,6 +38,22 @@ function scopeRules(rules: CSSRuleList): void {
       scopeRules(rule.cssRules);
     }
   }
+}
+
+// A css cell's public API, for a *named* cell to publish to `$`: class names
+// (Flavor A: pass through as-is, so they match the injected rules) and custom
+// properties (as `var(--name)` references). Regex over the raw text — a light
+// heuristic, no CSSOM needed (works headless).
+export function parseApi(code: string): {
+  classes: Record<string, string>;
+  vars: Record<string, string>;
+} {
+  const classes: Record<string, string> = {};
+  for (const m of code.matchAll(/\.(-?[A-Za-z_][\w-]*)/g)) classes[m[1]] = m[1];
+  const vars: Record<string, string> = {};
+  for (const m of code.matchAll(/--([A-Za-z_][\w-]*)\s*:/g))
+    vars[m[1]] = `var(--${m[1]})`;
+  return { classes, vars };
 }
 
 export const cssRegistry = {

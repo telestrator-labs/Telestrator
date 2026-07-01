@@ -4,7 +4,11 @@ import { RuntimeProvider } from "@/editor/reactive/RuntimeProvider";
 import { TraceProvider } from "@/editor/trace/TraceContext";
 import { TraceSettingsProvider } from "@/editor/trace/traceSettings";
 import { AppSidebar } from "./chrome/AppSidebar";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./ui/Sidebar.tsx";
 import { EditorTopBar, type NotebookLayout } from "./chrome/EditorTopBar";
 import { TracePanel } from "./chrome/TracePanel";
 import { ShareModal } from "./chrome/ShareModal";

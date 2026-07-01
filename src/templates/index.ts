@@ -3,6 +3,7 @@ import { rateLimiting } from "./rateLimiting";
 import { compoundInterest } from "./compoundInterest";
 import { greeting } from "./greeting";
 import { bitsTutorial } from "./bitsTutorial";
+import { reactViews } from "./reactViews";
 
 export type { NotebookTemplate } from "./types";
 export {
@@ -19,4 +20,5 @@ export const templates: NotebookTemplate[] = [
   compoundInterest,
   greeting,
   bitsTutorial,
+  reactViews,
 ];

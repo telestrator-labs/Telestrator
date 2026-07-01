@@ -1,5 +1,9 @@
 import { afterEach, expect, test } from "vitest";
-import { cssRegistry, OUTPUT_CLASS } from "@/editor/reactive/cssRegistry";
+import {
+  cssRegistry,
+  parseApi,
+  OUTPUT_CLASS,
+} from "@/editor/reactive/cssRegistry";
 
 const styleFor = (id: string) =>
   document.head.querySelector<HTMLStyleElement>(
@@ -38,4 +42,23 @@ test("set() replaces content on re-inject; remove() cleans up", () => {
 
   cssRegistry.remove("b");
   expect(styleFor("b")).toBeNull();
+});
+
+test("parseApi extracts class names and custom-property references", () => {
+  const api = parseApi(
+    ".card { padding: 12px } :root { --gap: 8px; --bg: red }",
+  );
+  expect(api.classes).toEqual({ card: "card" });
+  expect(api.vars).toEqual({ gap: "var(--gap)", bg: "var(--bg)" });
+});
+
+test("root selectors are replaced by the output scope, not nested under it", () => {
+  cssRegistry.set("a", ":root { --bg: red } .card { color: blue }");
+  const rules = [
+    ...(styleFor("a")!.sheet!.cssRules as unknown as CSSStyleRule[]),
+  ].map((r) => r.selectorText);
+  // `:root` → `.telestrator-output` (so the var lands on the container), and
+  // `.card` → `.telestrator-output .card`.
+  expect(rules).toContain(`.${OUTPUT_CLASS}`);
+  expect(rules.join(" ")).toContain(`.${OUTPUT_CLASS} .card`);
 });
