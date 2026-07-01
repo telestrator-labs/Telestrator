@@ -92,10 +92,11 @@ export function EditorTopBar({
         <Button
           variant="secondary"
           onClick={onToggleTrace}
+          aria-pressed={traceOpen}
           className={cx(
             "gap-1.5",
             traceOpen &&
-              "border-value-border bg-value-bg text-value hover:border-value-border hover:text-value",
+              "border-transparent bg-brand-9 text-brand-contrast hover:border-transparent hover:bg-brand-9 hover:text-brand-contrast",
           )}
         >
           <TraceIcon />
@@ -168,8 +169,8 @@ function RestartIcon() {
 }
 
 // A segmented control built from ghost <Button>s sharing one bordered track.
-// The active option is filled with the brand (lime) and takes its dark contrast
-// foreground, so the current view reads at a glance.
+// The active option lifts onto the raised surface — a quiet toggle; the lime
+// accent is reserved for the live/reactive affordances (Trace), not view state.
 function Seg({
   options,
   value,
@@ -191,7 +192,7 @@ function Seg({
             className={cx(
               "gap-1.5 rounded-[7px] px-3 py-1.5",
               on
-                ? "bg-brand-9 text-brand-contrast shadow-sm hover:bg-brand-9 hover:text-brand-contrast"
+                ? "bg-surface text-text shadow-sm hover:bg-surface"
                 : "hover:bg-transparent",
             )}
           >
