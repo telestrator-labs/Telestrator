@@ -59,9 +59,16 @@ and [§4](./stack-decisions.md#4-reactivity-primitive).
 
 - **The Trace** — a reactive dependency graph drawn as an SVG overlay on the document; hover/click a
   cell to see what it reads and writes (toggleable, so it stays out of the way while authoring).
-- **Inline prose `$`-value chips** — reference a live `$` value mid-sentence; it re-renders reactively.
-- **Honest live indicators** — the cell/document **LIVE** badge lights only when something actually
-  reads or writes a valid `$` value.
+- **Inline prose `$`-value chips** — reference a live `$` value mid-sentence. A chip holds a
+  `$`-*expression*: a **nested path** (`$.styles.vars.gap`, reachable via drill-in autocomplete and
+  searchable by leaf name) or a **compound/computed** chip (`$.rate * $.qty`) evaluated *in the
+  sandbox* (never the editor realm) and edited in a popover — with each `$.*` reference in a compound
+  chip individually hover-traceable to its own writer/readers.
+- **Reactive-state badges** — the "live" language is retired. A document simply **is** reactive or
+  not; a code cell's badge is its role in the `$` graph — **State** (writes `$` only, a source),
+  **Derived** (reads *and* writes, a computed value), or **Reactive** (reads only, a consumer). Only
+  cells that read `$` (reactive/derived) breathe; the badge shows only when the cell actually touches
+  a valid `$` value.
 - **Cell views** — a cell's *main export* (`export default`) renders as its output: **vanilla DOM or
   a React/JSX** element, mounted into a host `.telestrator-output` container via a same-origin
   side-channel (the compute iframe stays headless).
@@ -70,6 +77,11 @@ and [§4](./stack-decisions.md#4-reactivity-primitive).
 - **`export → $` sugar** — a top-level `export const/function foo = …` writes `$.foo` (reactive
   state) while `export default …` is the view — implemented in the sandbox transpile step
   (`src/sandbox/compile.ts`).
+- **Reactive design language** — one gold `--color-reactive-*` token family is reserved for
+  everything tied to a live `$` value: the value chips, the run badges, and inline prose code that
+  *references* `$` (a `.node-codeCell`-aware ProseMirror decoration tints it gold; plain code stays
+  neutral). Non-reactive selection/active affordances use accent (violet), so gold always reads as
+  "reactive".
 - **Editor restructure** — `src/editor/` regrouped by feature (`cells/`, `reactive/`, `trace/`, …)
   with a new `@/*` → `src/*` path alias.
 
