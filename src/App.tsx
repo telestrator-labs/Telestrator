@@ -93,6 +93,7 @@ export default function App() {
           onOpen={openNotebook}
           onNewBlank={createBlank}
           onHome={goHome}
+          onDelete={deleteNotebook}
         />
       )}
       <SidebarInset className="h-screen overflow-hidden">

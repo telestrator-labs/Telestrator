@@ -8,17 +8,22 @@ import {
 import { cx } from "../ui/cx";
 
 // Per-notebook document actions in the sidebar. The "⋯" reveals on row hover (or
-// while its menu is open) and opens this menu. The actions are INERT scaffolding
-// — they'll wire up when document management lands; for now each just closes the
-// menu. Kept alongside the existing delete-from-dashboard until that work unifies
-// document operations.
+// while its menu is open) and opens this menu. Delete is wired to the real
+// removal; Rename/Duplicate/Move are still inert scaffolding pending the
+// document-management work that will wire them up.
 const ACTIONS: { key: string; label: string; icon: React.ReactNode }[] = [
   { key: "rename", label: "Rename", icon: <PencilIcon /> },
   { key: "duplicate", label: "Duplicate", icon: <CopyIcon /> },
   { key: "move", label: "Move to…", icon: <MoveIcon /> },
 ];
 
-export function DocActionsMenu({ title }: { title: string }) {
+export function DocActionsMenu({
+  title,
+  onDelete,
+}: {
+  title: string;
+  onDelete: () => void;
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -45,7 +50,12 @@ export function DocActionsMenu({ title }: { title: string }) {
           <ActionItem key={a.key} icon={a.icon} label={a.label} />
         ))}
         <div className="my-1 h-px bg-border-subtle" />
-        <ActionItem icon={<TrashIcon />} label="Delete" danger />
+        <ActionItem
+          icon={<TrashIcon />}
+          label="Delete"
+          danger
+          onSelect={onDelete}
+        />
       </PopoverContent>
     </Popover>
   );
@@ -55,16 +65,19 @@ function ActionItem({
   icon,
   label,
   danger,
+  onSelect,
 }: {
   icon: React.ReactNode;
   label: string;
   danger?: boolean;
+  // Omitted for the still-inert actions — the item just closes the menu.
+  onSelect?: () => void;
 }) {
   return (
     <PopoverClose asChild>
-      {/* Inert until document management lands — closes the menu, no action. */}
       <button
         type="button"
+        onClick={onSelect}
         className={cx(
           "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[13px]",
           danger

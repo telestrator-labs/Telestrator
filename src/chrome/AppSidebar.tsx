@@ -33,12 +33,14 @@ export function AppSidebar({
   onOpen,
   onNewBlank,
   onHome,
+  onDelete,
 }: {
   docs: NotebookEntry[];
   selectedId: string | null;
   onOpen: (id: string) => void;
   onNewBlank: () => void;
   onHome: () => void;
+  onDelete: (id: string) => void;
 }) {
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -102,7 +104,10 @@ export function AppSidebar({
                         }
                       />
                     </SidebarMenuButton>
-                    <DocActionsMenu title={title} />
+                    <DocActionsMenu
+                      title={title}
+                      onDelete={() => onDelete(d.id)}
+                    />
                     {/* Sub-document stubs for the open notebook. */}
                     {active && (
                       <SidebarMenuSub>
