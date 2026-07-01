@@ -137,7 +137,7 @@ const cellTheme = EditorView.theme({
   ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--violet-11)" },
   "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection":
     {
-      backgroundColor: "var(--violet-4)",
+      backgroundColor: "var(--color-accent-a5)",
     },
   ".cm-activeLine": { backgroundColor: "transparent" },
 });

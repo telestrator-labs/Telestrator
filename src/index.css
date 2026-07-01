@@ -213,10 +213,10 @@
   /* ── Tier 3: semantic (role → raw scale) ─────────────────────────────────
    * The layer components actually use. Bind to these by intent. */
   /* surfaces */
-  --color-surface: var(--color-gray-1);
-  --color-surface-sunken: var(--color-gray-2);
-  --color-surface-raised: var(--color-gray-3);
-  --color-surface-active: var(--color-gray-4);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--color-gray-3);
+  --color-surface-raised: var(--color-gray-4);
+  --color-surface-active: var(--color-gray-5);
   /* paper: the document surface for the inset card. Points at --paper (a real
    * custom property, defined per-mode below) rather than directly at --white-a12,
    * because white-alpha has no dark variant — a raw white overlay would stay
@@ -300,13 +300,15 @@
   /* tell the UA to paint native chrome (scrollbars, form controls) for the mode,
    * so an overflowing code cell's scrollbar isn't a bright bar on a dark page. */
   color-scheme: light;
-  --chrome: var(--olive-1);
-  --paper: var(--olive-3);
+  --chrome: var(--olive-3);
+  --paper: var(--olive-2);
+  --surface: var(--color-white-a12);
 }
 .dark {
   color-scheme: dark;
   --chrome: var(--olive-2);
   --paper: var(--black-a12);
+  --surface: var(--color-gray-1);
 }
 
 *,
