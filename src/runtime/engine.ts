@@ -1,6 +1,7 @@
 import {
   effect,
   effectScope,
+  markRaw,
   onEffectCleanup,
   type EffectScope,
   type ReactiveEffectRunner,
@@ -34,6 +35,19 @@ interface CellRecord {
   reads: Set<string>;
   logs: LogEntry[];
   error?: string;
+  // The cell's main-export value from its last run (a DOM node → a mountable
+  // view). Kept live here (never serialized); the host reads it via getValue.
+  value: unknown;
+}
+
+// Duck-type a DOM node without referencing `Node` (the engine also runs headless
+// in tests). A node → the cell has a mountable view.
+function isDomNode(v: unknown): boolean {
+  return (
+    !!v &&
+    typeof v === "object" &&
+    typeof (v as { nodeType?: unknown }).nodeType === "number"
+  );
 }
 
 export function createEngine(initial: Context = {}): ReactiveEngine {
@@ -53,6 +67,7 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
       reads: [...cell.reads],
       logs: cell.logs,
       error: cell.error,
+      view: isDomNode(cell.value) || undefined,
     };
     outputs.set(cell.id, output);
     for (const cb of listeners) cb(output);
@@ -100,7 +115,13 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
       },
       set: (_t, key, value) => {
         if (typeof key === "string") writes.add(key);
-        return Reflect.set($, key, value);
+        // Never let reactivity deep-proxy a DOM node written to `$` — a Vue proxy
+        // over a live node breaks it. markRaw keeps the real node identity.
+        return Reflect.set(
+          $,
+          key,
+          isDomNode(value) ? markRaw(value as object) : value,
+        );
       },
       deleteProperty: (_t, key) => {
         if (typeof key === "string") writes.add(key);
@@ -113,6 +134,7 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
     cell.reads.clear();
     cell.logs = [];
     cell.error = undefined;
+    cell.value = undefined;
     const api: CellApi = { onDispose: (fn) => onEffectCleanup(fn) };
     const restoreConsole = captureConsole(cell.logs);
     try {
@@ -124,6 +146,9 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
           cell.error = errorText(e);
           emit(cell);
         });
+      } else {
+        // The cell's main export becomes its view (a DOM node → mountable).
+        cell.value = result;
       }
     } catch (e) {
       cell.error = errorText(e);
@@ -155,6 +180,7 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
       writes: new Set(),
       reads: new Set(),
       logs: [],
+      value: undefined,
     };
     cells.set(id, cell);
     startCell(cell);
@@ -192,6 +218,7 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
     setCell,
     removeCell,
     getOutput: (id) => outputs.get(id),
+    getValue: (id) => cells.get(id)?.value,
     onOutput: (cb) => {
       listeners.add(cb);
       return () => listeners.delete(cb);

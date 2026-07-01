@@ -14,6 +14,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* `@/…` → `src/…` so cross-module imports don't depend on nesting depth. */
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

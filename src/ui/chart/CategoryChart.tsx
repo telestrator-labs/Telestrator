@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { ChartType } from "../../editor/chart";
+import type { ChartType } from "@/editor/cells/chart/chart";
 import { cx } from "../cx";
 
 // A cartesian chart (area / line / bar) refactored from Tremor's chart components

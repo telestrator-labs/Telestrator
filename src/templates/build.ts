@@ -1,16 +1,19 @@
 import type { JSONContent } from "@tiptap/core";
 import type { MarkdownManager } from "@tiptap/markdown";
 import { generateId, type Language } from "../core/notebook";
-import { CODE_CELL_NODE } from "../editor/codeCellNode";
-import { INPUT_CELL_NODE, type InputCellConfig } from "../editor/inputCellNode";
-import { KNOWLEDGE_CHECK_NODE } from "../editor/knowledgeCheckNode";
-import { CHART_NODE } from "../editor/chartNode";
+import { CODE_CELL_NODE } from "@/editor/cells/code/codeCellNode";
+import {
+  INPUT_CELL_NODE,
+  type InputCellConfig,
+} from "@/editor/cells/input/inputCellNode";
+import { KNOWLEDGE_CHECK_NODE } from "@/editor/cells/check/knowledgeCheckNode";
+import { CHART_NODE } from "@/editor/cells/chart/chartNode";
 import type {
   AnswerKind,
   KnowledgeCheckConfig,
-} from "../editor/knowledgeCheck";
-import type { ChartConfig, ChartType } from "../editor/chart";
-import type { InputKind } from "../editor/binding";
+} from "@/editor/cells/check/knowledgeCheck";
+import type { ChartConfig, ChartType } from "@/editor/cells/chart/chart";
+import type { InputKind } from "@/editor/cells/input/binding";
 
 // Authoring helpers for templates. Cell ids are minted *here*, inside the
 // builder call, so two notebooks made from one template never share ids (which

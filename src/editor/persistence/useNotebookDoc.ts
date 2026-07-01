@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import * as Y from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
-import { docStoreKey } from "./docIndex";
+import { docStoreKey } from "@/editor/persistence/docIndex";
 
 export interface NotebookDocHandle {
   ydoc: Y.Doc;

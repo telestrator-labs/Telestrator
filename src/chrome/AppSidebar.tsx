@@ -1,4 +1,4 @@
-import type { NotebookEntry } from "../editor/docIndex";
+import type { NotebookEntry } from "@/editor/persistence/docIndex";
 import { DocBadge } from "./DocBadge";
 import { DocActionsMenu } from "./DocActionsMenu";
 import { ThemeMenu } from "./ThemeMenu";

@@ -7,9 +7,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useTraceGraph } from "./RuntimeProvider";
-import { useTraceSettings } from "./traceSettings";
-import { cx } from "../ui/cx";
+import { useTraceGraph } from "@/editor/reactive/RuntimeProvider";
+import { useTraceSettings } from "@/editor/trace/traceSettings";
+import { cx } from "@/ui/cx";
 
 // What the trace is currently scoped to. A transient hover (a cell or a single
 // `$` value) narrows the drawing to just that node's edges; with nothing

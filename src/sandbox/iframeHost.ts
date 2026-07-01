@@ -42,6 +42,16 @@ export function createIframeHost(): RuntimeHost {
   window.addEventListener("message", onMessage);
   document.body.appendChild(iframe);
 
+  // A cell's view is a live DOM node in the sandbox document; it can't cross
+  // postMessage. Since the iframe is same-origin we call its exposed mount
+  // functions directly, handing over the host-owned output container.
+  interface ViewGlobals {
+    __telestrator_mountView(id: string, container: Element): void;
+    __telestrator_unmountView(container: Element): void;
+  }
+  const win = () =>
+    ready ? (iframe.contentWindow as unknown as ViewGlobals | null) : null;
+
   return {
     load: (cells) => send({ type: "load", cells }),
     update: (id, code) => send({ type: "update", id, code }),
@@ -51,6 +61,8 @@ export function createIframeHost(): RuntimeHost {
       listeners.add(cb);
       return () => listeners.delete(cb);
     },
+    mountView: (id, container) => win()?.__telestrator_mountView(id, container),
+    unmountView: (container) => win()?.__telestrator_unmountView(container),
     dispose: () => {
       window.removeEventListener("message", onMessage);
       iframe.remove();

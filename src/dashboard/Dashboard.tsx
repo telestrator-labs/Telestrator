@@ -1,4 +1,4 @@
-import type { NotebookEntry } from "../editor/docIndex";
+import type { NotebookEntry } from "@/editor/persistence/docIndex";
 import { templates, type NotebookTemplate } from "../templates";
 import { TemplateCard } from "./TemplateCard";
 import { NotebookCard } from "./NotebookCard";

@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { CodeCellView } from "./CodeCellView";
+import { CodeCellView } from "@/editor/cells/code/CodeCellView";
 
 // A code cell is the greenfield analog of TypeCell's executable block: a
 // block-level *atom* node (its source lives in the `code` attr, not as editable

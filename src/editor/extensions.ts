@@ -1,13 +1,13 @@
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
-import { CodeCell } from "./codeCellNode";
-import { InputCell } from "./inputCellNode";
-import { KnowledgeCheck } from "./knowledgeCheckNode";
-import { Chart } from "./chartNode";
-import { ValueRef } from "./valueRefNode";
-import { SlashCommand } from "./slashCommand";
-import { ValueRefSuggestion } from "./valueRefSuggestion";
-import { AddBlock } from "./addBlock";
+import { CodeCell } from "@/editor/cells/code/codeCellNode";
+import { InputCell } from "@/editor/cells/input/inputCellNode";
+import { KnowledgeCheck } from "@/editor/cells/check/knowledgeCheckNode";
+import { Chart } from "@/editor/cells/chart/chartNode";
+import { ValueRef } from "@/editor/cells/valueRef/valueRefNode";
+import { SlashCommand } from "@/editor/commands/slashCommand";
+import { ValueRefSuggestion } from "@/editor/cells/valueRef/valueRefSuggestion";
+import { AddBlock } from "@/editor/commands/addBlock";
 
 // The single source of truth for the editor's schema. Shared by the live editor
 // (NotebookEditor) and the headless bridge test so they can never drift.

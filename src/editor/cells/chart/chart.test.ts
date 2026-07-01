@@ -5,7 +5,7 @@ import {
   coerceRows,
   inferSeries,
   resolveSeries,
-} from "./chart";
+} from "@/editor/cells/chart/chart";
 
 describe("chartCellCode", () => {
   it("publishes the parenthesized expression under the reserved key", () => {

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useTraceGraph } from "./RuntimeProvider";
-import { useTrace } from "./TraceContext";
+import { useTraceGraph } from "@/editor/reactive/RuntimeProvider";
+import { useTrace } from "@/editor/trace/TraceContext";
 
 interface Edge {
   key: string;

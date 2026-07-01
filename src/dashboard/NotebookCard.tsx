@@ -1,4 +1,4 @@
-import type { NotebookEntry } from "../editor/docIndex";
+import type { NotebookEntry } from "@/editor/persistence/docIndex";
 import { DocBadge } from "../chrome/DocBadge";
 import { Sparkline } from "./Sparkline";
 

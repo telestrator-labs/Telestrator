@@ -1,7 +1,10 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { KnowledgeCheckView } from "./KnowledgeCheckView";
-import type { AnswerKind, KnowledgeCheckConfig } from "./knowledgeCheck";
+import { KnowledgeCheckView } from "@/editor/cells/check/KnowledgeCheckView";
+import type {
+  AnswerKind,
+  KnowledgeCheckConfig,
+} from "@/editor/cells/check/knowledgeCheck";
 
 // A knowledge-check block: a graded question authored inline. A block-level atom
 // like inputCell — but instead of a `$`-knob it holds a question + expected

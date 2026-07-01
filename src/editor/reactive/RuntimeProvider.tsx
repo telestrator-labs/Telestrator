@@ -7,9 +7,9 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { createIframeHost } from "../sandbox/iframeHost";
-import { setValueEntries } from "./valueKeys";
-import type { CellOutput, RuntimeHost } from "../runtime";
+import { createIframeHost } from "@/sandbox/iframeHost";
+import { setValueEntries } from "@/editor/cells/valueRef/valueKeys";
+import type { CellOutput, RuntimeHost } from "@/runtime";
 
 // The reactive dependency graph, derived from every cell's latest output: which
 // cell writes each `$` value and which cells read it. This is the data "the
@@ -79,6 +79,9 @@ interface RuntimeContextValue {
   restart(): void;
   subscribe(id: string, cb: () => void): () => void;
   getOutput(id: string): CellOutput | undefined;
+  // Mount/unmount a cell's live DOM view into a host output container.
+  mountView(id: string, container: Element): void;
+  unmountView(container: Element): void;
   // Trace graph subscription (recomputed whenever any cell's output changes).
   subscribeGraph(cb: () => void): () => void;
   getGraph(): TraceGraph;
@@ -161,6 +164,8 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
         return () => set!.delete(cb);
       },
       getOutput: (id) => outputs.current.get(id),
+      mountView: (id, container) => getHost().mountView(id, container),
+      unmountView: (container) => getHost().unmountView(container),
       subscribeGraph: (cb) => {
         graphSubs.current.add(cb);
         return () => graphSubs.current.delete(cb);

@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { InputCellView } from "./InputCellView";
-import type { InputKind } from "./binding";
+import { InputCellView } from "@/editor/cells/input/InputCellView";
+import type { InputKind } from "@/editor/cells/input/binding";
 
 // An input cell is the explorable's *knob*: a block-level atom that writes one
 // `$` key (a slider/number/text/select/toggle). It mirrors codeCellNode — atom,

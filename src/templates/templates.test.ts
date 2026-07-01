@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
 import { Editor, type JSONContent } from "@tiptap/core";
 import { editorExtensions } from "../editor/extensions";
-import { CODE_CELL_NODE } from "../editor/codeCellNode";
-import { INPUT_CELL_NODE } from "../editor/inputCellNode";
+import { CODE_CELL_NODE } from "@/editor/cells/code/codeCellNode";
+import { INPUT_CELL_NODE } from "@/editor/cells/input/inputCellNode";
 import { templates } from "./index";
 
 // A headless editor only to obtain a real, schema-aware MarkdownManager (the

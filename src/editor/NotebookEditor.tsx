@@ -4,10 +4,10 @@ import { Collaboration } from "@tiptap/extension-collaboration";
 import type * as Y from "yjs";
 import { editorExtensions } from "./extensions";
 import { notebookToDocJSON } from "./bridge";
-import { useReadingMode } from "./ReadingMode";
+import { useReadingMode } from "@/editor/shared/ReadingMode";
 import { createNotebook } from "../core/notebook";
 import { takePendingTemplate } from "../templates";
-import { renameNotebook } from "./docIndex";
+import { renameNotebook } from "@/editor/persistence/docIndex";
 
 // The editing surface for one notebook. Persistence is Yjs + IndexedDB: the
 // Collaboration extension binds the editor to the notebook's Y.Doc (owned by

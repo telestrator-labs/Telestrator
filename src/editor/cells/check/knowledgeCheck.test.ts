@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bindingCode, gradeAnswer } from "./knowledgeCheck";
+import { bindingCode, gradeAnswer } from "@/editor/cells/check/knowledgeCheck";
 
 describe("gradeAnswer", () => {
   it("choice: unanswered is neutral, matches the correct option", () => {

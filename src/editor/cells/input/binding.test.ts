@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { bindingCode, coerceValue } from "./binding";
+import { bindingCode, coerceValue } from "@/editor/cells/input/binding";
 
 test("bindingCode generates a $-assignment for each input kind", () => {
   // slider / number → numeric literal
