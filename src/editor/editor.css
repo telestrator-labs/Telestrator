@@ -44,24 +44,71 @@
   color: var(--color-text-faint);
 }
 
-/* The toolbar sticks just under the title as the reader scrolls. The bar carries
- * an opaque, paper-matched background spanning the full content width so
- * scrolling prose can't bleed through behind the (fit-content) segmented
- * control, which sits left-aligned with the prose. */
-.notebook__tools {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  margin: 0 0 18px;
-  padding: 10px 0;
-  background: var(--color-paper);
-}
-
 /* Tiptap document surface. Typography (serif body, sans headings, gold inline
  * code, lists, quotes, rules) is owned by the `prose` class on the editable —
  * see typography.plugin.ts. Only editor-specific bits remain here. */
 .notebook__doc .tiptap {
   outline: none;
+}
+
+/* Empty-line "add block" affordance (see addBlock.ts). The empty paragraph gets
+ * a positioning context; the widget overlays it as a faint full-width separator
+ * with a centered "+" that opens the block menu. The rules are click-through so
+ * the caret still lands on the line; only the button takes pointer events. */
+.notebook__doc .tiptap p.is-empty-line {
+  position: relative;
+}
+
+.add-block {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.add-block__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border-subtle);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.add-block__btn {
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-faint);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.add-block__btn:hover {
+  border-color: var(--color-action-border);
+  color: var(--color-action-text);
+  background: var(--color-action-subtle);
+}
+
+/* Reveal the connecting rules on hover/focus of the line for the full separator
+ * look; keep them quiet otherwise so an empty line isn't noisy. */
+.add-block:hover .add-block__rule,
+.notebook__doc .tiptap:focus-within p.is-empty-line .add-block__rule {
+  opacity: 1;
 }
 
 .notebook--reading .tiptap {

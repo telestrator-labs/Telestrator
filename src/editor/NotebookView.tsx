@@ -1,4 +1,3 @@
-import { RuntimeProvider } from "./RuntimeProvider";
 import { NotebookEditor } from "./NotebookEditor";
 import { useNotebookDoc } from "./useNotebookDoc";
 import { ReadingModeContext } from "./ReadingMode";
@@ -23,17 +22,14 @@ export function NotebookView({
 
   return (
     <ReadingModeContext.Provider value={reading}>
-      <RuntimeProvider>
-        <div className={wide ? "notebook notebook--wide" : "notebook"}>
-          {/* Title renders inside NotebookEditor, below the (sticky) toolbar. */}
-          <NotebookEditor
-            docId={docId}
-            ydoc={ydoc}
-            whenSynced={whenSynced}
-            title={title}
-          />
-        </div>
-      </RuntimeProvider>
+      <div className={wide ? "notebook notebook--wide" : "notebook"}>
+        <NotebookEditor
+          docId={docId}
+          ydoc={ydoc}
+          whenSynced={whenSynced}
+          title={title}
+        />
+      </div>
     </ReadingModeContext.Provider>
   );
 }

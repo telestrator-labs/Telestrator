@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NotebookView } from "./editor/NotebookView";
+import { RuntimeProvider } from "./editor/RuntimeProvider";
 import { AppSidebar } from "./chrome/AppSidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { EditorTopBar, type NotebookLayout } from "./chrome/EditorTopBar";
@@ -96,7 +97,10 @@ export default function App() {
       )}
       <SidebarInset className="h-screen overflow-hidden">
         {inEditor ? (
-          <>
+          // Runtime is lifted here (keyed per doc) so the top bar can offer the
+          // document-level runtime reset next to the Live indicator, not the
+          // editor toolbar.
+          <RuntimeProvider key={selected.id}>
             <EditorTopBar
               title={selected.title}
               reading={reading}
@@ -122,7 +126,7 @@ export default function App() {
               </div>
               {traceOpen && !reading && <TracePanel />}
             </div>
-          </>
+          </RuntimeProvider>
         ) : (
           <>
             {/* Dashboard needs its own header so the sidebar trigger is always

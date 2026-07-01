@@ -4,12 +4,9 @@ import { Collaboration } from "@tiptap/extension-collaboration";
 import type * as Y from "yjs";
 import { editorExtensions } from "./extensions";
 import { notebookToDocJSON } from "./bridge";
-import { useRuntime } from "./RuntimeProvider";
 import { useReadingMode } from "./ReadingMode";
 import { createNotebook } from "../core/notebook";
-import { insertCodeCellAt, insertInputCellAt } from "./insertCells";
 import { takePendingTemplate } from "../templates";
-import { Toolbar, type ToolbarAction } from "../ui/Toolbar";
 import { renameNotebook } from "./docIndex";
 import "./editor.css";
 
@@ -30,7 +27,6 @@ export function NotebookEditor({
   whenSynced: Promise<unknown>;
   title: string;
 }) {
-  const runtime = useRuntime();
   const reading = useReadingMode();
 
   const editor = useEditor({
@@ -75,79 +71,11 @@ export function NotebookEditor({
 
   if (!editor) return null;
 
-  // Toolbar insertion shares the same helpers as the slash menu (insertCells.ts)
-  // so both produce identical cells. Insert *after* the current selection.
-  const insertCodeCell = (language: "typescript" | "css") =>
-    insertCodeCellAt(editor, editor.state.selection.to, language);
-  const insertInputCell = () =>
-    insertInputCellAt(editor, editor.state.selection.to);
-
-  const toolbarGroups: ToolbarAction[][] = [
-    [
-      {
-        key: "bold",
-        title: "Bold",
-        label: <span className="font-semibold">B</span>,
-        active: editor.isActive("bold"),
-        onClick: () => editor.chain().focus().toggleBold().run(),
-      },
-      {
-        key: "italic",
-        title: "Italic",
-        label: <span className="font-serif italic">I</span>,
-        active: editor.isActive("italic"),
-        onClick: () => editor.chain().focus().toggleItalic().run(),
-      },
-      {
-        key: "heading",
-        label: "Heading",
-        active: editor.isActive("heading"),
-        items: [
-          {
-            label: "Heading 1",
-            hint: "#",
-            onSelect: () =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run(),
-          },
-          {
-            label: "Heading 2",
-            hint: "##",
-            onSelect: () =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run(),
-          },
-        ],
-      },
-    ],
-    [
-      {
-        key: "code",
-        label: "Code",
-        items: [
-          {
-            label: "TypeScript cell",
-            hint: "runnable",
-            onSelect: () => insertCodeCell("typescript"),
-          },
-          { label: "CSS cell", onSelect: () => insertCodeCell("css") },
-        ],
-      },
-      { key: "input", label: "Input", onClick: insertInputCell },
-    ],
-    [
-      {
-        key: "restart",
-        label: "Restart",
-        title: "Restart runtime",
-        icon: <RestartIcon />,
-        onClick: () => runtime.restart(),
-      },
-    ],
-  ];
-
   return (
     <>
       {/* Title first: the document's single H1-level heading and the top of the
-       * information hierarchy. The template body no longer repeats it. */}
+       * information hierarchy. Blocks are added via `/` or the empty-line add
+       * affordance — no formatting toolbar. */}
       <header className="notebook__bar">
         {reading ? (
           <h1 className="notebook__title">{title || "Untitled notebook"}</h1>
@@ -160,33 +88,7 @@ export function NotebookEditor({
           />
         )}
       </header>
-      {!reading && (
-        <div className="notebook__tools">
-          {/* One prominent segmented control — formatting · insert · runtime,
-           * separated by group dividers. Spans the constrained reading measure
-           * (capped so the wide layout doesn't stretch it across the whole
-           * column); the sticky bar behind carries the opaque background. */}
-          <Toolbar groups={toolbarGroups} className="max-w-[640px]" />
-        </div>
-      )}
       <EditorContent editor={editor} className="notebook__doc" />
     </>
-  );
-}
-
-function RestartIcon() {
-  return (
-    <svg
-      className="size-3.5"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M13 8a5 5 0 1 1-1.46-3.54" />
-      <path d="M13 2.5V5h-2.5" />
-    </svg>
   );
 }

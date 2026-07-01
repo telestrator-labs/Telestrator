@@ -3,6 +3,7 @@ import { Markdown } from "@tiptap/markdown";
 import { CodeCell } from "./codeCellNode";
 import { InputCell } from "./inputCellNode";
 import { SlashCommand } from "./slashCommand";
+import { AddBlock } from "./addBlock";
 
 // The single source of truth for the editor's schema. Shared by the live editor
 // (NotebookEditor) and the headless bridge test so they can never drift.
@@ -19,4 +20,5 @@ export const editorExtensions = [
   CodeCell,
   InputCell,
   SlashCommand,
+  AddBlock,
 ];
