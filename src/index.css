@@ -211,9 +211,9 @@
   --color-action-hover: var(--color-accent-10);
   --color-action-text: var(--color-accent-11);
   /* live / run state (brand / lime) */
-  --color-live-subtle: var(--color-brand-3);
-  --color-live: var(--color-brand-9);
-  --color-live-text: var(--color-brand-11);
+  --color-live-subtle: var(--color-accent-3);
+  --color-live: var(--color-accent-9);
+  --color-live-text: var(--color-accent-11);
   /* Foreground for content on the solid brand (lime-9). Lime is a "bright"
      Radix scale, so its accessible text is dark in *both* modes (unlike most
      scales, which take white on step 9) — hence a fixed value, not a flip.
