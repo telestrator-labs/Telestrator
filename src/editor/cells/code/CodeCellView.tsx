@@ -7,7 +7,7 @@ import {
   useCellOutput,
   useIsLive,
 } from "@/editor/reactive/RuntimeProvider";
-import { cssRegistry } from "@/editor/reactive/cssRegistry";
+import { cssRegistry, parseApi } from "@/editor/reactive/cssRegistry";
 import { useCellTrace } from "@/editor/trace/TraceContext";
 import { useReadingMode } from "@/editor/shared/ReadingMode";
 import { CodeEditor } from "@/editor/cells/CodeEditor";
@@ -43,6 +43,7 @@ export function CodeCellView({
   const language = node.attrs.language as string;
   const code = node.attrs.code as string;
   const id = node.attrs.id as string | null;
+  const name = (node.attrs.name as string) ?? "";
   const runnable = language === "typescript" && !!id;
 
   const rt = useRuntime();
@@ -65,11 +66,19 @@ export function CodeCellView({
   useEffect(() => {
     if (!id) return;
     if (language === "css") {
-      rt.remove(id); // drop any prior TS registration
-      const timer = setTimeout(
-        () => cssRegistry.set(id, code),
-        REGISTER_DEBOUNCE_MS,
-      );
+      const timer = setTimeout(() => {
+        cssRegistry.set(id, code); // inject scoped styles
+        const key = name.trim();
+        if (key) {
+          // Named css cell: also publish its classes/vars to `$[key]` so cells
+          // can reference `styles.card` / `styles.vars.gap`.
+          const { classes, vars } = parseApi(code);
+          const api = { ...classes, vars };
+          rt.update(id, `$[${JSON.stringify(key)}] = ${JSON.stringify(api)};`);
+        } else {
+          rt.remove(id); // styles only
+        }
+      }, REGISTER_DEBOUNCE_MS);
       return () => clearTimeout(timer);
     }
     if (language === "typescript") {
@@ -79,7 +88,7 @@ export function CodeCellView({
     }
     rt.remove(id);
     cssRegistry.remove(id);
-  }, [rt, id, code, language]);
+  }, [rt, id, code, language, name]);
 
   // Tear down both registrations when the cell is deleted.
   useEffect(() => {
@@ -206,6 +215,25 @@ export function CodeCellView({
               </PopoverContent>
             </Popover>
           </StopEditorEvents>
+          {/* css cells can bind their classes/vars to `$name` (first-class CSS
+              values). Empty = styles only. */}
+          {language === "css" && (
+            <StopEditorEvents>
+              <label
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-raised pl-2 pr-1 font-mono text-[11px] text-text-muted focus-within:border-brand-8"
+                title="Publish this cell's classes/vars to a $ value"
+              >
+                <span className="text-gold-11">$</span>
+                <input
+                  aria-label="bound $ key"
+                  value={name}
+                  placeholder="styles"
+                  onChange={(e) => updateAttributes({ name: e.target.value })}
+                  className="w-20 bg-transparent py-1 font-mono text-[11px] text-text outline-none placeholder:text-text-faint"
+                />
+              </label>
+            </StopEditorEvents>
+          )}
           {runnable && (
             <button
               type="button"

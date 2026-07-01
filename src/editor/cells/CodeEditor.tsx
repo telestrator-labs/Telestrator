@@ -108,7 +108,9 @@ const highlightFor = (dark: boolean) =>
   syntaxHighlighting(dark ? darkHighlightStyle : defaultHighlightStyle);
 
 const languageExtension = (language: CellLanguage) =>
-  language === "css" ? css() : javascript({ typescript: true });
+  // TS cells can return JSX (React output), so parse TSX — otherwise `<div>` reads
+  // as a syntax error and highlighting breaks.
+  language === "css" ? css() : javascript({ typescript: true, jsx: true });
 
 // The cell editor's look — the CodeMirror-idiomatic home for what used to live in
 // editor.css as `.code-cell__cm .cm-*` rules (you can't put Tailwind classes on

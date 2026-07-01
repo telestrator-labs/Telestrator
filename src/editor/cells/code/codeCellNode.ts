@@ -13,6 +13,9 @@ export interface CodeCellAttributes {
   id: string | null;
   language: "typescript" | "css";
   code: string;
+  // Only meaningful for css cells: when set, the cell also publishes its parsed
+  // classes/vars to `$[name]` (first-class CSS values). Empty = styles only.
+  name: string;
 }
 
 export const CodeCell = Node.create({
@@ -39,6 +42,11 @@ export const CodeCell = Node.create({
         default: "",
         parseHTML: (element) => element.getAttribute("data-code") ?? "",
         renderHTML: (attrs) => ({ "data-code": attrs.code }),
+      },
+      name: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("data-name") ?? "",
+        renderHTML: (attrs) => (attrs.name ? { "data-name": attrs.name } : {}),
       },
     };
   },

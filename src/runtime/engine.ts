@@ -40,8 +40,10 @@ interface CellRecord {
   value: unknown;
 }
 
-// Duck-type a DOM node without referencing `Node` (the engine also runs headless
-// in tests). A node → the cell has a mountable view.
+// A cell's main export becomes a mountable "view" when it's a DOM node or a React
+// element. Both are duck-typed so the engine stays framework/DOM-agnostic (it also
+// runs headless in tests); engine and cells share one realm (the iframe), so the
+// React element symbol matches.
 function isDomNode(v: unknown): boolean {
   return (
     !!v &&
@@ -49,6 +51,15 @@ function isDomNode(v: unknown): boolean {
     typeof (v as { nodeType?: unknown }).nodeType === "number"
   );
 }
+function isReactElement(v: unknown): boolean {
+  // React 18's element brand (React 19 uses `react.transitional.element`).
+  return (
+    !!v &&
+    typeof v === "object" &&
+    (v as { $$typeof?: unknown }).$$typeof === Symbol.for("react.element")
+  );
+}
+const isViewLike = (v: unknown): boolean => isDomNode(v) || isReactElement(v);
 
 export function createEngine(initial: Context = {}): ReactiveEngine {
   const $ = createContext(initial);
@@ -67,7 +78,7 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
       reads: [...cell.reads],
       logs: cell.logs,
       error: cell.error,
-      view: isDomNode(cell.value) || undefined,
+      view: isViewLike(cell.value) || undefined,
     };
     outputs.set(cell.id, output);
     for (const cb of listeners) cb(output);
@@ -115,12 +126,13 @@ export function createEngine(initial: Context = {}): ReactiveEngine {
       },
       set: (_t, key, value) => {
         if (typeof key === "string") writes.add(key);
-        // Never let reactivity deep-proxy a DOM node written to `$` — a Vue proxy
-        // over a live node breaks it. markRaw keeps the real node identity.
+        // Never let reactivity deep-proxy a DOM node / React element written to
+        // `$` — a Vue proxy over one breaks the node / React reconciliation.
+        // markRaw keeps the real identity.
         return Reflect.set(
           $,
           key,
-          isDomNode(value) ? markRaw(value as object) : value,
+          isViewLike(value) ? markRaw(value as object) : value,
         );
       },
       deleteProperty: (_t, key) => {
