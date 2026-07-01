@@ -6,10 +6,11 @@
 export type Context = Record<string, unknown>;
 
 // What a cell does when it runs: read/write `$`, optionally register teardown,
-// and optionally produce a *view* — its main export (a DOM node today, a React
-// element later). The engine captures the return value but stays DOM-agnostic.
-// (M3: cells reference `$` directly, e.g. `$.sum = $.a + $.b`. The
-// `export const x → $.x` sugar arrives in M4 with full transpilation.)
+// and optionally produce a *view* — returned to the engine, which renders it if
+// it's a DOM node / React element. The engine stays DOM-agnostic.
+// Cells reference `$` directly (`$.sum = $.a + $.b`), and the transpile layer adds
+// the export sugar: a top-level `export const/function foo = …` writes `$.foo`
+// (shared reactive state), while `export default …` becomes the returned view.
 export type CellBody = ($: Context, api: CellApi) => unknown;
 
 export interface CellApi {
