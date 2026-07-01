@@ -95,12 +95,14 @@ export function AppSidebar({
                       <span className="truncate group-data-[collapsible=icon]:hidden">
                         {title}
                       </span>
-                      {/* live/idle status dot — fades out when the actions "⋯"
-                          takes its place on hover / while its menu is open. */}
+                      {/* active/idle status dot — a selection indicator, not a
+                          reactivity one, so it uses accent (violet), not the
+                          reactive gold. Fades out when the actions "⋯" takes its
+                          place on hover / while its menu is open. */}
                       <span
                         className={
                           "ml-auto size-[7px] flex-none rounded-full transition-opacity group-data-[collapsible=icon]:hidden group-hover/menu-item:opacity-0 " +
-                          (active ? "bg-live" : "bg-gray-6")
+                          (active ? "bg-accent-9" : "bg-gray-6")
                         }
                       />
                     </SidebarMenuButton>

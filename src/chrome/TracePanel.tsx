@@ -17,8 +17,8 @@ export function TracePanel() {
       <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-faint">
         Reactive trace
       </div>
-      <div className="rounded-[10px] border border-value-border bg-value-bg p-[13px]">
-        <h4 className="text-[12.5px] font-semibold text-value">
+      <div className="rounded-[10px] border border-reactive-border bg-reactive-bg p-[13px]">
+        <h4 className="text-[12.5px] font-semibold text-reactive-text">
           ◆ What feeds what
         </h4>
         <div className="mt-2 flex items-center gap-3 text-[11px] text-text-muted">

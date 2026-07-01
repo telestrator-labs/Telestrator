@@ -25,7 +25,7 @@ const SlashPluginKey = new PluginKey("slashCommand");
 const ITEMS: SlashItem[] = [
   {
     title: "TypeScript cell",
-    group: "Live",
+    group: "Reactive",
     icon: "TS",
     desc: "Reactive code, shares $",
     run: (e, r) => {
@@ -35,7 +35,7 @@ const ITEMS: SlashItem[] = [
   },
   {
     title: "CSS cell",
-    group: "Live",
+    group: "Reactive",
     icon: "{}",
     desc: "Styles for the document",
     run: (e, r) => {
@@ -45,7 +45,7 @@ const ITEMS: SlashItem[] = [
   },
   {
     title: "Input (slider)",
-    group: "Live",
+    group: "Reactive",
     icon: "◉",
     desc: "A knob bound to a $ value",
     run: (e, r) => {
@@ -55,7 +55,7 @@ const ITEMS: SlashItem[] = [
   },
   {
     title: "Knowledge check",
-    group: "Live",
+    group: "Reactive",
     icon: "?",
     desc: "A graded question",
     run: (e, r) => {
@@ -65,7 +65,7 @@ const ITEMS: SlashItem[] = [
   },
   {
     title: "Chart",
-    group: "Live",
+    group: "Reactive",
     icon: "▦",
     desc: "A viz cell that reads $",
     run: (e, r) => {
@@ -75,7 +75,7 @@ const ITEMS: SlashItem[] = [
   },
   {
     title: "Insert $ value",
-    group: "Live",
+    group: "Reactive",
     icon: "$",
     desc: "Reference a live value in prose",
     // Insert a literal "$" so the value-ref autocomplete takes over — one picker

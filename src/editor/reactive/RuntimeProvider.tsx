@@ -234,11 +234,35 @@ export function useValue(key: string): unknown {
 }
 
 // Whether a cell is *live*: it reads or writes at least one valid `$` value (a
-// value with a writer in the graph). Drives the cell's LIVE badge — an empty or
-// non-reactive cell isn't "live" just because it can run.
+// value with a writer in the graph). An empty or non-reactive cell isn't "live"
+// just because it can run.
 export function useIsLive(id: string | null): boolean {
   const graph = useTraceGraph();
   return !!id && graph.valuesTouching(id).length > 0;
+}
+
+// A cell's role in the `$` graph, for its badge:
+//   • "state"    — writes `$` but reads none: a source (a root/input value).
+//   • "derived"  — reads *and* writes `$`: a computed value (recomputes on its
+//                  inputs and feeds downstream).
+//   • "reactive" — reads `$` but writes none: a consumer that recomputes/renders
+//                  (an effect/view) without publishing back.
+// null when the cell touches no valid `$` value (inert). Reading is what makes a
+// cell recompute, so "derived"/"reactive" both run; "state" is a static source.
+export type CellRole = "state" | "derived" | "reactive";
+export function useCellRole(id: string | null): CellRole | null {
+  const graph = useTraceGraph();
+  if (!id) return null;
+  let reads = false;
+  let writes = false;
+  for (const { writer, readers } of graph.values.values()) {
+    if (writer === id) writes = true;
+    if (readers.includes(id)) reads = true;
+  }
+  if (reads && writes) return "derived";
+  if (reads) return "reactive";
+  if (writes) return "state";
+  return null;
 }
 
 // Whether the document is live: any cell has written a valid `$` value. Drives

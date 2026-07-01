@@ -10,8 +10,8 @@
  *                   (--color-gray-* → --olive-*, brand → lime, accent → violet,
  *                   gold → gold/signal, danger → red). "Which Radix hue" lives here.
  *   3. Semantic   — design-language roles pointing at raw scales
- *                   (--color-surface, --color-action, --color-value, …).
- * Components use the semantic utilities (bg-surface, text-value, border-border);
+ *                   (--color-surface, --color-action, --color-reactive, …).
+ * Components use the semantic utilities (bg-surface, text-reactive-text, border-border);
  * the raw-scale families (gray-*, accent-*) are the fallback when no role fits.
  * This also sets up dark mode: flip a tier under .dark, components untouched. */
 
@@ -224,7 +224,7 @@
    * = a raised gray (olive-2) floating above the near-black shell (see --chrome). */
   --color-paper: var(--paper);
   /* borders / hairlines */
-  --color-border-subtle: var(--color-gray-4);
+  --color-border-subtle: var(--color-gray-5);
   --color-border: var(--color-gray-6);
   --color-border-strong: var(--color-gray-7);
   /* text */
@@ -238,21 +238,22 @@
   --color-action-hover: var(--color-brand-10);
   --color-action-text: var(--color-brand-11);
   --color-action-text-contrast: var(--color-brand-contrast);
-  /* live / run state (brand / lime) */
-  --color-live-subtle: var(--color-accent-3);
-  --color-live: var(--color-accent-9);
-  --color-live-text: var(--color-accent-11);
   /* Foreground for content on the solid brand (lime-9). Lime is a "bright"
      Radix scale, so its accessible text is dark in *both* modes (unlike most
      scales, which take white on step 9) — hence a fixed value, not a flip.
      #1d211c is Radix `olive-12` (light), pinned so it doesn't invert in dark. */
   --color-brand-contrast: #1d211c;
-  /* signal / $-value markers (gold) */
-  --color-value-bg: var(--color-gold-4);
-  --color-value-bg-strong: var(--color-gold-9);
-  --color-value-border: var(--color-gold-7);
-  --color-value: var(--color-gold-11);
-  --color-value-contrast: white;
+  /* reactive — the gold "signal" scheme for everything tied to a live `$` value:
+     inline value chips, `$`-referencing code, and the reactive/derived/state run
+     badges. One family (supersedes the former value-* and live-* tokens); gold
+     stays reserved for reactivity, so non-reactive "active"/selection affordances
+     use accent (violet) instead. */
+  --color-reactive-subtle: var(--color-gold-3); /* faint fill / focus ring */
+  --color-reactive-bg: var(--color-gold-4); /* pill background */
+  --color-reactive-border: var(--color-gold-7);
+  --color-reactive: var(--color-gold-9); /* solid dot / marker */
+  --color-reactive-text: var(--color-gold-11); /* text / value */
+  --color-reactive-contrast: white; /* on the solid marker */
   /* error (danger / red) */
   --color-danger-bg: var(--color-danger-3);
   --color-danger-border: var(--color-danger-6);
@@ -332,15 +333,12 @@
  * (Trace, cards) keep their border. Native select/inputs are left alone so their
  * affordances (the dropdown arrow) survive. */
 @layer base {
-  :root {
-    --tw-shadow-color: var(--black-a4);
-  }
   /* Sans is the UI default; serif is prose-only (opted into via .prose in
    * typography.plugin.ts). Set on <body> — not just the app's font-sans wrapper —
    * so menus/popovers portaled to <body> don't fall back to the UA serif (Times).
    * Buttons/inputs `font: inherit`, so they pick this up too. */
   body {
-    @apply font-sans;
+    @apply font-sans [--tw-shadow-color:var(--color-black-a5)];
   }
 
   button {
@@ -360,9 +358,9 @@
   }
 }
 
-/* The code cell's "LIVE" indicator breathes. Keyframes live in the entry file
- * (they're plain CSS); the `--animate-*` token exposes the `animate-breathe`
- * utility used by the dot in CodeCellView. */
+/* The code cell's reactive/derived badge breathes (a static "state" source does
+ * not). Keyframes live in the entry file (they're plain CSS); the `--animate-*`
+ * token exposes the `animate-breathe` utility used by the dot in CodeCellView. */
 @theme {
   --animate-breathe: code-cell-breathe 2.4s ease-in-out infinite;
   /* Trace: a one-shot lime pulse when a cell re-runs, and the "ink" draw-on for
@@ -376,10 +374,10 @@
 @keyframes code-cell-breathe {
   0%,
   100% {
-    box-shadow: 0 0 0 2px var(--color-live-subtle);
+    box-shadow: 0 0 0 2px var(--color-reactive-subtle);
   }
   50% {
-    box-shadow: 0 0 0 5px var(--color-accent-a5);
+    box-shadow: 0 0 0 5px var(--color-gold-a5);
   }
 }
 

@@ -53,7 +53,7 @@ export default {
 
             // Headings — sans, tight.
             "h1, h2, h3": {
-              fontFamily: "var(--font-sans)",
+              fontFamily: "var(--font-serif)",
               color: "var(--tw-prose-headings)",
               fontWeight: "600",
               letterSpacing: "-0.02em",

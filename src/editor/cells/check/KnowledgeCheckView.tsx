@@ -135,8 +135,8 @@ export function KnowledgeCheckView({
     >
       {/* Warm authoring header — hidden for the reader. */}
       {!reading && (
-        <div className="flex items-center gap-2.5 border-b border-value-border bg-value-bg px-3 py-2">
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-transparent bg-gold-9 py-0.75 pl-1.5 pr-2 font-mono text-[11px] font-medium text-value-contrast">
+        <div className="flex items-center gap-2.5 border-b border-reactive-border bg-reactive-bg px-3 py-2">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-transparent bg-gold-9 py-0.75 pl-1.5 pr-2 font-mono text-[11px] font-medium text-reactive-contrast">
             <CheckChipGlyph />
             check
           </span>
@@ -146,7 +146,7 @@ export function KnowledgeCheckView({
           {name && (
             <span
               data-slot="check-bindtag"
-              className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px] text-value"
+              className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px] text-reactive-text"
             >
               writes <b className="font-semibold">${name}</b>
             </span>
@@ -297,7 +297,7 @@ export function KnowledgeCheckView({
         </div>
 
         {hintOpen && config.hint && (
-          <div className="mt-3 flex gap-2 rounded-[10px] border border-value-border bg-value-bg px-3 py-[11px] text-[13px] leading-normal text-value animate-in fade-in slide-in-from-top-1">
+          <div className="mt-3 flex gap-2 rounded-[10px] border border-reactive-border bg-reactive-bg px-3 py-[11px] text-[13px] leading-normal text-reactive-text animate-in fade-in slide-in-from-top-1">
             <b className="font-semibold">Hint ·</b>
             {config.hint}
           </div>
@@ -305,7 +305,7 @@ export function KnowledgeCheckView({
 
         {checked && <Feedback passed={passed} config={config} />}
         {!checked && lastWrong && (
-          <p className="mt-3 text-[13px] text-value animate-in fade-in">
+          <p className="mt-3 text-[13px] text-reactive-text animate-in fade-in">
             Not quite — {attemptsLeft} tr{attemptsLeft === 1 ? "y" : "ies"}{" "}
             left.
           </p>
@@ -328,7 +328,7 @@ export function KnowledgeCheckView({
               type="button"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => setHintOpen((o) => !o)}
-              className="font-sans! inline-flex items-center gap-1.5 rounded-[9px] border border-transparent bg-value-bg px-3 py-2 text-[12.5px] font-medium text-value hover:bg-gold-4"
+              className="font-sans! inline-flex items-center gap-1.5 rounded-[9px] border border-transparent bg-reactive-bg px-3 py-2 text-[12.5px] font-medium text-reactive-text hover:bg-gold-4"
             >
               {hintOpen ? "Hide hint" : "Show hint"}
             </button>
@@ -349,7 +349,7 @@ export function KnowledgeCheckView({
                 key={i}
                 className={cx(
                   "size-1.75 rounded-full",
-                  !checked && i < attemptsLeft ? "bg-live" : "bg-border",
+                  !checked && i < attemptsLeft ? "bg-reactive" : "bg-border",
                 )}
               />
             ))}
@@ -362,18 +362,19 @@ export function KnowledgeCheckView({
             data-slot="check-binding"
             className="mt-3.5 flex flex-wrap items-center gap-2.5 rounded-[9px] border border-border-subtle bg-surface-sunken px-3 py-2.5 font-mono text-[12.5px] text-text-muted"
           >
-            <span className="inline-flex items-center gap-1.5 font-semibold text-live-text">
-              <span className="size-2 rounded-full bg-live shadow-[0_0_0_2px_var(--color-live-subtle)]" />
-              LIVE
+            <span className="inline-flex items-center gap-1.5 font-semibold uppercase text-reactive-text">
+              {/* A check publishes its result to `$` — a source, so "State". */}
+              <span className="size-2 rounded-full bg-reactive shadow-[0_0_0_2px_var(--color-reactive-subtle)]" />
+              State
             </span>
-            <span className="font-semibold text-value">${name}</span>=
+            <span className="font-semibold text-reactive-text">${name}</span>=
             <span
               className={cx(
                 "rounded px-[7px] font-semibold",
                 !checked
                   ? "bg-surface-active text-text-faint"
                   : passed
-                    ? "bg-live-subtle text-live-text"
+                    ? "bg-reactive-subtle text-reactive-text"
                     : "bg-danger-bg text-danger-text",
               )}
             >
@@ -394,7 +395,7 @@ export function KnowledgeCheckView({
           </FlowStep>
           <FlowStep k="Attempt">
             up to{" "}
-            <span className="font-mono font-semibold text-value">
+            <span className="font-mono font-semibold text-reactive-text">
               {attemptsTotal}
             </span>
             ×

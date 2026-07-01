@@ -51,19 +51,20 @@ export function EditorTopBar({
         <span className="truncate font-medium text-text">
           {title || "Untitled notebook"}
         </span>
-        {/* Live indicator + document runtime reset. Only shown once the document
-            is actually reactive — a cell reads or writes a valid `$` value — so
-            "Live" means something (and there's a runtime worth restarting). */}
+        {/* Reactive indicator + document runtime reset. Only shown once the
+            document is actually reactive — a cell reads or writes a valid `$`
+            value — so the badge means something (and there's a runtime worth
+            restarting). A notebook simply is reactive or it isn't. */}
         {documentLive && (
-          <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-brand-5 bg-live-subtle py-0.5 pl-2 pr-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-live-text">
-            <span className="size-1.5 rounded-full bg-live" />
-            Live
+          <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-reactive-border bg-reactive-subtle py-0.5 pl-2 pr-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-reactive-text">
+            <span className="size-1.5 rounded-full bg-reactive" />
+            Reactive
             <button
               type="button"
               title="Restart runtime"
               aria-label="Restart runtime"
               onClick={() => runtime.restart()}
-              className="ml-0.5 grid size-4 place-items-center rounded-full text-live-text/80 outline-none hover:bg-live/20 hover:text-live-text focus-visible:ring-2 focus-visible:ring-brand-8"
+              className="ml-0.5 grid size-4 place-items-center rounded-full text-reactive-text/80 outline-none hover:bg-reactive/20 hover:text-reactive-text focus-visible:ring-2 focus-visible:ring-reactive-border"
             >
               <RestartIcon />
             </button>
