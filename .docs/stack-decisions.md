@@ -11,10 +11,10 @@ These are **decided**. The sections below give the reasoning and the alternative
 
 | § | Concern | Decision |
 |---|---|---|
-| 1 | Execution & sandboxing | **Sandpack** (sandbox/bundle/npm/export) **+ a custom injected `$` runtime** for fine-grained reactive re-run |
+| 1 | Execution & sandboxing | **Hidden sandbox iframe + `postMessage`**, running our `@vue/reactivity` `$` runtime; **npm from esm.sh** at runtime. *(Sandpack was the committed plan but was dropped at M4 — see §1.)* |
 | 2 | Editor foundation | **Tiptap-direct + [Tiptap UI Components](https://tiptap.dev/docs/ui-components/getting-started/overview)** — code cells as raw NodeViews |
 | 3 | In-block code editor | **CodeMirror 6** inside the cell NodeView (Monaco an optional upgrade for IntelliSense) |
-| 4 | Reactivity primitive | **Decided by an M3 spike** — MobX vs `@preact/signals-core` |
+| 4 | Reactivity primitive | **`@vue/reactivity`** (M3 spike resolved — not MobX, not signals) |
 | 5 | Collaboration | **Managed Yjs provider** (Liveblocks / y-sweet / PartyKit) over `y-prosemirror` |
 | 6 | Persistence / auth / DB | **Supabase** (auth + DB + cascading RLS permissions) |
 | 7 | App framework & repo shape | **Vite + React SPA**; single app + `core` (+ `runtime`) lib |
@@ -324,6 +324,10 @@ host and no cross-process contract to package — so the 10 packages collapse to
 ---
 
 ## 8. Summary — current package → greenfield fate
+
+> **Note (M4 outcome):** "Sandpack" below was the *planned* absorber of the sandbox/resolver/packager
+> roles. It was dropped at M4 (§1); those roles are now filled by a **hidden sandbox iframe +
+> runtime esm.sh imports**. The fates are unchanged — only the mechanism differs.
 
 ```mermaid
 flowchart LR

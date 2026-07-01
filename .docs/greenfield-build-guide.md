@@ -30,6 +30,51 @@ rationale and the alternatives considered live in [stack-decisions.md](./stack-d
 
 ---
 
+## Status (as of 2026-07-01)
+
+**M0 → M5 are shipped** and merged to `next/staging`. **M6 (real-time collaboration) is next.**
+Each milestone below carries a status tag; where the *implementation* diverged from the plan the
+tag links to a short **Shipped** note (the roadmap is kept honest rather than rewritten).
+
+| Milestone | Status |
+|---|---|
+| M0 · Scaffold + cell model | ✅ Shipped |
+| M1 · Document (Tiptap + code-cell node) | ✅ Shipped |
+| M2 · Run one cell | ✅ Shipped — **not Sandpack** (see note) |
+| M3 · Reactive `$` context ⭐ | ✅ Shipped — primitive decided (`@vue/reactivity`) |
+| M4 · npm imports + types | ✅ Shipped — npm via **esm.sh**; types deferred |
+| M5 · Persistence (Yjs + IndexedDB) | ✅ Shipped |
+| M6 · Real-time collaboration | ⏳ Next |
+| M7 · Auth, sharing, workspaces | Planned |
+| M8 · Distribution | Planned |
+
+**The headline stack change:** **Sandpack was dropped at M4, as the plan allowed.** Execution
+settled on a **plain hidden sandbox iframe** running our own `@vue/reactivity` `$` engine over
+`postMessage`; **npm imports resolve at runtime from [esm.sh](https://esm.sh)** via `await import()`
+(no bundler); the in-cell editor is **CodeMirror 6**. Nothing re-bundles, so `$` state survives
+edits. Full rationale in [stack-decisions.md §1](./stack-decisions.md#1-execution--sandboxing-the-big-one)
+and [§4](./stack-decisions.md#4-reactivity-primitive).
+
+**Beyond the roadmap — the differentiating features (shipped after M5, before M6):**
+
+- **The Trace** — a reactive dependency graph drawn as an SVG overlay on the document; hover/click a
+  cell to see what it reads and writes (toggleable, so it stays out of the way while authoring).
+- **Inline prose `$`-value chips** — reference a live `$` value mid-sentence; it re-renders reactively.
+- **Honest live indicators** — the cell/document **LIVE** badge lights only when something actually
+  reads or writes a valid `$` value.
+- **Cell views** — a cell's *main export* (`export default`) renders as its output: **vanilla DOM or
+  a React/JSX** element, mounted into a host `.telestrator-output` container via a same-origin
+  side-channel (the compute iframe stays headless).
+- **CSS cells** — `<style>` text scoped to output regions (every selector prefixed
+  `.telestrator-output`); a **named** css cell also publishes first-class `$name = { classes, vars }`.
+- **`export → $` sugar** — a top-level `export const/function foo = …` writes `$.foo` (reactive
+  state) while `export default …` is the view — implemented in the sandbox transpile step
+  (`src/sandbox/compile.ts`).
+- **Editor restructure** — `src/editor/` regrouped by feature (`cells/`, `reactive/`, `trace/`, …)
+  with a new `@/*` → `src/*` path alias.
+
+---
+
 ## Why the existing rebuild plan isn't the greenfield plan
 
 The current plan is dependency-graph-driven, which makes it accurate to the running system — and
@@ -134,7 +179,7 @@ flowchart LR
     class M3 star;
 ```
 
-### M0 — Scaffold & the cell model
+### M0 — Scaffold & the cell model — ✅ Shipped
 - **Goal:** an empty app that compiles, plus the `core` types above.
 - **The one new idea:** the *document/cell model* is the contract; lock it first.
 - **Recommended:** **TypeScript + Vite + React** — the committed reference stack (see
@@ -260,7 +305,7 @@ npx vitest run       # 1 passing test
 You now have the **scaffold + the cell contract** running. M1 swaps the static `<pre>` for a real
 block editor that reads and writes this same `NotebookDocument`.
 
-### M1 — The document
+### M1 — The document — ✅ Shipped
 - **Goal:** author a Notion-style doc with prose + code blocks (code is *inert* — highlighted text,
   no execution yet). Persist to `localStorage`.
 - **The one new idea:** a rich-text editor with a **custom code-cell node** — and, crucially, that
@@ -281,7 +326,11 @@ block editor that reads and writes this same `NotebookDocument`.
 - **Maps to:** `frame` (the editor half) + `editor` (the shell).
 - **Done when:** you can write a document with code-cell nodes and it survives a reload.
 
-### M2 — Run one cell (Sandpack enters)
+### M2 — Run one cell (Sandpack enters) — ✅ Shipped (without Sandpack)
+> **Shipped:** we did **not** adopt Sandpack. A single cell executes inside a **hidden sandbox
+> iframe** (`sandbox.html` → `src/sandbox/iframeRuntime.ts`) driven by `postMessage` — cell source
+> goes in as data, output/errors come back. This is the seam M3's reactive runtime and M4's esm.sh
+> imports both build on. See the [Status note](#status-as-of-2026-07-01).
 - **Goal:** a single code cell executes and shows output/errors below the block.
 - **The one new idea:** delegate *sandboxing + bundling* to **Sandpack** instead of building an
   iframe runtime.
@@ -295,7 +344,13 @@ block editor that reads and writes this same `NotebookDocument`.
 - **Done when:** typing `document.body` work in a cell produces visible output without you writing
   any iframe/PostMessage code.
 
-### M3 — Many cells + the reactive `$` context ⭐ (the special sauce)
+### M3 — Many cells + the reactive `$` context ⭐ (the special sauce) — ✅ Shipped
+> **Shipped:** the reactivity-primitive spike below resolved to **`@vue/reactivity`** (not MobX, not
+> signals). The `$` engine lives in `src/runtime/` (portable, no DOM) and runs *inside the M2 sandbox
+> iframe* over `postMessage` — no Sandpack, nothing re-bundles, so `$` and cell state persist across
+> edits. A read of `$.x` is tracked and a write re-runs only the dependent cells. See
+> [stack-decisions.md §4](./stack-decisions.md#4-reactivity-primitive).
+
 This is the milestone that makes the product *TypeCell-like* rather than *CodeSandbox-like*. It is
 the one piece Sandpack does **not** give you.
 
@@ -349,7 +404,14 @@ the one piece Sandpack does **not** give you.
 - **Done when:** two cells communicate through `$` and a change in one re-runs the dependent one —
   without a full preview reload.
 
-### M4 — NPM imports + types
+### M4 — NPM imports + types — ✅ Shipped (esm.sh; types deferred)
+> **Shipped:** with Sandpack gone, imports resolve **at runtime from [esm.sh](https://esm.sh)** — the
+> in-iframe runtime transpiles the cell (sucrase), collects specifiers from the generated `require()`
+> calls, and `await import()`s each from esm.sh (React pinned to 18.3.1 + `?deps` dedupe so JSX and
+> `react-dom` share one instance). The in-cell editor is **CodeMirror 6**
+> (`javascript({ typescript: true, jsx: true })`). **`.d.ts`/IntelliSense type acquisition stays
+> deferred** (esm.sh's `X-TypeScript-Types` header is the intended path). See
+> [stack-decisions.md §3](./stack-decisions.md#3-in-block-code-editor).
 - **Goal:** `import _ from "lodash"` works inside a cell.
 - **The one new idea:** runtime dependency resolution — **mostly free with Sandpack.**
 - **Recommended:** declare deps in the virtual `package.json`; Sandpack's bundler fetches them from
@@ -364,7 +426,7 @@ the one piece Sandpack does **not** give you.
   `frame`.
 - **Done when:** an imported package runs in a cell with no custom CDN-resolution code.
 
-### M5 — Persistence & local-first
+### M5 — Persistence & local-first — ✅ Shipped
 - **Goal:** documents persist offline, survive reloads, and a multi-doc list works.
 - **The one new idea:** model the document as a **Yjs document now** (even before collaboration) —
   Tiptap's Yjs binding (`y-prosemirror`) is first-class, so doing this here makes M6 incremental
@@ -375,7 +437,7 @@ the one piece Sandpack does **not** give you.
 - **Maps to:** `editor` (document management + IndexedDB cache).
 - **Done when:** edits survive offline reloads and you can switch between saved documents.
 
-### M6 — Real-time collaboration
+### M6 — Real-time collaboration — ⏳ Next
 - **Goal:** two browsers edit the same doc live, with visible cursors.
 - **The one new idea:** a **sync provider** over the Yjs CRDT.
 - **Decision:** a **managed Yjs provider** (Liveblocks / y-sweet / PartyKit) — avoids running a
@@ -392,7 +454,7 @@ the one piece Sandpack does **not** give you.
 - **Maps to:** `server` (sync) and **`y-penpal` (dropped entirely)**.
 - **Done when:** two clients edit concurrently with merged changes and live cursors.
 
-### M7 — Auth, sharing, workspaces, identity
+### M7 — Auth, sharing, workspaces, identity — Planned
 - **Goal:** sign-in, private/shared documents, forking, and `/@user/doc` routing.
 - **The one new idea:** **identity + authorization** — who may read/write each document.
 - **Decision:** **Supabase** for auth + DB + permissions (Clerk+Neon and Convex were considered;
@@ -406,7 +468,7 @@ the one piece Sandpack does **not** give you.
 - **Done when:** a signed-in user can keep private docs, share/fork, and URLs resolve to the right
   document.
 
-### M8 — Distribution
+### M8 — Distribution — Planned
 - **Goal:** publish a notebook as a standalone app; import one notebook into another.
 - **The one new idea:** the notebook *is already a buildable project* — so export is cheap.
 - **Recommended:**
