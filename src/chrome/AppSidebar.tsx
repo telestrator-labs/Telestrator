@@ -1,5 +1,6 @@
 import type { NotebookEntry } from "../editor/docIndex";
 import { DocBadge } from "./DocBadge";
+import { ThemeMenu } from "./ThemeMenu";
 import { Logo } from "./Logo";
 import {
   Sidebar,
@@ -136,23 +137,26 @@ export function AppSidebar({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              tooltip="Your workspace"
-              className="group-data-[collapsible=icon]:!p-1"
-            >
-              <span className="flex size-6 flex-none items-center justify-center rounded-full bg-accent-5 text-[11px] font-semibold text-action-text">
-                You
-              </span>
-              <span className="flex flex-col group-data-[collapsible=icon]:hidden">
-                <span className="text-[13px] font-medium text-sidebar-foreground">
-                  Your workspace
+            <ThemeMenu>
+              <SidebarMenuButton
+                size="lg"
+                tooltip="Your workspace"
+                className="group-data-[collapsible=icon]:!p-1"
+              >
+                <span className="flex size-6 flex-none items-center justify-center rounded-full bg-accent-5 text-[11px] font-semibold text-action-text">
+                  You
                 </span>
-                <span className="text-[11px] text-sidebar-foreground/60">
-                  Local · this device
+                <span className="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
+                  <span className="truncate text-[13px] font-medium text-sidebar-foreground">
+                    Your workspace
+                  </span>
+                  <span className="truncate text-[11px] text-sidebar-foreground/60">
+                    Local · this device
+                  </span>
                 </span>
-              </span>
-            </SidebarMenuButton>
+                <ChevronUpDownIcon />
+              </SidebarMenuButton>
+            </ThemeMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
@@ -173,6 +177,23 @@ function SearchIcon() {
     >
       <circle cx="7" cy="7" r="4.5" />
       <path d="M11 11l3 3" />
+    </svg>
+  );
+}
+
+// Up/down chevrons — hints that the user button opens a menu (theme switcher).
+function ChevronUpDownIcon() {
+  return (
+    <svg
+      className="ml-auto size-4 flex-none text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 6.5L8 3.5l3 3M5 9.5l3 3 3-3" />
     </svg>
   );
 }
