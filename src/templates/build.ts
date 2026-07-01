@@ -3,6 +3,11 @@ import type { MarkdownManager } from "@tiptap/markdown";
 import { generateId, type Language } from "../core/notebook";
 import { CODE_CELL_NODE } from "../editor/codeCellNode";
 import { INPUT_CELL_NODE, type InputCellConfig } from "../editor/inputCellNode";
+import { KNOWLEDGE_CHECK_NODE } from "../editor/knowledgeCheckNode";
+import type {
+  AnswerKind,
+  KnowledgeCheckConfig,
+} from "../editor/knowledgeCheck";
 import type { InputKind } from "../editor/binding";
 
 // Authoring helpers for templates. Cell ids are minted *here*, inside the
@@ -36,6 +41,30 @@ export function inputCell(opts: {
       value: opts.value,
       // Must match inputCellNode's schema for the kind (slider: min/max/step;
       // select: options) or coerceValue silently resets the seeded value.
+      config: opts.config ?? {},
+    },
+  };
+}
+
+// A graded question. `name` (optional) publishes `$[name]` + `$[name]Correct`
+// for a later scoring cell. `config` carries the answer definition + feedback per
+// kind (choice: options/correctChoice; number: correctNumber/tolerance; text:
+// correctText/caseSensitive; plus hint/explanation).
+export function knowledgeCheck(opts: {
+  question: string;
+  answerKind: AnswerKind;
+  name?: string;
+  value?: unknown;
+  config?: KnowledgeCheckConfig;
+}): JSONContent {
+  return {
+    type: KNOWLEDGE_CHECK_NODE,
+    attrs: {
+      id: generateId(),
+      name: opts.name ?? "",
+      question: opts.question,
+      answerKind: opts.answerKind,
+      value: opts.value ?? "",
       config: opts.config ?? {},
     },
   };

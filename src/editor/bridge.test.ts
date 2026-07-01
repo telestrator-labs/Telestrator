@@ -63,3 +63,38 @@ test("notebook round-trips through the editor bridge", () => {
     destroy();
   }
 });
+
+test("editor-only atoms (input/knowledge-check) are dropped, prose survives", () => {
+  const { manager, destroy } = makeMarkdownManager();
+  try {
+    const docJSON = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Before." }] },
+        {
+          type: "knowledgeCheck",
+          attrs: {
+            id: "kc1",
+            name: "q1",
+            question: "Secret question?",
+            answerKind: "choice",
+            value: "",
+            config: { options: ["a", "b"], correctChoice: 0 },
+          },
+        },
+        { type: "paragraph", content: [{ type: "text", text: "After." }] },
+      ],
+    };
+
+    const result = docToNotebook(manager, docJSON, createNotebook("x"));
+
+    // The check never becomes a cell and never leaks into the prose stream.
+    expect(result.cells.every((c) => c.language === "markdown")).toBe(true);
+    const prose = result.cells.map((c) => c.code).join("\n");
+    expect(prose).toContain("Before.");
+    expect(prose).toContain("After.");
+    expect(prose).not.toContain("Secret question?");
+  } finally {
+    destroy();
+  }
+});

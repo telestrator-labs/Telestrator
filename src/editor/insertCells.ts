@@ -45,3 +45,31 @@ export function insertInputCellAt(editor: Editor, at: number): void {
     .focus()
     .run();
 }
+
+// A graded question — starts as a two-option multiple choice (first correct) so
+// it's functional the moment it lands; the author fills in the real question and
+// answers via the settings gear.
+export function insertKnowledgeCheckAt(editor: Editor, at: number): void {
+  editor
+    .chain()
+    .insertContentAt(at, [
+      {
+        type: "knowledgeCheck",
+        attrs: {
+          id: generateId(),
+          name: "",
+          question: "",
+          answerKind: "choice",
+          value: "",
+          config: {
+            options: ["Option A", "Option B"],
+            optionsText: "Option A, Option B",
+            correctChoice: 0,
+          },
+        },
+      },
+      { type: "paragraph" },
+    ])
+    .focus()
+    .run();
+}

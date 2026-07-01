@@ -8,6 +8,7 @@ import {
 } from "../core/notebook";
 import { CODE_CELL_NODE } from "./codeCellNode";
 import { INPUT_CELL_NODE } from "./inputCellNode";
+import { KNOWLEDGE_CHECK_NODE } from "./knowledgeCheckNode";
 
 // The bridge between the editor's ProseMirror document and the framework-
 // agnostic core `NotebookDocument`. The mapping (TypeCell-style):
@@ -70,9 +71,13 @@ export function docToNotebook(
       // Reuse an existing stable id; mint one only if the node somehow lacks it.
       const id = (attrs.id as string | null) || createCell(language, code).id;
       cells.push({ id, language, code });
-    } else if (node.type === INPUT_CELL_NODE) {
-      // Input cells aren't part of the core cell model / export path yet (M8);
-      // flush prose and skip so they never reach markdown.serialize.
+    } else if (
+      node.type === INPUT_CELL_NODE ||
+      node.type === KNOWLEDGE_CHECK_NODE
+    ) {
+      // Editor-only atoms (input cells, knowledge checks) aren't part of the core
+      // cell model / export path yet (M8); flush prose and skip so they never
+      // reach markdown.serialize (which would mangle the prose stream).
       flushProse();
     } else {
       proseRun.push(node);

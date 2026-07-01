@@ -3,7 +3,11 @@ import { PluginKey } from "@tiptap/pm/state";
 import Suggestion from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
 import { SlashMenu, type SlashItem, type SlashMenuRef } from "./SlashMenu";
-import { insertCodeCellAt, insertInputCellAt } from "./insertCells";
+import {
+  insertCodeCellAt,
+  insertInputCellAt,
+  insertKnowledgeCheckAt,
+} from "./insertCells";
 
 // `/`-command insertion. A thin Extension wrapping @tiptap/suggestion: typing "/"
 // at a textblock start (or after whitespace) opens a filterable popup; choosing
@@ -42,6 +46,16 @@ const ITEMS: SlashItem[] = [
     run: (e, r) => {
       e.chain().focus().deleteRange(r).run();
       insertInputCellAt(e, r.from);
+    },
+  },
+  {
+    title: "Knowledge check",
+    group: "Live",
+    icon: "?",
+    desc: "A graded question",
+    run: (e, r) => {
+      e.chain().focus().deleteRange(r).run();
+      insertKnowledgeCheckAt(e, r.from);
     },
   },
   {

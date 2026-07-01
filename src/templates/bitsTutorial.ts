@@ -1,10 +1,10 @@
 import type { NotebookTemplate } from "./types";
-import { codeCell, doc, inputCell, md, para } from "./build";
+import { codeCell, doc, inputCell, knowledgeCheck, md, para } from "./build";
 
-// A guided tutorial that shows the "knowledge check" pattern: a question, an
-// input for the reader's answer, and a code cell that grades it live via
-// console.log (re-runs whenever the answer changes). Exercises number + select
-// inputs and reactive feedback with no persisted quiz state.
+// A guided tutorial showcasing the knowledge-check block: an explorable (a bits
+// slider driving 2^n) followed by three graded questions authored as single
+// `knowledgeCheck` nodes, each publishing its result to `$` so the closing cell
+// tallies a live score.
 export const bitsTutorial: NotebookTemplate = {
   id: "bits-tutorial",
   title: "Counting with bits",
@@ -30,59 +30,51 @@ export const bitsTutorial: NotebookTemplate = {
       ),
       md(
         m,
-        "Every extra bit **doubles** the range: 1 bit → 2, 2 bits → 4, and eight bits — a *byte* — → 256. Now check your understanding. Each answer is graded the moment you change it.",
+        "Every extra bit **doubles** the range: 1 bit → 2, 2 bits → 4, and eight bits — a *byte* — → 256. Now check your understanding.",
       ),
 
-      md(
-        m,
-        "## Knowledge check 1\n\nHow many distinct values can a single **byte** (8 bits) hold?",
-      ),
-      inputCell({ name: "q1", kind: "number", value: 0 }),
-      codeCell(
-        "typescript",
-        [
-          "// reads $.q1 — grades live",
-          'if ($.q1 === 0) console.log("Enter your answer above.");',
-          'else if ($.q1 === 256) console.log("✓ Correct — a byte holds 256 values (2^8).");',
-          'else console.log("✗ Not 256. A byte is 8 bits, and 2^8 = 256.");',
-        ].join("\n"),
-      ),
-
-      md(
-        m,
-        "## Knowledge check 2\n\nYou need to give every one of **1,000** items a unique binary code. What is the *fewest* number of bits that will do?",
-      ),
-      inputCell({ name: "q2", kind: "number", value: 0 }),
-      codeCell(
-        "typescript",
-        [
-          "// reads $.q2 — grades live",
-          'if ($.q2 === 0) console.log("Enter your answer above.");',
-          'else if ($.q2 === 10) console.log("✓ Correct — 2^9 = 512 is too few, but 2^10 = 1024 covers 1,000.");',
-          'else if (2 ** $.q2 >= 1000) console.log("✗ " + $.q2 + " bits works, but it is more than you need — try fewer.");',
-          'else console.log("✗ " + $.q2 + " bits only reaches " + (2 ** $.q2) + " — not enough for 1,000.");',
-        ].join("\n"),
-      ),
-
-      md(
-        m,
-        "## Knowledge check 3\n\nAdd exactly **one** more bit to any number. The count of representable values…",
-      ),
-      inputCell({
-        name: "q3",
-        kind: "select",
-        value: "— select —",
+      knowledgeCheck({
+        name: "q1",
+        question: "How many distinct values can a single byte (8 bits) hold?",
+        answerKind: "number",
         config: {
-          options: ["— select —", "doubles", "stays the same", "gets squared"],
+          correctNumber: 256,
+          explanation: "A byte is 8 bits, and 2^8 = 256.",
+          hint: "A byte is 8 bits — think 2^8.",
         },
       }),
+      knowledgeCheck({
+        name: "q2",
+        question:
+          "You need to give every one of 1,000 items a unique binary code. What is the fewest number of bits that will do?",
+        answerKind: "number",
+        config: {
+          correctNumber: 10,
+          explanation: "2^9 = 512 is too few, but 2^10 = 1024 covers 1,000.",
+          hint: "2^9 = 512, 2^10 = 1024 — which is the first that reaches 1,000?",
+        },
+      }),
+      knowledgeCheck({
+        name: "q3",
+        question:
+          "Add exactly one more bit to any number. The count of representable values…",
+        answerKind: "choice",
+        config: {
+          options: ["stays the same", "doubles", "gets squared"],
+          optionsText: "stays the same, doubles, gets squared",
+          correctChoice: 1,
+          explanation: "Right — one more bit always doubles the range.",
+          hint: "Each extra bit multiplies the count by 2.",
+        },
+      }),
+
+      md(m, "### Your score"),
       codeCell(
         "typescript",
         [
-          "// reads $.q3 — grades live",
-          'if ($.q3 === "— select —") console.log("Choose an answer above.");',
-          'else if ($.q3 === "doubles") console.log("✓ Right — one more bit always doubles the range.");',
-          'else console.log("✗ " + $.q3 + " — not quite. Each extra bit multiplies the count by 2.");',
+          "// each check writes its pass boolean to $ → a live tally",
+          "const got = [$.q1, $.q2, $.q3].filter(Boolean).length;",
+          'console.log(got + " of 3 correct" + (got === 3 ? " — nice, you have it. 🎉" : "."));',
         ].join("\n"),
       ),
 

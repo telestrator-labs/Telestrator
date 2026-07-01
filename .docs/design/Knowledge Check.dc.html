@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>
+:root{--olive1:#fcfdfc;--olive2:#f8faf8;--olive3:#eff1ef;--olive4:#e7e9e7;--olive5:#dfe2df;--olive6:#d7dbd7;--olive7:#cccfcc;--olive8:#b9bcb8;--olive9:#898e87;--olive10:#7f847d;--olive11:#60655f;--olive12:#1d211c;--lime3:#eef6d6;--lime5:#d3e7a6;--lime7:#abc978;--lime9:#bdee63;--lime10:#b0e64c;--lime11:#59722b;--violet3:#f4f0fe;--violet5:#e1d9ff;--violet6:#d4cafe;--violet7:#c2b5f5;--violet9:#6e56cf;--violet10:#654dc4;--violet11:#6550b9;--gold3:#f5f2e9;--gold4:#eeeadd;--gold6:#dad1bd;--gold9:#978365;--gold11:#71624b;--goldline:#b08b2e;--err-bg:#fbeeec;--err-border:#eeccc4;--err-text:#b04228;--err-strong:#bf4429;--shadow:0 1px 2px rgba(29,33,28,.05),0 4px 16px rgba(29,33,28,.04)}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--olive2);color:var(--olive12);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.serif{font-family:'IBM Plex Serif',Georgia,serif}.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.wrap{padding:38px 46px 90px;max-width:1240px;margin:0 auto}
+.canvhead{margin-bottom:8px}
+.kicker{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive9);display:flex;align-items:center;gap:9px}
+.kdot{width:8px;height:8px;border-radius:50%;background:var(--lime9);box-shadow:0 0 0 3px var(--lime3)}
+.h1{font-size:30px;font-weight:600;letter-spacing:-.02em;margin:12px 0 6px}
+.sub{color:var(--olive11);font-size:14.5px;max-width:70ch;line-height:1.6}
+.sub code{font-family:'IBM Plex Mono',monospace;font-size:.9em;color:var(--gold11);background:var(--gold3);border-radius:4px;padding:1px 5px}
+/* direction */
+.dir{margin-top:40px}
+.dirhead{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.badge{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--violet11);background:var(--violet3);border:1px solid var(--violet6);border-radius:7px;padding:3px 9px}
+.dirtitle{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.dirdesc{color:var(--olive9);font-size:13px;flex:1;min-width:0}
+.fmtbadge{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive11);background:var(--olive3);border:1px solid var(--olive5);border-radius:999px;padding:3px 11px}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;align-items:start}
+.col{min-width:0}
+.colcap{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--olive9);margin:0 2px 9px}
+.capdot{width:7px;height:7px;border-radius:50%;background:var(--olive7)}
+.capdot.live{background:var(--lime9);box-shadow:0 0 0 2.5px var(--lime3)}
+/* the node cell */
+.kc{background:var(--olive1);border:1px solid var(--olive6);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.kc.reader{border-color:var(--olive5)}
+.kctop{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--olive4)}
+.langchip{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--violet11);background:var(--violet3);border:1px solid var(--violet6);padding:3px 8px;border-radius:6px}
+.glyph{width:14px;height:14px;display:inline-block;flex:none}
+.fmtpill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:500;color:var(--olive12);background:var(--olive2);border:1px solid var(--olive5);border-radius:8px;padding:5px 10px;cursor:pointer}
+.fmtpill svg{color:var(--olive9)}
+.bindtag{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold11)}
+.bindtag b{font-weight:600}
+.gear{width:24px;height:24px;border-radius:6px;border:1px solid var(--olive5);background:var(--olive1);color:var(--olive9);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.gear:hover{border-color:var(--violet7);color:var(--violet11)}
+.kcbody{padding:15px 16px 14px}
+.qauthor{font-family:'IBM Plex Serif',Georgia,serif;font-size:18.5px;line-height:1.45;color:var(--olive12);border-bottom:1px dashed var(--olive6);padding-bottom:11px;margin-bottom:14px;position:relative;cursor:text}
+.qcaret{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--violet9)}
+/* author option rows */
+.arows{display:flex;flex-direction:column;gap:3px}
+.arow{display:grid;grid-template-columns:22px 1fr auto;align-items:start;gap:11px;padding:8px 8px 8px 6px;border-radius:9px}
+.arow:hover{background:var(--olive2)}
+.cmark{width:20px;height:20px;margin-top:1px;border:1.7px solid var(--olive7);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;flex:none}
+.cmark.radio{border-radius:50%}.cmark.box{border-radius:5px}
+.cmark.on{background:var(--lime10);border-color:var(--lime7);color:var(--olive12)}
+.cmark svg{width:12px;height:12px;opacity:0}.cmark.on svg{opacity:1}
+.acell{min-width:0}
+.atext{font-size:14.5px;color:var(--olive12);line-height:1.35}
+.afb{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px;color:var(--olive9)}
+.afb .fbk{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--olive8)}
+.arow.correct .afb{color:var(--lime11)}
+.arowctl{display:flex;align-items:center;gap:4px;color:var(--olive8)}
+.ictl{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ictl:hover{background:var(--olive3);color:var(--olive11)}
+.addrow{display:flex;align-items:center;gap:9px;margin-top:6px;padding:8px 8px;border:1px dashed var(--olive6);border-radius:9px;color:var(--olive10);font-size:13px;font-weight:500;cursor:pointer}
+.addrow:hover{border-color:var(--violet7);color:var(--violet11);background:var(--violet3)}
+/* settings strip */
+.kcfoot{display:flex;flex-wrap:wrap;gap:8px;padding:11px 15px;border-top:1px solid var(--olive4);background:var(--olive2)}
+.setchip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--olive11);background:var(--olive1);border:1px solid var(--olive5);border-radius:8px;padding:5px 10px;cursor:pointer}
+.setchip:hover{border-color:var(--olive7)}
+.setchip.on{background:var(--violet3);border-color:var(--violet6);color:var(--violet11)}
+.setchip .sv{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold11)}
+.setchip.on .sv{color:var(--violet11)}
+.setchip svg{width:13px;height:13px}
+.setchip.ref{background:var(--gold3);border-color:var(--gold6);color:var(--gold11)}
+/* two-column author (1b) */
+.authgrid{display:grid;grid-template-columns:1fr 216px;gap:0}
+.authmain{padding:15px 16px 15px}
+.authside{border-left:1px solid var(--olive4);background:var(--olive2);padding:14px 14px}
+.sfield{margin-bottom:13px}
+.slabel{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--olive9);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.sinput{width:100%;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--olive12);background:var(--olive1);border:1px solid var(--olive5);border-radius:7px;padding:6px 9px}
+.srow{display:flex;align-items:center;gap:8px}
+.stog{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--olive11);padding:5px 0}
+.tog{width:34px;height:19px;border-radius:999px;background:var(--olive6);position:relative;flex:none;cursor:pointer;transition:.15s}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:.15s}
+.tog.on{background:var(--violet9)}.tog.on::after{left:17px}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--olive5);border-radius:7px;overflow:hidden;background:var(--olive1)}
+.stepper button{width:26px;height:26px;border:none;background:none;color:var(--olive11);cursor:pointer;font-size:15px;font-family:inherit}
+.stepper button:hover{background:var(--olive3)}
+.stepper .sc{width:30px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--olive12);border-left:1px solid var(--olive5);border-right:1px solid var(--olive5);line-height:26px}
+.tgtrow{display:flex;align-items:center;flex-wrap:wrap;gap:9px;font-size:13.5px;color:var(--olive11);margin:10px 0 6px}
+.tgtpill{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--gold11);background:var(--gold3);border:1px solid var(--gold6);border-radius:7px;padding:4px 9px}
+.tgtnum{width:52px;font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;color:var(--olive12);background:var(--olive1);border:1px solid var(--olive5);border-radius:7px;padding:4px 6px}
+.fbdefs{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.fbdef{display:grid;grid-template-columns:74px 1fr;align-items:center;gap:10px;font-size:12.5px}
+.fbtag{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:6px;text-align:center}
+.fbtag.ok{color:var(--lime11);background:var(--lime3)}
+.fbtag.near{color:var(--gold11);background:var(--gold3)}
+.fbtag.no{color:var(--err-text);background:var(--err-bg)}
+.fbdef .ft{color:var(--olive11)}
+.livemini{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--lime11)}
+.livemini i{width:7px;height:7px;border-radius:50%;background:var(--lime9);box-shadow:0 0 0 2.5px var(--lime3)}
+/* flow (1c) */
+.kc.warm .kctop{background:var(--gold3);border-bottom-color:var(--gold6)}
+.langchip.warm{color:var(--gold11);background:var(--gold4);border-color:var(--gold6)}
+.flow{display:flex;align-items:stretch;gap:0;padding:12px 15px;border-top:1px solid var(--olive4);background:var(--olive2);overflow-x:auto}
+.fstep{display:flex;flex-direction:column;gap:3px;padding:0 14px;position:relative;min-width:0}
+.fstep:first-child{padding-left:2px}
+.fstep+.fstep::before{content:"";position:absolute;left:0;top:9px;width:1px;bottom:2px;background:var(--olive5)}
+.fk{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--olive9)}
+.fv{font-size:12.5px;color:var(--olive12);font-weight:500;white-space:nowrap}
+.fv .fcount{font-family:'IBM Plex Mono',monospace;color:var(--gold11);font-weight:600}
+/* reader */
+.rq{font-family:'IBM Plex Serif',Georgia,serif;font-size:19px;line-height:1.45;color:var(--olive12);margin:0 0 14px;text-wrap:pretty}
+.rqmeta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--olive9);margin-bottom:14px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.rdopt{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--olive5);border-radius:10px;cursor:pointer;background:var(--olive1);font-size:14.5px;color:var(--olive12);transition:border-color .12s,background .12s,box-shadow .12s;text-align:left;width:100%;font-family:inherit}
+.rdopt:hover{border-color:var(--olive7)}
+.rdopt.sel{border-color:var(--violet9);background:var(--violet3);box-shadow:inset 0 0 0 1px var(--violet9)}
+.rdopt.correct{border-color:var(--lime7);background:var(--lime3);box-shadow:inset 0 0 0 1px var(--lime7)}
+.rdopt.wrong{border-color:var(--err-border);background:var(--err-bg);box-shadow:inset 0 0 0 1px var(--err-border)}
+.rdopt.missed{border-color:var(--lime7);border-style:dashed}
+.rdopt.muted{opacity:.5}
+.rdmark{width:19px;height:19px;flex:none;border:1.7px solid var(--olive7);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;line-height:1}
+.rdmark.radio{border-radius:50%}.rdmark.box{border-radius:5px}
+.rdmark.on{background:var(--violet9);border-color:var(--violet9)}
+.rdmark.ok{background:var(--lime10);border-color:var(--lime7);color:var(--olive12)}
+.rdmark.no{background:var(--err-strong);border-color:var(--err-strong)}
+.rlbl{flex:1;min-width:0}
+.ofb{font-size:12.5px;line-height:1.4;color:var(--olive11);padding:3px 2px 2px 44px;margin-top:-3px}
+.ofb.good{color:var(--lime11)}.ofb.bad{color:var(--err-text)}
+.optwrap{display:flex;flex-direction:column}
+/* numeric reader */
+.numwrap{display:flex;align-items:center;gap:11px;margin:2px 0 4px}
+.numin{width:120px;font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--olive12);background:var(--olive1);border:1.5px solid var(--olive6);border-radius:9px;padding:9px 12px;outline:none}
+.numin:focus{border-color:var(--violet9);box-shadow:0 0 0 3px var(--violet3)}
+.numunit{font-size:13px;color:var(--olive9)}
+.numref{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--gold11);background:var(--gold3);border:1px solid var(--gold6);border-radius:8px;padding:5px 9px}
+/* reader actions */
+.ract{display:flex;align-items:center;gap:10px;margin-top:16px}
+.checkbtn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-size:13.5px;font-weight:600;color:#fff;background:var(--violet9);border:1px solid var(--violet9);border-radius:9px;padding:9px 16px;cursor:pointer}
+.checkbtn:hover{background:var(--violet10)}
+.checkbtn:disabled{background:var(--olive5);border-color:var(--olive5);color:var(--olive9);cursor:not-allowed}
+.hintbtn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:12.5px;font-weight:500;color:var(--gold11);background:var(--gold3);border:1px solid var(--gold6);border-radius:9px;padding:8px 12px;cursor:pointer}
+.hintbtn:hover{background:var(--gold4)}
+.attempts{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--olive9)}
+.adot{width:7px;height:7px;border-radius:50%;background:var(--olive6)}
+.adot.left{background:var(--violet9)}
+.revealbtn{font-family:inherit;font-size:12px;font-weight:500;color:var(--olive11);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0}
+.revealbtn:hover{color:var(--violet11)}
+.hintbox{margin-top:12px;background:var(--gold3);border:1px solid var(--gold6);border-radius:10px;padding:11px 13px;font-size:13px;line-height:1.5;color:var(--gold11);display:flex;gap:9px}
+.hintbox .hk{font-weight:600}
+.rdfb{margin-top:14px;border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.5;display:flex;align-items:flex-start;gap:10px}
+.rdfb.good{background:var(--lime3);border:1px solid var(--lime5);color:var(--lime11)}
+.rdfb.bad{background:var(--err-bg);border:1px solid var(--err-border);color:var(--err-text)}
+.rdfb.warn{background:var(--gold3);border:1px solid var(--gold6);color:var(--gold11)}
+.rdfb.hide{display:none}
+.fbicon{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none;color:#fff}
+.rdfb.good .fbicon{background:var(--lime10);color:var(--olive12)}
+.rdfb.bad .fbicon{background:var(--err-strong)}
+.rdfb.warn .fbicon{background:var(--goldline)}
+.rdfb b{font-weight:600}
+/* binding readout */
+.bindwell{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 13px;background:var(--olive2);border:1px solid var(--olive4);border-radius:9px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--olive11);flex-wrap:wrap}
+.bindwell .live{display:inline-flex;align-items:center;gap:6px;color:var(--lime11);font-weight:600}
+.bindwell .live i{width:8px;height:8px;border-radius:50%;background:var(--lime9);box-shadow:0 0 0 3px var(--lime3)}
+.bindkey{color:var(--gold11);font-weight:600}
+.bindval{border-radius:5px;padding:1px 7px;font-weight:600}
+.bindval.t{background:var(--lime3);color:var(--lime11);box-shadow:inset 0 -2px 0 var(--lime5)}
+.bindval.f{background:var(--err-bg);color:var(--err-text);box-shadow:inset 0 -2px 0 var(--err-border)}
+.bindval.n{background:var(--olive3);color:var(--olive9)}
+.reacthint{margin-left:auto;color:var(--olive9);font-family:'IBM Plex Sans',sans-serif;font-size:11.5px}
+@media(max-width:1080px){.pair{grid-template-columns:1fr}.authgrid{grid-template-columns:1fr}.authside{border-left:none;border-top:1px solid var(--olive4)}}
+</style></helmet><div class="wrap"><div class="canvhead"><div class="kicker"><span class="kdot"></span>Telestrator · new cell type</div><div class="h1">Knowledge check — authoring node</div><div class="sub">A reactive check cell: the author writes a question and marks the answer; a passed check writes a <code>$</code> key (like an input cell) so prose and downstream cells can react to whether the reader got it. Three directions below — each pairs the <b>authoring</b> face with a live <b>reader preview</b>. Supports multiple choice, multi-select, true/false, short text, numeric-with-tolerance, and predict-a-<code>$</code>-value.</div></div>
+
+<section class="dir" id="1a"><div class="dirhead"><span class="badge">1a</span><div class="dirtitle">Notebook-native cell</div><div class="dirdesc">A first-class sibling of the code &amp; input cells — same chrome, answers marked inline, settings as a quiet footer strip.</div><span class="fmtbadge">multiple choice</span></div><div class="pair"><div class="col"><div class="colcap"><span class="capdot"></span>Authoring</div><div class="kc"><div class="kctop"><span class="langchip"><svg class="glyph" viewBox="0 0 16 16"><rect width="16" height="16" rx="3.5" fill="var(--violet9)"></rect><path d="M4.5 8.2l2.2 2.2 4.3-4.6" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>check</span><span class="fmtpill">Multiple choice<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"></path></svg></span><span class="bindtag">writes <b>$.q_rate_passed</b></span><span class="gear"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 5h6M11 5h3M2 11h3M8 11h6"></path><circle cx="9.5" cy="5" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="6.5" cy="11" r="1.5" fill="currentColor" stroke="none"></circle></svg></span></div><div class="kcbody"><div class="qauthor">Which dial most directly caps how much traffic is served each tick?<span class="qcaret"></span></div><div class="arows"><div class="arow"><span class="cmark radio"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">The queue capacity</div><div class="afb"><span class="fbk">feedback</span>That sets the buffer size, not the drain.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div><div class="arow correct"><span class="cmark radio on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">The drain rate</div><div class="afb"><span class="fbk">feedback</span>Right — $.rate is how much each tick clears.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div><div class="arow"><span class="cmark radio"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">The burst size</div><div class="afb"><span class="fbk">feedback</span>Bursts are the input, not a control.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div><div class="arow"><span class="cmark radio"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">The tick window</div><div class="afb"><span class="fbk">feedback</span>That just sets how long we watch.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div></div><div class="addrow"><span style="font-size:15px">+</span> Add option</div></div><div class="kcfoot"><span class="setchip on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v4M8 11v.5M8 8.5a1.4 1.4 0 1 0 0-2.8"></path></svg>Hint</span><span class="setchip on">Attempts<span class="sv">2</span></span><span class="setchip on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.2"></circle><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8Z"></path></svg>Reveal answer</span><span class="setchip ref"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 3v7a2.5 2.5 0 0 0 2.5 2.5H12"></path><path d="M9 9.5l3 3-3 3" transform="translate(0 -4)"></path></svg>The two dials</span></div></div></div><div class="col"><div class="colcap"><span class="capdot live"></span>Reader preview</div><div class="kc reader"><div class="kcbody"><div class="rq">Which dial most directly caps how much traffic is served each tick?</div><div class="opts"><sc-for list="{{ a.options }}" as="o" hint-placeholder-count="4"><div class="optwrap"><button class="{{ o.cls }}" onClick="{{ o.pick }}"><span class="{{ o.markCls }}">{{ o.glyph }}</span><span class="rlbl">{{ o.label }}</span></button><sc-if value="{{ o.showFb }}" hint-placeholder-val="{{ false }}"><div class="{{ o.fbCls }}">{{ o.fb }}</div></sc-if></div></sc-for></div><sc-if value="{{ a.hintOpen }}" hint-placeholder-val="{{ false }}"><div class="hintbox"><span class="hk">Hint ·</span>Look at what the simulate cell divides the queue by each tick.</div></sc-if><div class="{{ a.fbCls }}"><span class="fbicon">{{ a.fbIcon }}</span><span>{{ a.fbText }}</span></div><div class="ract"><button class="checkbtn" onClick="{{ a.check }}" disabled="{{ a.checkDisabled }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"></path></svg>{{ a.checkLabel }}</button><button class="hintbtn" onClick="{{ a.toggleHint }}">{{ a.hintLabel }}</button><span class="attempts"><span class="{{ a.dot1 }}"></span><span class="{{ a.dot2 }}"></span>{{ a.attemptsLabel }}</span></div><sc-if value="{{ showBinding }}" hint-placeholder-val="{{ true }}"><div class="bindwell"><span class="live"><i></i>LIVE</span><span class="bindkey">$.q_rate_passed</span>=<span class="{{ a.bindCls }}">{{ a.bindVal }}</span><span class="reacthint">downstream cells re-run on change</span></div></sc-if></div></div></div></div></section>
+
+<section class="dir" id="1b"><div class="dirhead"><span class="badge">1b</span><div class="dirtitle">Split config — reactive predict</div><div class="dirdesc">A denser authoring face: question on the left, all settings in a right rail. The answer is checked against a live <code style="font-family:'IBM Plex Mono',monospace;font-size:.86em;color:var(--gold11)">$</code>-value with tolerance.</div><span class="fmtbadge">predict a $-value</span></div><div class="pair"><div class="col"><div class="colcap"><span class="capdot"></span>Authoring</div><div class="kc"><div class="kctop"><span class="langchip"><svg class="glyph" viewBox="0 0 16 16"><rect width="16" height="16" rx="3.5" fill="var(--violet9)"></rect><path d="M4.5 8.2l2.2 2.2 4.3-4.6" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>check</span><span class="fmtpill">Predict a $-value<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"></path></svg></span><span class="bindtag"><span class="livemini"><i></i></span>checks <b>$.result</b></span></div><div class="authgrid"><div class="authmain"><div class="qauthor">Before you run it — at rate 9 with capacity 6, about how many of the 194 requests get served?<span class="qcaret"></span></div><div class="tgtrow">Correct when the guess is within<span class="tgtnum">8</span>of<span class="tgtpill"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="var(--goldline)" stroke-width="1.6"><path d="M8 2v12M5 5.5h4.5a2 2 0 0 1 0 4H5"></path></svg>$.result.allowed</span></div><div class="fbdefs"><div class="fbdef"><span class="fbtag ok">on target</span><span class="ft">Exactly — the bucket serves 128.</span></div><div class="fbdef"><span class="fbtag near">close</span><span class="ft">Within a burst — good instinct for the drain.</span></div><div class="fbdef"><span class="fbtag no">off</span><span class="ft">Re-check the drain math: rate × ticks, capped.</span></div></div></div><div class="authside"><div class="sfield"><div class="slabel">Bound $ key</div><input class="sinput" value="$.prediction_ok" readonly></div><div class="sfield"><div class="slabel"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--gold11)" stroke-width="1.5"><path d="M8 2v4M8 11v.5M8 8.5a1.4 1.4 0 1 0 0-2.8"></path></svg>Hint</div><input class="sinput" style="font-family:'IBM Plex Sans';font-size:12px" value="rate × 24 ticks, then capped" readonly></div><div class="sfield"><div class="stog">Attempts<span class="stepper"><button>−</button><span class="sc">3</span><button>+</button></span></div><div class="stog">Reveal answer<span class="tog on"></span></div><div class="stog">Show live value<span class="tog"></span></div></div><div class="sfield" style="margin-bottom:0"><div class="slabel">Reference</div><span class="setchip ref" style="width:100%;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 3v7a2.5 2.5 0 0 0 2.5 2.5H12"></path></svg>Simulating the bucket</span></div></div></div></div></div><div class="col"><div class="colcap"><span class="capdot live"></span>Reader preview</div><div class="kc reader"><div class="kcbody"><div class="rq">Before you run it — at rate 9 with capacity 6, about how many of the 194 requests get served?</div><div class="numwrap"><input class="numin" placeholder="?" value="{{ b.val }}" onInput="{{ b.onInput }}" inputmode="numeric"><span class="numunit">requests served</span><span class="numref"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="var(--goldline)" stroke-width="1.6"><path d="M8 2v12M5 5.5h4.5a2 2 0 0 1 0 4H5"></path></svg>checks $.result</span></div><sc-if value="{{ b.hintOpen }}" hint-placeholder-val="{{ false }}"><div class="hintbox"><span class="hk">Hint ·</span>rate × 24 ticks, then capped by the buffer.</div></sc-if><div class="{{ b.fbCls }}"><span class="fbicon">{{ b.fbIcon }}</span><span>{{ b.fbText }}</span></div><div class="ract"><button class="checkbtn" onClick="{{ b.check }}" disabled="{{ b.checkDisabled }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"></path></svg>{{ b.checkLabel }}</button><button class="hintbtn" onClick="{{ b.toggleHint }}">{{ b.hintLabel }}</button><span class="attempts">{{ b.attemptsLabel }}</span></div><sc-if value="{{ showBinding }}" hint-placeholder-val="{{ true }}"><div class="bindwell"><span class="live"><i></i>LIVE</span><span class="bindkey">$.prediction_ok</span>=<span class="{{ b.bindCls }}">{{ b.bindVal }}</span><span class="reacthint">= |guess − $.result| ≤ 8</span></div></sc-if></div></div></div></div></section>
+
+<section class="dir" id="1c"><div class="dirhead"><span class="badge">1c</span><div class="dirtitle">Pedagogical flow card</div><div class="dirdesc">Warmer treatment that frames a check as a small teaching moment — the ask → attempt → feedback → reveal path is made explicit as a footer flow.</div><span class="fmtbadge">select all that apply</span></div><div class="pair"><div class="col"><div class="colcap"><span class="capdot"></span>Authoring</div><div class="kc warm"><div class="kctop"><span class="langchip warm"><svg class="glyph" viewBox="0 0 16 16"><rect width="16" height="16" rx="3.5" fill="var(--goldline)"></rect><path d="M4.5 8.2l2.2 2.2 4.3-4.6" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>check</span><span class="fmtpill">Select all that apply<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"></path></svg></span><span class="bindtag">writes <b>$.fixes_passed</b></span><span class="gear"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 5h6M11 5h3M2 11h3M8 11h6"></path><circle cx="9.5" cy="5" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="6.5" cy="11" r="1.5" fill="currentColor" stroke="none"></circle></svg></span></div><div class="kcbody"><div class="qauthor">Which changes would reduce dropped requests? Select every one that helps.<span class="qcaret"></span></div><div class="arows"><div class="arow correct"><span class="cmark box on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">Raise the drain rate</div><div class="afb"><span class="fbk">feedback</span>Yes — a faster drain clears the queue.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div><div class="arow correct"><span class="cmark box on"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">Widen the queue capacity</div><div class="afb"><span class="fbk">feedback</span>Yes — more buffer absorbs the bursts.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div><div class="arow"><span class="cmark box"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">Increase the burst size</div><div class="afb"><span class="fbk">feedback</span>That adds load, not relief.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div><div class="arow"><span class="cmark box"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 8.3l2.4 2.4L12 5"></path></svg></span><div class="acell"><div class="atext">Run more ticks</div><div class="afb"><span class="fbk">feedback</span>Longer window, same loss rate.</div></div><div class="arowctl"><span class="ictl">⋮⋮</span></div></div></div><div class="addrow"><span style="font-size:15px">+</span> Add option</div></div><div class="flow"><div class="fstep"><span class="fk">Ask</span><span class="fv">Multi-select</span></div><div class="fstep"><span class="fk">Attempt</span><span class="fv">up to <span class="fcount">2</span>×</span></div><div class="fstep"><span class="fk">Feedback</span><span class="fv">Per-answer</span></div><div class="fstep"><span class="fk">Hint</span><span class="fv">On request</span></div><div class="fstep"><span class="fk">Reveal</span><span class="fv">After last try</span></div></div></div></div><div class="col"><div class="colcap"><span class="capdot live"></span>Reader preview</div><div class="kc reader"><div class="kcbody"><div class="rq">Which changes would reduce dropped requests? Select every one that helps.</div><div class="rqmeta"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"></rect><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"></rect><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"></rect></svg>Select all that apply</div><div class="opts"><sc-for list="{{ c.options }}" as="o" hint-placeholder-count="4"><div class="optwrap"><button class="{{ o.cls }}" onClick="{{ o.pick }}"><span class="{{ o.markCls }}">{{ o.glyph }}</span><span class="rlbl">{{ o.label }}</span></button><sc-if value="{{ o.showFb }}" hint-placeholder-val="{{ false }}"><div class="{{ o.fbCls }}">{{ o.fb }}</div></sc-if></div></sc-for></div><sc-if value="{{ c.hintOpen }}" hint-placeholder-val="{{ false }}"><div class="hintbox"><span class="hk">Hint ·</span>Think about the two dials — not the traffic feeding in.</div></sc-if><div class="{{ c.fbCls }}"><span class="fbicon">{{ c.fbIcon }}</span><span>{{ c.fbText }}</span></div><div class="ract"><button class="checkbtn" onClick="{{ c.check }}" disabled="{{ c.checkDisabled }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"></path></svg>{{ c.checkLabel }}</button><button class="hintbtn" onClick="{{ c.toggleHint }}">{{ c.hintLabel }}</button><span class="attempts"><button class="revealbtn" onClick="{{ c.reveal }}">{{ c.revealLabel }}</button><span class="{{ c.dot1 }}"></span><span class="{{ c.dot2 }}"></span></span></div><sc-if value="{{ showBinding }}" hint-placeholder-val="{{ true }}"><div class="bindwell"><span class="live"><i></i>LIVE</span><span class="bindkey">$.fixes_passed</span>=<span class="{{ c.bindCls }}">{{ c.bindVal }}</span><span class="reacthint">true only when the set matches</span></div></sc-if></div></div></div></div></section></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:1400},&quot;showBinding&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Reactive binding&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.A_CORRECT = 1;
+    this.B_TARGET = 128; this.B_TOL = 8;
+    this.C_CORRECT = [0, 1];
+    this.aOpts = [
+      { t: 'The queue capacity', fb: 'That sets the buffer size, not the drain.' },
+      { t: 'The drain rate', fb: 'Right — $.rate is how much each tick clears.' },
+      { t: 'The burst size', fb: 'Bursts are the input, not a control.' },
+      { t: 'The tick window', fb: 'That just sets how long we watch.' },
+    ];
+    this.cOpts = [
+      { t: 'Raise the drain rate', fb: 'Yes — a faster drain clears the queue.' },
+      { t: 'Widen the queue capacity', fb: 'Yes — more buffer absorbs the bursts.' },
+      { t: 'Increase the burst size', fb: 'That adds load, not relief.' },
+      { t: 'Run more ticks', fb: 'Longer window, same loss rate.' },
+    ];
+    this.state = {
+      a: { sel: null, checked: false, hint: false, attempts: 2 },
+      b: { val: '', checked: false, hint: false, attempts: 3 },
+      c: { sel: [], checked: false, hint: false, attempts: 2, reveal: false },
+      showBinding: props.showBinding !== false,
+    };
+  }
+  _upd(k, patch) { this.setState((s) => ({ [k]: { ...s[k], ...patch } })); }
+  // ---------- A: multiple choice ----------
+  buildA() {
+    const a = this.state.a, cor = this.A_CORRECT;
+    const passed = a.checked && a.sel === cor;
+    const options = this.aOpts.map((o, i) => {
+      let state = '';
+      if (a.checked) state = i === cor ? 'correct' : (i === a.sel ? 'wrong' : 'muted');
+      else if (a.sel === i) state = 'sel';
+      let mk = 'rdmark radio';
+      if (a.checked && i === cor) mk += ' ok';
+      else if (a.checked && i === a.sel) mk += ' no';
+      else if (a.sel === i) mk += ' on';
+      const glyph = a.checked ? (i === cor ? '✓' : (i === a.sel ? '✗' : '')) : '';
+      return {
+        label: o.t, fb: o.fb, cls: 'rdopt ' + state, markCls: mk, glyph,
+        showFb: a.checked && i === a.sel,
+        fbCls: 'ofb ' + (i === cor ? 'good' : 'bad'),
+        pick: () => { if (!a.checked) this._upd('a', { sel: i }); },
+      };
+    });
+    return {
+      options,
+      hintOpen: a.hint,
+      check: () => { if (a.sel != null && !a.checked) this._upd('a', { checked: true }); },
+      checkDisabled: a.sel == null || a.checked,
+      checkLabel: a.checked ? 'Checked' : 'Check answer',
+      toggleHint: () => this._upd('a', { hint: !a.hint }),
+      hintLabel: a.hint ? 'Hide hint' : 'Show hint',
+      fbCls: 'rdfb ' + (!a.checked ? 'hide' : (passed ? 'good' : 'bad')),
+      fbIcon: passed ? '✓' : '!',
+      fbText: !a.checked ? '' : (passed
+        ? 'Correct — the drain rate caps each tick. $.q_rate_passed is now true.'
+        : 'Not the tightest cap — the rate is what drains the queue. Try once more.'),
+      dot1: 'adot' + (a.attempts >= 1 && !a.checked ? ' left' : ''),
+      dot2: 'adot' + (a.attempts >= 2 && !a.checked ? ' left' : ''),
+      attemptsLabel: a.checked ? 'answered' : a.attempts + ' tries',
+      bindVal: !a.checked ? '—' : (passed ? 'true' : 'false'),
+      bindCls: 'bindval ' + (!a.checked ? 'n' : (passed ? 't' : 'f')),
+    };
+  }
+  // ---------- B: predict numeric ----------
+  buildB() {
+    const b = this.state.b;
+    const num = parseFloat(b.val);
+    const has = b.val.trim() !== '' && Number.isFinite(num);
+    const diff = has ? Math.abs(num - this.B_TARGET) : Infinity;
+    const good = diff <= this.B_TOL, near = diff <= 22;
+    const tone = !b.checked ? 'hide' : (good ? 'good' : (near ? 'warn' : 'bad'));
+    return {
+      val: b.val,
+      onInput: (e) => this._upd('b', { val: e.target.value.replace(/[^0-9.\-]/g, ''), checked: false }),
+      hintOpen: b.hint,
+      check: () => { if (has && !b.checked) this._upd('b', { checked: true }); },
+      checkDisabled: !has || b.checked,
+      checkLabel: b.checked ? 'Checked' : 'Check guess',
+      toggleHint: () => this._upd('b', { hint: !b.hint }),
+      hintLabel: b.hint ? 'Hide hint' : 'Show hint',
+      fbCls: 'rdfb ' + tone,
+      fbIcon: good ? '✓' : (near ? '≈' : '!'),
+      fbText: !b.checked ? '' : (good
+        ? 'On target — the bucket serves 128. $.prediction_ok is true.'
+        : (near
+          ? 'Close — within a burst of the real 128. Good feel for the drain.'
+          : 'Off — the bucket serves 128. Re-check: rate × ticks, capped by the buffer.')),
+      attemptsLabel: b.checked ? 'answered' : b.attempts + ' tries',
+      bindVal: !b.checked ? '—' : (good ? 'true' : 'false'),
+      bindCls: 'bindval ' + (!b.checked ? 'n' : (good ? 't' : 'f')),
+    };
+  }
+  // ---------- C: multi-select ----------
+  buildC() {
+    const c = this.state.c, cor = this.C_CORRECT;
+    const setEq = c.sel.length === cor.length && cor.every((i) => c.sel.includes(i));
+    const passed = c.checked && setEq;
+    const shown = c.checked || c.reveal;
+    const options = this.cOpts.map((o, i) => {
+      const isCor = cor.includes(i), isSel = c.sel.includes(i);
+      let state = '';
+      if (shown) state = isCor ? (isSel ? 'correct' : 'missed') : (isSel ? 'wrong' : 'muted');
+      else if (isSel) state = 'sel';
+      let mk = 'rdmark box';
+      if (shown && isCor) mk += ' ok';
+      else if (shown && isSel && !isCor) mk += ' no';
+      else if (isSel) mk += ' on';
+      const glyph = shown ? (isCor ? '✓' : (isSel ? '✗' : '')) : (isSel ? '✓' : '');
+      return {
+        label: o.t, fb: o.fb, cls: 'rdopt ' + state, markCls: mk, glyph,
+        showFb: shown && (isSel || isCor),
+        fbCls: 'ofb ' + (isCor ? 'good' : 'bad'),
+        pick: () => {
+          if (c.checked) return;
+          const has = c.sel.includes(i);
+          this._upd('c', { sel: has ? c.sel.filter((x) => x !== i) : [...c.sel, i] });
+        },
+      };
+    });
+    const left = Math.max(0, c.attempts);
+    return {
+      options,
+      hintOpen: c.hint,
+      check: () => {
+        if (c.checked || !c.sel.length) return;
+        if (setEq) this._upd('c', { checked: true });
+        else { const n = c.attempts - 1; this._upd('c', { attempts: n, checked: n <= 0 }); }
+      },
+      checkDisabled: c.checked || !c.sel.length,
+      checkLabel: c.checked ? 'Checked' : 'Check answers',
+      toggleHint: () => this._upd('c', { hint: !c.hint }),
+      hintLabel: c.hint ? 'Hide hint' : 'Show hint',
+      reveal: () => this._upd('c', { reveal: !c.reveal }),
+      revealLabel: c.reveal ? 'Hide answer' : 'Reveal',
+      fbCls: 'rdfb ' + (!c.checked ? 'hide' : (passed ? 'good' : 'bad')),
+      fbIcon: passed ? '✓' : '!',
+      fbText: !c.checked ? '' : (passed
+        ? 'Both dials — rate and capacity. $.fixes_passed is now true.'
+        : 'Not quite the full set. Out of attempts — the answer is revealed above.'),
+      dot1: 'adot' + (left >= 1 ? ' left' : ''),
+      dot2: 'adot' + (left >= 2 ? ' left' : ''),
+      bindVal: !c.checked ? '—' : (passed ? 'true' : 'false'),
+      bindCls: 'bindval ' + (!c.checked ? 'n' : (passed ? 't' : 'f')),
+    };
+  }
+  renderVals() {
+    return { showBinding: this.state.showBinding, a: this.buildA(), b: this.buildB(), c: this.buildC() };
+  }
+}
+</script>
+</body>
+</html>
