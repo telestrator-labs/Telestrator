@@ -10,6 +10,7 @@ import { CODE_CELL_NODE } from "./codeCellNode";
 import { INPUT_CELL_NODE } from "./inputCellNode";
 import { KNOWLEDGE_CHECK_NODE } from "./knowledgeCheckNode";
 import { CHART_NODE } from "./chartNode";
+import { VALUE_REF_NODE } from "./valueRefNode";
 
 // The bridge between the editor's ProseMirror document and the framework-
 // agnostic core `NotebookDocument`. The mapping (TypeCell-style):
@@ -56,9 +57,12 @@ export function docToNotebook(
 
   const flushProse = () => {
     if (proseRun.length === 0) return;
-    const source = markdown
-      .serialize({ type: "doc", content: proseRun })
-      .trim();
+    // Inline `$`-chips live inside paragraphs, so they reach markdown.serialize
+    // (unlike the block atoms, which are dropped above). The markdown serializer
+    // has no rule for them, so collapse each to its `$.name` text first — the
+    // reference degrades to plain text in the export/core stream.
+    const content = proseRun.map(valueRefsToText);
+    const source = markdown.serialize({ type: "doc", content }).trim();
     if (source.length > 0) cells.push(createCell("markdown", source));
     proseRun = [];
   };
@@ -88,4 +92,17 @@ export function docToNotebook(
   flushProse();
 
   return { id: base.id, title: base.title, cells };
+}
+
+// Recursively replace inline `valueRef` nodes with their `$.name` text so a
+// paragraph containing chips serializes cleanly to markdown.
+function valueRefsToText(node: JSONContent): JSONContent {
+  if (node.type === VALUE_REF_NODE) {
+    const name = (node.attrs?.name as string) ?? "";
+    return { type: "text", text: `$.${name}` };
+  }
+  if (node.content) {
+    return { ...node, content: node.content.map(valueRefsToText) };
+  }
+  return node;
 }

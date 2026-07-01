@@ -94,9 +94,9 @@ export const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(
                 }`}
               >
                 <span
-                  className={`flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[7px] font-mono text-[11px] ${
+                  className={`flex h-7.5 w-7.5 flex-none items-center justify-center rounded-[7px] font-mono text-[11px] ${
                     on
-                      ? "bg-accent-5 text-action-text"
+                      ? "bg-brand-contrast text-brand-11"
                       : "bg-surface-raised text-text-muted"
                   }`}
                 >

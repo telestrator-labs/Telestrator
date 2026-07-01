@@ -92,8 +92,9 @@ export function useTrace(): TraceState {
 
 // A one-shot flag that flips true for ~500ms after `signal` changes — the
 // reactive pulse. `enabled` gates it so cells only pulse while participating in
-// a trace (avoids every cell flashing on unrelated edits).
-function usePulse(signal: unknown, enabled: boolean): boolean {
+// a trace (avoids every cell flashing on unrelated edits). Also used by the
+// inline `$`-chip to ripple when its value changes.
+export function usePulse(signal: unknown, enabled: boolean): boolean {
   const [pulsing, setPulsing] = useState(false);
   const prev = useRef(signal);
   useEffect(() => {

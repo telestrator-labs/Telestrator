@@ -74,6 +74,24 @@ export function insertKnowledgeCheckAt(editor: Editor, at: number): void {
     .run();
 }
 
+// An inline `$`-value reference chip, dropped at the cursor mid-sentence. Unlike
+// the block cells, no trailing paragraph — it flows inside prose. A trailing
+// space keeps typing natural after the chip.
+export function insertValueRefAt(
+  editor: Editor,
+  at: number,
+  name: string,
+): void {
+  editor
+    .chain()
+    .insertContentAt(at, [
+      { type: "valueRef", attrs: { name } },
+      { type: "text", text: " " },
+    ])
+    .focus()
+    .run();
+}
+
 // A chart — starts with a small static series so it draws the moment it lands;
 // the author points the data source at a `$` expression via the settings gear.
 export function insertChartAt(editor: Editor, at: number): void {

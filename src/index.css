@@ -335,6 +335,8 @@
    * provenance connectors. Both are signal-shaped and non-looping. */
   --animate-cell-pulse: cell-pulse 0.5s ease;
   --animate-conn-in: conn-in 0.34s ease;
+  /* Inline `$`-chip: a gold flash when its value changes (the reactive ripple). */
+  --animate-value-ripple: value-ripple 0.55s ease;
 }
 
 @keyframes code-cell-breathe {
@@ -367,11 +369,23 @@
   }
 }
 
+@keyframes value-ripple {
+  0% {
+    background: var(--color-gold-9);
+    color: var(--color-brand-contrast);
+  }
+  100% {
+    background: var(--color-gold-3);
+    color: var(--color-gold-11);
+  }
+}
+
 /* Motion is restrained and signal-shaped: honor reduced-motion by making the
  * pulse/draw-on instant rather than animated (design-language Motion §). */
 @media (prefers-reduced-motion: reduce) {
   .animate-cell-pulse,
-  .trace-conn {
+  .trace-conn,
+  .value-ref--ripple {
     animation: none !important;
   }
 }

@@ -4,7 +4,9 @@ import { CodeCell } from "./codeCellNode";
 import { InputCell } from "./inputCellNode";
 import { KnowledgeCheck } from "./knowledgeCheckNode";
 import { Chart } from "./chartNode";
+import { ValueRef } from "./valueRefNode";
 import { SlashCommand } from "./slashCommand";
+import { ValueRefSuggestion } from "./valueRefSuggestion";
 import { AddBlock } from "./addBlock";
 
 // The single source of truth for the editor's schema. Shared by the live editor
@@ -17,7 +19,9 @@ import { AddBlock } from "./addBlock";
 //   - InputCell:  a `$`-bound knob (slider/number/text/select/toggle)
 //   - KnowledgeCheck: a graded question that can publish its result to `$`
 //   - Chart:      a viz cell that reads a `$` expression and re-renders reactively
+//   - ValueRef:   an inline `$`-value reference chip in prose (live value)
 //   - SlashCommand: `/` menu to insert blocks/cells at the cursor
+//   - ValueRefSuggestion: `$` autocomplete to drop a value chip inline
 export const editorExtensions = [
   StarterKit.configure({ undoRedo: false }),
   Markdown,
@@ -25,6 +29,8 @@ export const editorExtensions = [
   InputCell,
   KnowledgeCheck,
   Chart,
+  ValueRef,
   SlashCommand,
+  ValueRefSuggestion,
   AddBlock,
 ];
