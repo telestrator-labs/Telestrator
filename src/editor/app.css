@@ -134,3 +134,37 @@
    * the page (or an active cell behind the drawing). */
   pointer-events: none;
 }
+
+/* ---- Inline `$`-value chip (prose) ----
+ * A live value referenced mid-sentence: the key in gold marker, the current
+ * value alongside it, updating as inputs change. Hovering draws the trace. */
+.value-ref {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 0.5px 5px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  white-space: nowrap;
+  cursor: default;
+  color: var(--color-gold-11);
+  background: var(--color-gold-3);
+  box-shadow: inset 0 -2px 0 var(--color-gold-a6);
+  transition:
+    background 0.12s,
+    box-shadow 0.12s;
+}
+.value-ref:hover {
+  background: var(--color-gold-a6);
+  box-shadow: inset 0 -2px 0 var(--color-gold-8);
+}
+.value-ref__key {
+  font-weight: 600;
+}
+.value-ref__val {
+  color: var(--color-text);
+}
+.value-ref--ripple {
+  animation: var(--animate-value-ripple);
+}

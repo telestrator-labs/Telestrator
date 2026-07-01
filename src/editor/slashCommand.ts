@@ -70,6 +70,15 @@ const ITEMS: SlashItem[] = [
     },
   },
   {
+    title: "Insert $ value",
+    group: "Live",
+    icon: "$",
+    desc: "Reference a live value in prose",
+    // Insert a literal "$" so the value-ref autocomplete takes over — one picker
+    // for both routes (mirrors the "+" affordance inserting "/").
+    run: (e, r) => e.chain().focus().deleteRange(r).insertContent("$").run(),
+  },
+  {
     title: "Heading 1",
     group: "Prose",
     icon: "H1",

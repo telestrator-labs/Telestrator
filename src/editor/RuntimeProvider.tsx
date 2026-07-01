@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { createIframeHost } from "../sandbox/iframeHost";
+import { setValueEntries } from "./valueKeys";
 import type { CellOutput, RuntimeHost } from "../runtime";
 
 // The reactive dependency graph, derived from every cell's latest output: which
@@ -100,7 +101,16 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
   const graphRef = useRef<TraceGraph | null>(null);
 
   const invalidateGraph = () => {
-    graphRef.current = null;
+    // Recompute eagerly so the graph *and* the value-key registry (which the
+    // detached `$`-autocomplete popup reads) stay in sync on every output.
+    const graph = computeGraph(outputs.current);
+    graphRef.current = graph;
+    setValueEntries(
+      [...graph.values].map(([key, v]) => ({
+        key,
+        value: outputs.current.get(v.writer)?.values[key],
+      })),
+    );
     graphSubs.current.forEach((cb) => cb());
   };
 
@@ -124,6 +134,7 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
       hostRef.current = null;
       outputs.current.clear();
       graphRef.current = null;
+      setValueEntries([]); // don't leak this notebook's keys into the next
     };
   }, []);
 
@@ -190,4 +201,29 @@ export function useTraceGraph(): TraceGraph {
     (cb) => ctx?.subscribeGraph(cb) ?? (() => {}),
     () => ctx?.getGraph() ?? EMPTY_GRAPH,
   );
+}
+
+// The current value of a `$` key, for an inline prose chip. Resolves the writing
+// cell via the graph, then reads that cell's latest output — so it re-renders
+// exactly when the writer re-emits. `undefined` until something writes the key.
+export function useValue(key: string): unknown {
+  const graph = useTraceGraph();
+  const writerId = graph.values.get(key)?.writer;
+  const output = useCellOutput(writerId ?? "");
+  return writerId ? output?.values[key] : undefined;
+}
+
+// Whether a cell is *live*: it reads or writes at least one valid `$` value (a
+// value with a writer in the graph). Drives the cell's LIVE badge — an empty or
+// non-reactive cell isn't "live" just because it can run.
+export function useIsLive(id: string | null): boolean {
+  const graph = useTraceGraph();
+  return !!id && graph.valuesTouching(id).length > 0;
+}
+
+// Whether the document is live: any cell has written a valid `$` value. Drives
+// the header's Live indicator.
+export function useDocumentLive(): boolean {
+  const graph = useTraceGraph();
+  return graph.values.size > 0;
 }

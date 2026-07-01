@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Button } from "../ui/Button";
 import { SidebarTrigger } from "../ui/sidebar";
-import { useRuntime } from "../editor/RuntimeProvider";
+import { useRuntime, useDocumentLive } from "../editor/RuntimeProvider";
 import { cx } from "../ui/cx";
 
 export type NotebookLayout = "document" | "studio";
@@ -39,6 +39,7 @@ export function EditorTopBar({
   onToggleWide: () => void;
 }) {
   const runtime = useRuntime();
+  const documentLive = useDocumentLive();
   return (
     <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border-subtle bg-surface-sunken/85 px-[26px] py-3 backdrop-blur">
       <div className="flex min-w-0 items-center gap-2 text-[13px] text-text-faint">
@@ -50,21 +51,24 @@ export function EditorTopBar({
         <span className="truncate font-medium text-text">
           {title || "Untitled notebook"}
         </span>
-        {/* Live indicator + document runtime reset — the runtime's home now that
-            the editor toolbar is gone. */}
-        <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-brand-5 bg-live-subtle py-0.5 pl-2 pr-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-live-text">
-          <span className="size-1.5 rounded-full bg-live" />
-          Live
-          <button
-            type="button"
-            title="Restart runtime"
-            aria-label="Restart runtime"
-            onClick={() => runtime.restart()}
-            className="ml-0.5 grid size-4 place-items-center rounded-full text-live-text/80 outline-none hover:bg-live/20 hover:text-live-text focus-visible:ring-2 focus-visible:ring-brand-8"
-          >
-            <RestartIcon />
-          </button>
-        </span>
+        {/* Live indicator + document runtime reset. Only shown once the document
+            is actually reactive — a cell reads or writes a valid `$` value — so
+            "Live" means something (and there's a runtime worth restarting). */}
+        {documentLive && (
+          <span className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-brand-5 bg-live-subtle py-0.5 pl-2 pr-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-live-text">
+            <span className="size-1.5 rounded-full bg-live" />
+            Live
+            <button
+              type="button"
+              title="Restart runtime"
+              aria-label="Restart runtime"
+              onClick={() => runtime.restart()}
+              className="ml-0.5 grid size-4 place-items-center rounded-full text-live-text/80 outline-none hover:bg-live/20 hover:text-live-text focus-visible:ring-2 focus-visible:ring-brand-8"
+            >
+              <RestartIcon />
+            </button>
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-2">

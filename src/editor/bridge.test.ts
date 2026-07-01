@@ -110,3 +110,30 @@ test("editor-only atoms (input/knowledge-check/chart) are dropped, prose survive
     destroy();
   }
 });
+
+test("inline $-value chips serialize to $.name text in the prose stream", () => {
+  const { manager, destroy } = makeMarkdownManager();
+  try {
+    const docJSON = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "The limiter drains " },
+            { type: "valueRef", attrs: { name: "rate" } },
+            { type: "text", text: " per tick." },
+          ],
+        },
+      ],
+    };
+
+    const result = docToNotebook(manager, docJSON, createNotebook("x"));
+    const prose = result.cells.map((c) => c.code).join("\n");
+
+    // The chip degrades to its reference text; the sentence stays intact.
+    expect(prose).toContain("The limiter drains $.rate per tick.");
+  } finally {
+    destroy();
+  }
+});

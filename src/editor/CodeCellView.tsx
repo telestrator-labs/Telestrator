@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { TextSelection } from "@tiptap/pm/state";
 import type { Language } from "../core/notebook";
-import { useRuntime, useCellOutput } from "./RuntimeProvider";
+import { useRuntime, useCellOutput, useIsLive } from "./RuntimeProvider";
 import { useCellTrace } from "./TraceContext";
 import { useReadingMode } from "./ReadingMode";
 import { CodeEditor } from "./CodeEditor";
@@ -43,6 +43,9 @@ export function CodeCellView({
   const rt = useRuntime();
   const output = useCellOutput(id ?? "");
   const trace = useCellTrace(id, output);
+  // "Live" now means participating in reactivity — reads or writes a valid `$`
+  // value — not merely "runnable". An empty/non-reactive TS cell reads as inert.
+  const live = useIsLive(id);
   const reading = useReadingMode();
   const [showCode, setShowCode] = useState(false);
   // Edit-mode collapse: the source (header + editor) and the output can each be
@@ -201,7 +204,7 @@ export function CodeCellView({
               </svg>
             </button>
           )}
-          {runnable ? (
+          {live ? (
             <span
               data-slot="cell-live"
               className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.04em] text-live-text"
