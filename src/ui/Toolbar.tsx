@@ -26,7 +26,7 @@ export type ToolbarAction = {
 };
 
 const cell =
-  "flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-text outline-none transition-colors hover:bg-surface-raised focus-visible:bg-surface-raised";
+  "flex items-center gap-1.5 px-3.5 py-2 text-[13px] font-medium text-text outline-none transition-colors hover:bg-surface-active focus-visible:bg-surface-active";
 
 export function Toolbar({
   groups,
@@ -38,12 +38,24 @@ export function Toolbar({
   return (
     <div
       className={cx(
-        "inline-flex items-stretch divide-x divide-border overflow-hidden rounded-lg border border-border bg-surface",
+        // A single, prominent segmented control: white and elevated so it reads
+        // as the document's command surface. Fills its container (cap the width
+        // via className) with group dividers stronger than the per-cell ones to
+        // keep formatting · insert · runtime legible.
+        "flex items-stretch divide-x divide-border-strong overflow-hidden rounded-lg border border-border bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.04),0_2px_6px_rgb(0_0_0/0.05)]",
         className,
       )}
     >
       {groups.map((group, i) => (
-        <div key={i} className="flex items-stretch divide-x divide-border">
+        <div
+          key={i}
+          className={cx(
+            "flex items-stretch divide-x divide-border",
+            // Push the final group (runtime actions) to the trailing edge so the
+            // full-width bar reads as formatting/insert left, actions right.
+            i === groups.length - 1 && groups.length > 1 && "ml-auto",
+          )}
+        >
           {group.map((action) => (
             <ToolbarCell key={action.key} action={action} />
           ))}

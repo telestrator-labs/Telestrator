@@ -44,29 +44,17 @@
   color: var(--color-text-faint);
 }
 
-/* The formatting/insert toolbar sticks just under the editor top bar; the
- * document content scrolls beneath it. The bar (background + hairline) spans the
- * full content width so scrolling prose never bleeds through; an opaque surface
- * matched to the document paper keeps it seamless. */
+/* The toolbar sticks just under the title as the reader scrolls. The bar carries
+ * an opaque, paper-matched background spanning the full content width so
+ * scrolling prose can't bleed through behind the (fit-content) segmented
+ * control, which sits left-aligned with the prose. */
 .notebook__tools {
   position: sticky;
   top: 0;
   z-index: 5;
   margin: 0 0 18px;
-  background: var(--color-paper);
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-
-/* The controls themselves stay within the narrow reading measure even when the
- * document is expanded — spanning the full wide column would strand the Restart
- * action far from the formatting cluster. Left edge tracks the prose. */
-.notebook__tools-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  max-width: 640px;
   padding: 10px 0;
+  background: var(--color-paper);
 }
 
 /* Tiptap document surface. Typography (serif body, sans headings, gold inline
@@ -101,23 +89,25 @@
   font-family: var(--font-sans);
 }
 
+/* Run is the cell's primary action — the solid violet call-to-action (matches
+ * the primary <Button> variant: bg-action → action-hover, white glyph). */
 .code-cell__run {
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent;
   border-radius: 6px;
-  background: var(--color-surface);
-  color: var(--color-text-muted);
+  background: var(--color-action);
+  color: #fff;
   cursor: pointer;
   padding: 0;
+  transition: background-color 0.12s ease;
 }
 
 .code-cell__run:hover {
-  border-color: var(--color-action-border);
-  color: var(--color-action-text);
+  background: var(--color-action-hover);
 }
 
 /* Live indicator: lime is the telestrator "on air" signal. */
