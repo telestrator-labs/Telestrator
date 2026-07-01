@@ -57,6 +57,41 @@ export function chipCellCode(id: string, expr: string): string {
   return `$[${key}] = (${e});`;
 }
 
+export interface ValuePath {
+  path: string; // dotted access path off `$`, e.g. "styles.vars.gap"
+  value: unknown;
+}
+
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  !!v && typeof v === "object" && !Array.isArray(v);
+
+const DOT_KEY = /^[A-Za-z_$][\w$]*$/;
+
+// Expand top-level `$` entries into every dot-accessible path — top-level keys
+// *and* their nested object leaves — so the `$` picker can surface (and search)
+// nested values like `styles.vars.gap` by name, not only by drilling the parent.
+// Plain objects only (arrays/values are leaves); bounded depth + count so a big
+// data object can't flood the picker.
+export function flattenValuePaths(
+  entries: { key: string; value: unknown }[],
+  maxDepth = 3,
+  cap = 300,
+): ValuePath[] {
+  const out: ValuePath[] = [];
+  const visit = (path: string, value: unknown, depth: number) => {
+    if (out.length >= cap) return;
+    out.push({ path, value });
+    if (depth < maxDepth && isPlainObject(value)) {
+      for (const k of Object.keys(value)) {
+        if (!DOT_KEY.test(k)) continue; // only ident keys are `$.a.b`-reachable
+        visit(`${path}.${k}`, value[k], depth + 1);
+      }
+    }
+  };
+  for (const e of entries) visit(e.key, e.value, 1);
+  return out;
+}
+
 export interface ExprToken {
   text: string;
   // Present on a `$.<path>` reference token; the top-level `$` key it reads (so

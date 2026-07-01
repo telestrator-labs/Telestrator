@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   chipCellCode,
   chipOutputKey,
+  flattenValuePaths,
   isPlainPath,
   isReservedKey,
   pathSegments,
@@ -62,6 +63,36 @@ describe("computed-chip codegen", () => {
     expect(isReservedKey(chipOutputKey("abc"))).toBe(true);
     expect(isReservedKey("__chart_x")).toBe(true);
     expect(isReservedKey("rate")).toBe(false);
+  });
+});
+
+describe("flattenValuePaths", () => {
+  const entries = [
+    { key: "rate", value: 10 },
+    { key: "styles", value: { vars: { gap: "8px", pad: "4px" }, classes: { card: "c1" } } },
+    { key: "rows", value: [{ x: 1 }] }, // arrays are leaves, not expanded
+  ];
+
+  it("includes top-level keys and nested object leaves, arrays left whole", () => {
+    const paths = flattenValuePaths(entries).map((p) => p.path);
+    expect(paths).toContain("rate");
+    expect(paths).toContain("styles");
+    expect(paths).toContain("styles.vars");
+    expect(paths).toContain("styles.vars.gap");
+    expect(paths).toContain("styles.classes.card");
+    expect(paths).toContain("rows"); // present…
+    expect(paths).not.toContain("rows.0"); // …but not descended into
+  });
+
+  it("carries the resolved value for each path", () => {
+    const gap = flattenValuePaths(entries).find((p) => p.path === "styles.vars.gap");
+    expect(gap?.value).toBe("8px");
+  });
+
+  it("honors the depth cap", () => {
+    const paths = flattenValuePaths(entries, 2).map((p) => p.path);
+    expect(paths).toContain("styles.vars");
+    expect(paths).not.toContain("styles.vars.gap"); // depth 3 excluded
   });
 });
 
