@@ -62,7 +62,14 @@ function ToolbarCell({ action }: { action: ToolbarAction }) {
           {action.label}
           <Chevron />
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-48 p-1">
+        <PopoverContent
+          align="start"
+          className="w-48 p-1"
+          // Don't return focus to the trigger on close — the action handles
+          // focus itself (heading re-focuses the editor; inserting a code cell
+          // focuses the new cell's CodeMirror).
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
           {action.items.map((item) => (
             <PopoverClose asChild key={item.label}>
               <button

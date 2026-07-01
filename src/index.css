@@ -294,6 +294,14 @@
  * (Trace, cards) keep their border. Native select/inputs are left alone so their
  * affordances (the dropdown arrow) survive. */
 @layer base {
+  /* Sans is the UI default; serif is prose-only (opted into via .prose in
+   * typography.plugin.ts). Set on <body> — not just the app's font-sans wrapper —
+   * so menus/popovers portaled to <body> don't fall back to the UA serif (Times).
+   * Buttons/inputs `font: inherit`, so they pick this up too. */
+  body {
+    font-family: var(--font-sans);
+  }
+
   button {
     font: inherit;
     color: inherit;

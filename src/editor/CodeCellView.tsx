@@ -5,6 +5,7 @@ import type { Language } from "../core/notebook";
 import { useRuntime, useCellOutput } from "./RuntimeProvider";
 import { useReadingMode } from "./ReadingMode";
 import { CodeEditor } from "./CodeEditor";
+import { shouldFocusCell } from "./pendingFocus";
 import {
   Popover,
   PopoverClose,
@@ -220,6 +221,7 @@ export function CodeCellView({
         <CodeEditor
           value={code}
           language={language === "css" ? "css" : "typescript"}
+          autoFocus={id ? shouldFocusCell(id) : false}
           onChange={(next) => updateAttributes({ code: next })}
           onArrowOut={moveOut}
           onDeleteEmpty={deleteSelf}

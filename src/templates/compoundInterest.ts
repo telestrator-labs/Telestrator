@@ -11,7 +11,7 @@ export const compoundInterest: NotebookTemplate = {
     doc(
       md(
         m,
-        "# Compound interest\n\nSet the inputs and the final balance recomputes. The explanation and the calculation are the same artifact.",
+        "Set the inputs and the final balance recomputes. The explanation and the calculation are the same artifact.",
       ),
       inputCell({ name: "principal", kind: "number", value: 1000 }),
       inputCell({ name: "rate", kind: "number", value: 5 }),

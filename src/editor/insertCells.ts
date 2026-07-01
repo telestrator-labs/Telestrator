@@ -1,5 +1,6 @@
 import type { Editor } from "@tiptap/core";
 import { createCell, generateId } from "../core/notebook";
+import { requestCellFocus } from "./pendingFocus";
 
 // Shared cell-insertion helpers so the toolbar buttons and the slash menu
 // produce identical cells from one source of truth. `at` is the document
@@ -13,13 +14,15 @@ export function insertCodeCellAt(
   language: "typescript" | "css" = "typescript",
 ): void {
   const cell = createCell(language, "");
+  // Hand focus to the new cell's CodeMirror once its NodeView mounts, rather than
+  // .focus()-ing into the trailing paragraph.
+  requestCellFocus(cell.id);
   editor
     .chain()
     .insertContentAt(at, [
       { type: "codeCell", attrs: { id: cell.id, language, code: "" } },
       { type: "paragraph" },
     ])
-    .focus()
     .run();
 }
 

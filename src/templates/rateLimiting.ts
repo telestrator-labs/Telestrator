@@ -11,7 +11,7 @@ export const rateLimiting: NotebookTemplate = {
     doc(
       md(
         m,
-        "# Rate limiting, by feel\n\nA rate limiter decides which requests get through and which get dropped. The usual explanation is a diagram and a paragraph. Here you set the dials — drag a slider and the numbers below update under your hands.",
+        "A rate limiter decides which requests get through and which get dropped. The usual explanation is a diagram and a paragraph. Here you set the dials — drag a slider and the numbers below update under your hands.",
       ),
       inputCell({
         name: "rate",
