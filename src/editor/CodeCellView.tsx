@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
 import { TextSelection } from "@tiptap/pm/state";
 import type { Language } from "../core/notebook";
 import { useRuntime, useCellOutput, useIsLive } from "./RuntimeProvider";
+import { cssRegistry } from "./cssRegistry";
 import { useCellTrace } from "./TraceContext";
 import { useReadingMode } from "./ReadingMode";
 import { CodeEditor } from "./CodeEditor";
@@ -53,22 +54,36 @@ export function CodeCellView({
   const [sourceOpen, setSourceOpen] = useState(true);
   const [outputOpen, setOutputOpen] = useState(true);
 
-  // Register / update this cell in the runtime (debounced); deregister non-TS
-  // cells. Re-runs when code or language changes.
+  // Register / update this cell (debounced). TS cells run in the runtime; css
+  // cells apply as a scoped stylesheet (cssRegistry); each path clears the other
+  // so switching a cell's language leaves no stale registration. Re-runs on code
+  // or language change.
   useEffect(() => {
     if (!id) return;
-    if (language !== "typescript") {
-      rt.remove(id);
-      return;
+    if (language === "css") {
+      rt.remove(id); // drop any prior TS registration
+      const timer = setTimeout(
+        () => cssRegistry.set(id, code),
+        REGISTER_DEBOUNCE_MS,
+      );
+      return () => clearTimeout(timer);
     }
-    const timer = setTimeout(() => rt.update(id, code), REGISTER_DEBOUNCE_MS);
-    return () => clearTimeout(timer);
+    if (language === "typescript") {
+      cssRegistry.remove(id); // drop any prior stylesheet
+      const timer = setTimeout(() => rt.update(id, code), REGISTER_DEBOUNCE_MS);
+      return () => clearTimeout(timer);
+    }
+    rt.remove(id);
+    cssRegistry.remove(id);
   }, [rt, id, code, language]);
 
-  // Remove from the runtime when the cell is deleted.
+  // Tear down both registrations when the cell is deleted.
   useEffect(() => {
     if (!id) return;
-    return () => rt.remove(id);
+    return () => {
+      rt.remove(id);
+      cssRegistry.remove(id);
+    };
   }, [rt, id]);
 
   // Keyboard flow: move the selection out of the CodeMirror island into prose.
@@ -107,6 +122,7 @@ export function CodeCellView({
     runnable &&
     !!output &&
     (!!output.error ||
+      !!output.view ||
       output.logs.length > 0 ||
       Object.keys(output.values).length > 0);
 
@@ -378,7 +394,10 @@ function CellOutputView({
 }) {
   const valueKeys = Object.keys(output.values);
   const hasAnything =
-    output.error || output.logs.length > 0 || valueKeys.length > 0;
+    output.error ||
+    output.view ||
+    output.logs.length > 0 ||
+    valueKeys.length > 0;
   if (!hasAnything) return null;
 
   // An error replaces the output well with a plain-language band, not a raw
@@ -409,46 +428,84 @@ function CellOutputView({
     );
   }
 
+  const hasData = output.logs.length > 0 || valueKeys.length > 0;
+
   return (
     <div
-      data-slot="cell-output"
-      className="relative flex flex-col gap-1.5 border-t border-border bg-surface-raised px-4 py-[11px] font-mono text-[12.5px]"
+      data-slot="cell-output-group"
+      className="relative border-t border-border"
     >
       <OutputCaret onCollapse={onCollapse} />
-      {output.logs.map((log, i) => (
+      {/* The rendered DOM view (the cell's main export), mounted from the sandbox
+          into the `.telestrator-output` container — css cells style its contents. */}
+      {output.view && <ViewMount id={output.id} runKey={output} />}
+      {hasData && (
         <div
-          key={i}
-          data-slot="cell-log"
+          data-slot="cell-output"
           className={cx(
-            "whitespace-pre-wrap text-text-muted",
-            log.level === "warn" && "text-value",
-            log.level === "error" && "text-danger-text",
+            "flex flex-col gap-1.5 bg-surface-raised px-4 py-[11px] font-mono text-[12.5px]",
+            output.view && "border-t border-border",
           )}
         >
-          {log.text}
-        </div>
-      ))}
-      {valueKeys.length > 0 && (
-        <div
-          data-slot="cell-values"
-          className="flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono"
-        >
-          <span data-slot="cell-ok" className="font-bold text-live-text">
-            ✓
-          </span>
-          {valueKeys.map((k) => (
-            <span
-              key={k}
-              data-slot="cell-value"
-              className="inline-flex items-baseline gap-[5px] rounded bg-value-bg px-[7px] py-px text-value shadow-[inset_0_-2px_0_var(--color-gold-a6)]"
+          {output.logs.map((log, i) => (
+            <div
+              key={i}
+              data-slot="cell-log"
+              className={cx(
+                "whitespace-pre-wrap text-text-muted",
+                log.level === "warn" && "text-value",
+                log.level === "error" && "text-danger-text",
+              )}
             >
-              <span className="font-semibold">${k}</span>
-              <span className="text-text">{formatValue(output.values[k])}</span>
-            </span>
+              {log.text}
+            </div>
           ))}
+          {valueKeys.length > 0 && (
+            <div
+              data-slot="cell-values"
+              className="flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono"
+            >
+              <span data-slot="cell-ok" className="font-bold text-live-text">
+                ✓
+              </span>
+              {valueKeys.map((k) => (
+                <span
+                  key={k}
+                  data-slot="cell-value"
+                  className="inline-flex items-baseline gap-[5px] rounded bg-value-bg px-[7px] py-px text-value shadow-[inset_0_-2px_0_var(--color-gold-a6)]"
+                >
+                  <span className="font-semibold">${k}</span>
+                  <span className="text-text">
+                    {formatValue(output.values[k])}
+                  </span>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
+  );
+}
+
+// Mounts the cell's live DOM view (produced in the sandbox) into a host
+// `.telestrator-output` container. Re-mounts when the cell re-runs (`runKey`
+// changes → the sandbox has a fresh node); unmounts on teardown.
+function ViewMount({ id, runKey }: { id: string; runKey: unknown }) {
+  const rt = useRuntime();
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    rt.mountView(id, el);
+    return () => rt.unmountView(el);
+  }, [rt, id, runKey]);
+  return (
+    <div
+      ref={ref}
+      data-slot="cell-view"
+      className="telestrator-output bg-surface-raised px-4 py-3 font-sans text-text"
+    />
   );
 }
 

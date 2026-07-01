@@ -196,4 +196,30 @@ describe("reactive engine", () => {
 
     engine.dispose();
   });
+
+  test("a cell's main export becomes its view; a DOM node flags output.view", () => {
+    const engine = createEngine();
+    const node = { nodeType: 1, tag: "div" }; // duck-typed DOM node
+    engine.setCell("view", () => node);
+    engine.setCell("plain", () => 42);
+
+    expect(engine.getValue("view")).toBe(node);
+    expect(engine.getOutput("view")?.view).toBe(true);
+    // A non-node export doesn't flag a mountable view.
+    expect(engine.getOutput("plain")?.view).toBeUndefined();
+
+    engine.dispose();
+  });
+
+  test("a DOM node written to $ is not deep-proxied (markRaw)", () => {
+    const engine = createEngine();
+    const node = { nodeType: 1 };
+    engine.setCell("w", ($: Context) => {
+      $.el = node;
+    });
+    // Reading the reactive $ returns the raw node identity, not a Vue proxy.
+    expect(engine.context.el).toBe(node);
+
+    engine.dispose();
+  });
 });

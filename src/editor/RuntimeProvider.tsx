@@ -79,6 +79,9 @@ interface RuntimeContextValue {
   restart(): void;
   subscribe(id: string, cb: () => void): () => void;
   getOutput(id: string): CellOutput | undefined;
+  // Mount/unmount a cell's live DOM view into a host output container.
+  mountView(id: string, container: Element): void;
+  unmountView(container: Element): void;
   // Trace graph subscription (recomputed whenever any cell's output changes).
   subscribeGraph(cb: () => void): () => void;
   getGraph(): TraceGraph;
@@ -161,6 +164,8 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
         return () => set!.delete(cb);
       },
       getOutput: (id) => outputs.current.get(id),
+      mountView: (id, container) => getHost().mountView(id, container),
+      unmountView: (container) => getHost().unmountView(container),
       subscribeGraph: (cb) => {
         graphSubs.current.add(cb);
         return () => graphSubs.current.delete(cb);

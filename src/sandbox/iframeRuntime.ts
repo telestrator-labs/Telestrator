@@ -77,7 +77,16 @@ async function compile(code: string): Promise<CellBody> {
   return ($, api) => {
     const module = { exports: {} as Record<string, unknown> };
     fn($, api, requireShim, module, module.exports);
+    return mainExport(module.exports);
   };
+}
+
+// A cell's "view" is its main export: the default export, else a lone named
+// export, else nothing. A DOM node here becomes a mountable output.
+function mainExport(exports: Record<string, unknown>): unknown {
+  if (exports.default !== undefined) return exports.default;
+  const names = Object.keys(exports).filter((k) => k !== "__esModule");
+  return names.length === 1 ? exports[names[0]] : undefined;
 }
 
 // Register a cell, surfacing resolution/compile/syntax errors as that cell's
@@ -98,6 +107,27 @@ async function setCell(id: string, code: string) {
     });
   }
 }
+
+// --- view mounting (same-origin side-channel) ------------------------------
+//
+// A cell's view is a live DOM node that can't cross postMessage, so the host
+// (same-origin) hands us its output container and we mount the current node into
+// it directly. Re-called by the host on every re-run (output change) to swap in
+// the fresh node. Exposed as window globals the host invokes via contentWindow.
+interface ViewGlobals {
+  __telestrator_mountView(id: string, container: Element): void;
+  __telestrator_unmountView(container: Element): void;
+}
+const w = window as unknown as ViewGlobals;
+w.__telestrator_mountView = (id, container) => {
+  const value = engine.getValue(id);
+  if (value && typeof (value as Node).nodeType === "number") {
+    container.replaceChildren(value as Node);
+  } else {
+    container.replaceChildren();
+  }
+};
+w.__telestrator_unmountView = (container) => container.replaceChildren();
 
 window.addEventListener("message", (event: MessageEvent<HostMessage>) => {
   const msg = event.data;
