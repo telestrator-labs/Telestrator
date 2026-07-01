@@ -11,11 +11,15 @@ import {
 import { SelectNative } from "../ui/SelectNative";
 import { Switch } from "../ui/Switch";
 import {
-  Popover,
-  PopoverClose,
-  PopoverContent,
-  PopoverTrigger,
-} from "../ui/Popover";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/Sheet";
 import { StopEditorEvents } from "./StopEditorEvents";
 import { cx } from "../ui/cx";
 
@@ -141,110 +145,120 @@ export function KnowledgeCheckView({
           )}
           <div className={name ? "" : "ml-auto"}>
             <StopEditorEvents>
-              <Popover>
-                <PopoverTrigger
+              {/* Non-modal on purpose: a modal Dialog's scroll-lock + focus-trap
+                  (react-remove-scroll) fights the ProseMirror contentEditable it
+                  lives inside and never mounts. Non-modal is also better here —
+                  the author can watch the cell update live behind the panel;
+                  Escape and click-outside still dismiss it. */}
+              <Sheet modal={false}>
+                <SheetTrigger
                   aria-label="check settings"
                   className="flex size-6 items-center justify-center rounded-md border border-gold-6 bg-surface text-gold-11 outline-none hover:border-gold-8 focus-visible:ring-2 focus-visible:ring-accent-8"
                 >
                   <GearIcon />
-                </PopoverTrigger>
-                <PopoverContent
-                  align="end"
-                  className="max-h-[70vh] w-80 space-y-3 overflow-auto font-sans text-xs"
-                >
-                  <Field label="Question">
-                    <textarea
-                      aria-label="question"
-                      rows={2}
-                      className="w-full resize-y rounded border border-border-strong bg-surface px-2 py-1 font-sans text-xs text-text outline-none focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8"
-                      value={question}
-                      onChange={(e) =>
-                        updateAttributes({ question: e.target.value })
-                      }
-                    />
-                  </Field>
-                  <Field label="Answer type">
-                    <SelectNative
-                      aria-label="answer kind"
-                      className="text-xs"
-                      value={answerKind}
-                      onChange={(e) =>
-                        updateAttributes({ answerKind: e.target.value })
-                      }
-                    >
-                      {(Object.keys(KIND_LABEL) as AnswerKind[]).map((k) => (
-                        <option key={k} value={k}>
-                          {KIND_LABEL[k]}
-                        </option>
-                      ))}
-                    </SelectNative>
-                  </Field>
-                  <ConfigEditor
-                    kind={answerKind}
-                    config={config}
-                    setConfig={setConfig}
-                  />
-                  <Field label="Explanation (shown when right)">
-                    <input
-                      className={FIELD_INPUT}
-                      value={config.explanation ?? ""}
-                      onChange={(e) =>
-                        setConfig({ explanation: e.target.value })
-                      }
-                    />
-                  </Field>
-                  <Field label="Hint (offered on request)">
-                    <input
-                      className={FIELD_INPUT}
-                      value={config.hint ?? ""}
-                      onChange={(e) => setConfig({ hint: e.target.value })}
-                    />
-                  </Field>
-                  <div className="flex gap-2">
-                    <Field label="Attempts">
-                      <input
-                        type="number"
-                        min={1}
-                        className={cx(FIELD_INPUT, "font-mono")}
-                        value={String(config.attempts ?? 2)}
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[min(92vw,384px)]">
+                  <SheetHeader>
+                    <SheetTitle>Knowledge check</SheetTitle>
+                    <SheetDescription>
+                      Set the question, the accepted answer, and the feedback.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="flex-1 space-y-3 overflow-y-auto px-4 font-sans text-xs">
+                    <Field label="Question">
+                      <textarea
+                        aria-label="question"
+                        rows={2}
+                        className="w-full resize-y rounded border border-border-strong bg-surface px-2 py-1 font-sans text-xs text-text outline-none focus-visible:border-accent-8 focus-visible:ring-2 focus-visible:ring-accent-8"
+                        value={question}
                         onChange={(e) =>
-                          setConfig({ attempts: Number(e.target.value) })
+                          updateAttributes({ question: e.target.value })
                         }
                       />
                     </Field>
-                    <label className="flex flex-1 items-center gap-2 pt-5 text-text-muted">
-                      <Switch
-                        checked={config.reveal !== false}
-                        onCheckedChange={(c) => setConfig({ reveal: c })}
-                      />
-                      Reveal
-                    </label>
-                  </div>
-                  <Field label="Bound $ key (optional — for scoring)">
-                    <input
-                      aria-label="bound $ key"
-                      className={cx(FIELD_INPUT, "font-mono")}
-                      placeholder="e.g. q1"
-                      value={name}
-                      onChange={(e) =>
-                        updateAttributes({ name: e.target.value })
-                      }
+                    <Field label="Answer type">
+                      <SelectNative
+                        aria-label="answer kind"
+                        className="text-xs"
+                        value={answerKind}
+                        onChange={(e) =>
+                          updateAttributes({ answerKind: e.target.value })
+                        }
+                      >
+                        {(Object.keys(KIND_LABEL) as AnswerKind[]).map((k) => (
+                          <option key={k} value={k}>
+                            {KIND_LABEL[k]}
+                          </option>
+                        ))}
+                      </SelectNative>
+                    </Field>
+                    <ConfigEditor
+                      kind={answerKind}
+                      config={config}
+                      setConfig={setConfig}
                     />
-                  </Field>
-                  <div className="border-t border-border-subtle pt-2">
-                    <PopoverClose asChild>
+                    <Field label="Explanation (shown when right)">
+                      <input
+                        className={FIELD_INPUT}
+                        value={config.explanation ?? ""}
+                        onChange={(e) =>
+                          setConfig({ explanation: e.target.value })
+                        }
+                      />
+                    </Field>
+                    <Field label="Hint (offered on request)">
+                      <input
+                        className={FIELD_INPUT}
+                        value={config.hint ?? ""}
+                        onChange={(e) => setConfig({ hint: e.target.value })}
+                      />
+                    </Field>
+                    <div className="flex gap-2">
+                      <Field label="Attempts">
+                        <input
+                          type="number"
+                          min={1}
+                          className={cx(FIELD_INPUT, "font-mono")}
+                          value={String(config.attempts ?? 2)}
+                          onChange={(e) =>
+                            setConfig({ attempts: Number(e.target.value) })
+                          }
+                        />
+                      </Field>
+                      <label className="flex flex-1 items-center gap-2 pt-5 text-text-muted">
+                        <Switch
+                          checked={config.reveal !== false}
+                          onCheckedChange={(c) => setConfig({ reveal: c })}
+                        />
+                        Reveal
+                      </label>
+                    </div>
+                    <Field label="Bound $ key (optional — for scoring)">
+                      <input
+                        aria-label="bound $ key"
+                        className={cx(FIELD_INPUT, "font-mono")}
+                        placeholder="e.g. q1"
+                        value={name}
+                        onChange={(e) =>
+                          updateAttributes({ name: e.target.value })
+                        }
+                      />
+                    </Field>
+                  </div>
+                  <SheetFooter>
+                    <SheetClose asChild>
                       <button
                         type="button"
                         onClick={deleteSelf}
-                        className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-danger-text hover:bg-danger-bg"
+                        className="flex w-full items-center justify-center gap-2 rounded-md border border-danger-border px-2 py-2 text-danger-text hover:bg-danger-bg"
                       >
                         <TrashIcon />
                         Delete check
                       </button>
-                    </PopoverClose>
-                  </div>
-                </PopoverContent>
-              </Popover>
+                    </SheetClose>
+                  </SheetFooter>
+                </SheetContent>
+              </Sheet>
             </StopEditorEvents>
           </div>
         </div>
