@@ -50,7 +50,7 @@ the actual scope of dark mode.
     template for the remaining alpha surfaces.
   - Also set `color-scheme: light/dark` per-mode so the UA paints native chrome
     (an overflowing code cell's scrollbar was a bright bar on the dark page).
-- **Inset card ring** `ring-[var(--black-a4)]` (sidebar.tsx) — a black hairline,
+- **Inset card ring** `ring-[var(--black-a4)]` (Sidebar.tsx) — a black hairline,
   invisible on a dark card. Needs `white-a` in dark (same `--card-ring` per-mode
   trick).
 - Any other `*-a*` usage on a surface: the mobile scrim `bg-gray-a8` is fine

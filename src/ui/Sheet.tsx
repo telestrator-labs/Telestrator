@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { cva, type VariantProps } from "class-variance-authority";
+import { tv, type VariantProps } from "tailwind-variants";
 import { cx } from "./cx";
 
 // Sheet — a Dialog that slides in from an edge. Vendored from shadcn/ui (MIT) and
@@ -49,22 +49,20 @@ function SheetOverlay({
   );
 }
 
-const sheetVariants = cva(
-  "fixed z-50 flex flex-col gap-4 bg-surface text-text shadow-[0_12px_40px_rgb(0_0_0/0.22)] transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500",
-  {
-    variants: {
-      side: {
-        right:
-          "inset-y-0 right-0 h-full w-3/4 border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
-        top: "inset-x-0 top-0 h-auto border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-        bottom:
-          "inset-x-0 bottom-0 h-auto border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-      },
+const sheetVariants = tv({
+  base: "fixed z-50 flex flex-col gap-4 bg-surface text-text shadow-[0_12px_40px_rgb(0_0_0/0.22)] transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500",
+  variants: {
+    side: {
+      right:
+        "inset-y-0 right-0 h-full w-3/4 border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+      left: "inset-y-0 left-0 h-full w-3/4 border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+      top: "inset-x-0 top-0 h-auto border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+      bottom:
+        "inset-x-0 bottom-0 h-auto border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
     },
-    defaultVariants: { side: "right" },
   },
-);
+  defaultVariants: { side: "right" },
+});
 
 function SheetContent({
   className,
@@ -79,13 +77,11 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cx(sheetVariants({ side }), className)}
-        {...props}
-      >
+        {...props}>
         {children}
         <SheetPrimitive.Close
           aria-label="Close"
-          className="absolute right-3.5 top-3.5 rounded-md p-0.5 text-text-faint opacity-80 outline-none transition hover:text-text focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-accent-8"
-        >
+          className="absolute right-3.5 top-3.5 rounded-md p-0.5 text-text-faint opacity-80 outline-none transition hover:text-text focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-accent-8">
           <XGlyph />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>
@@ -156,8 +152,7 @@ function XGlyph() {
       strokeWidth={1.6}
       strokeLinecap="round"
       strokeLinejoin="round"
-      aria-hidden
-    >
+      aria-hidden>
       <path d="M4 4l8 8M12 4l-8 8" />
     </svg>
   );

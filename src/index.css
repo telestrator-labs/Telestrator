@@ -67,6 +67,33 @@
 @config "../typography.plugin.ts";
 
 @theme inline {
+  /* Static alpha channels */
+  --color-white-a1: var(--white-a1);
+  --color-white-a2: var(--white-a2);
+  --color-white-a3: var(--white-a3);
+  --color-white-a4: var(--white-a4);
+  --color-white-a5: var(--white-a5);
+  --color-white-a6: var(--white-a6);
+  --color-white-a7: var(--white-a7);
+  --color-white-a8: var(--white-a8);
+  --color-white-a9: var(--white-a9);
+  --color-white-a10: var(--white-a10);
+  --color-white-a11: var(--white-a11);
+  --color-white-a12: var(--white-a12);
+
+  --color-black-a1: var(--black-a1);
+  --color-black-a2: var(--black-a2);
+  --color-black-a3: var(--black-a3);
+  --color-black-a4: var(--black-a4);
+  --color-black-a5: var(--black-a5);
+  --color-black-a6: var(--black-a6);
+  --color-black-a7: var(--black-a7);
+  --color-black-a8: var(--black-a8);
+  --color-black-a9: var(--black-a9);
+  --color-black-a10: var(--black-a10);
+  --color-black-a11: var(--black-a11);
+  --color-black-a12: var(--black-a12);
+
   /* ── Tier 2: raw scale (generic family → primitive) ──────────────────────
    * gray = olive (neutral substrate) · brand = lime (live/brand) ·
    * accent = violet (action) · gold = signal/$-markers · danger = red. */
@@ -221,9 +248,11 @@
      #1d211c is Radix `olive-12` (light), pinned so it doesn't invert in dark. */
   --color-brand-contrast: #1d211c;
   /* signal / $-value markers (gold) */
-  --color-value-bg: var(--color-gold-3);
-  --color-value-border: var(--color-gold-6);
+  --color-value-bg: var(--color-gold-4);
+  --color-value-bg-strong: var(--color-gold-9);
+  --color-value-border: var(--color-gold-7);
   --color-value: var(--color-gold-11);
+  --color-value-contrast: white;
   /* error (danger / red) */
   --color-danger-bg: var(--color-danger-3);
   --color-danger-border: var(--color-danger-6);
@@ -271,13 +300,13 @@
   /* tell the UA to paint native chrome (scrollbars, form controls) for the mode,
    * so an overflowing code cell's scrollbar isn't a bright bar on a dark page. */
   color-scheme: light;
-  --chrome: var(--olive-3);
-  --paper: var(--white-a12);
+  --chrome: var(--olive-1);
+  --paper: var(--olive-3);
 }
 .dark {
   color-scheme: dark;
-  --chrome: var(--black-a12);
-  --paper: var(--olive-2);
+  --chrome: var(--olive-2);
+  --paper: var(--black-a12);
 }
 
 *,
@@ -301,6 +330,9 @@
  * (Trace, cards) keep their border. Native select/inputs are left alone so their
  * affordances (the dropdown arrow) survive. */
 @layer base {
+  :root {
+    --tw-shadow-color: var(--black-a4);
+  }
   /* Sans is the UI default; serif is prose-only (opted into via .prose in
    * typography.plugin.ts). Set on <body> — not just the app's font-sans wrapper —
    * so menus/popovers portaled to <body> don't fall back to the UA serif (Times).

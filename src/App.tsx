@@ -4,7 +4,11 @@ import { RuntimeProvider } from "@/editor/reactive/RuntimeProvider";
 import { TraceProvider } from "@/editor/trace/TraceContext";
 import { TraceSettingsProvider } from "@/editor/trace/traceSettings";
 import { AppSidebar } from "./chrome/AppSidebar";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./ui/Sidebar.tsx";
 import { EditorTopBar, type NotebookLayout } from "./chrome/EditorTopBar";
 import { TracePanel } from "./chrome/TracePanel";
 import { ShareModal } from "./chrome/ShareModal";
@@ -122,8 +126,7 @@ export default function App() {
                 <div className="flex min-h-0 flex-1">
                   <div
                     data-slot="notebook-scroll"
-                    className="relative min-w-0 flex-1 overflow-auto"
-                  >
+                    className="relative min-w-0 flex-1 overflow-auto">
                     <NotebookView
                       key={selected.id}
                       reading={reading}
