@@ -73,3 +73,27 @@ export function insertKnowledgeCheckAt(editor: Editor, at: number): void {
     .focus()
     .run();
 }
+
+// A chart — starts with a small static series so it draws the moment it lands;
+// the author points the data source at a `$` expression via the settings gear.
+export function insertChartAt(editor: Editor, at: number): void {
+  editor
+    .chain()
+    .insertContentAt(at, [
+      {
+        type: "chart",
+        attrs: {
+          id: generateId(),
+          chartType: "area",
+          expression:
+            "[\n  { x: 1, y: 2 },\n  { x: 2, y: 4 },\n  { x: 3, y: 8 },\n  { x: 4, y: 16 },\n]",
+          index: "x",
+          categories: ["y"],
+          config: {},
+        },
+      },
+      { type: "paragraph" },
+    ])
+    .focus()
+    .run();
+}

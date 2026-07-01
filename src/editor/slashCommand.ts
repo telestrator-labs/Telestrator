@@ -7,6 +7,7 @@ import {
   insertCodeCellAt,
   insertInputCellAt,
   insertKnowledgeCheckAt,
+  insertChartAt,
 } from "./insertCells";
 
 // `/`-command insertion. A thin Extension wrapping @tiptap/suggestion: typing "/"
@@ -56,6 +57,16 @@ const ITEMS: SlashItem[] = [
     run: (e, r) => {
       e.chain().focus().deleteRange(r).run();
       insertKnowledgeCheckAt(e, r.from);
+    },
+  },
+  {
+    title: "Chart",
+    group: "Live",
+    icon: "▦",
+    desc: "A viz cell that reads $",
+    run: (e, r) => {
+      e.chain().focus().deleteRange(r).run();
+      insertChartAt(e, r.from);
     },
   },
   {

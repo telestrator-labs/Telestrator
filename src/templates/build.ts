@@ -4,10 +4,12 @@ import { generateId, type Language } from "../core/notebook";
 import { CODE_CELL_NODE } from "../editor/codeCellNode";
 import { INPUT_CELL_NODE, type InputCellConfig } from "../editor/inputCellNode";
 import { KNOWLEDGE_CHECK_NODE } from "../editor/knowledgeCheckNode";
+import { CHART_NODE } from "../editor/chartNode";
 import type {
   AnswerKind,
   KnowledgeCheckConfig,
 } from "../editor/knowledgeCheck";
+import type { ChartConfig, ChartType } from "../editor/chart";
 import type { InputKind } from "../editor/binding";
 
 // Authoring helpers for templates. Cell ids are minted *here*, inside the
@@ -65,6 +67,29 @@ export function knowledgeCheck(opts: {
       question: opts.question,
       answerKind: opts.answerKind,
       value: opts.value ?? "",
+      config: opts.config ?? {},
+    },
+  };
+}
+
+// A chart cell. `expression` is evaluated in the runtime (reads `$`) to a list of
+// rows; `index` is the x-axis field and `categories` the value series (both
+// inferred from the data when omitted).
+export function chart(opts: {
+  expression: string;
+  chartType?: ChartType;
+  index?: string;
+  categories?: string[];
+  config?: ChartConfig;
+}): JSONContent {
+  return {
+    type: CHART_NODE,
+    attrs: {
+      id: generateId(),
+      chartType: opts.chartType ?? "area",
+      expression: opts.expression,
+      index: opts.index ?? "",
+      categories: opts.categories ?? [],
       config: opts.config ?? {},
     },
   };

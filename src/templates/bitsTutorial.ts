@@ -1,5 +1,13 @@
 import type { NotebookTemplate } from "./types";
-import { codeCell, doc, inputCell, knowledgeCheck, md, para } from "./build";
+import {
+  chart,
+  codeCell,
+  doc,
+  inputCell,
+  knowledgeCheck,
+  md,
+  para,
+} from "./build";
 
 // A guided tutorial showcasing the knowledge-check block: an explorable (a bits
 // slider driving 2^n) followed by three graded questions authored as single
@@ -28,6 +36,17 @@ export const bitsTutorial: NotebookTemplate = {
           "\n",
         ),
       ),
+      md(
+        m,
+        "Here is that growth as a curve — every extra bit *doubles* the height. Drag the slider above and watch the chart redraw.",
+      ),
+      chart({
+        chartType: "area",
+        expression:
+          "Array.from({ length: $.bits }, (_, i) => ({ bits: i + 1, values: 2 ** (i + 1) }))",
+        index: "bits",
+        categories: ["values"],
+      }),
       md(
         m,
         "Every extra bit **doubles** the range: 1 bit → 2, 2 bits → 4, and eight bits — a *byte* — → 256. Now check your understanding.",

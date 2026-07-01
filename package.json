@@ -44,6 +44,7 @@
     "es-module-lexer": "^2.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "recharts": "^3.9.0",
     "sucrase": "^3.35.1",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.2",

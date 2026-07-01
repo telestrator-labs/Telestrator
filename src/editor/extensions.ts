@@ -3,6 +3,7 @@ import { Markdown } from "@tiptap/markdown";
 import { CodeCell } from "./codeCellNode";
 import { InputCell } from "./inputCellNode";
 import { KnowledgeCheck } from "./knowledgeCheckNode";
+import { Chart } from "./chartNode";
 import { SlashCommand } from "./slashCommand";
 import { AddBlock } from "./addBlock";
 
@@ -15,6 +16,7 @@ import { AddBlock } from "./addBlock";
 //   - CodeCell:   our executable-code-cell node
 //   - InputCell:  a `$`-bound knob (slider/number/text/select/toggle)
 //   - KnowledgeCheck: a graded question that can publish its result to `$`
+//   - Chart:      a viz cell that reads a `$` expression and re-renders reactively
 //   - SlashCommand: `/` menu to insert blocks/cells at the cursor
 export const editorExtensions = [
   StarterKit.configure({ undoRedo: false }),
@@ -22,6 +24,7 @@ export const editorExtensions = [
   CodeCell,
   InputCell,
   KnowledgeCheck,
+  Chart,
   SlashCommand,
   AddBlock,
 ];

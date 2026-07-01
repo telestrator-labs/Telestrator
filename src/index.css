@@ -305,7 +305,7 @@
    * so menus/popovers portaled to <body> don't fall back to the UA serif (Times).
    * Buttons/inputs `font: inherit`, so they pick this up too. */
   body {
-    font-family: var(--font-sans);
+    @apply font-sans;
   }
 
   button {
