@@ -18,15 +18,24 @@ const GLOBALS_DEBOUNCE_MS = 200;
 
 export function getTsWorker(): Promise<WorkerShape> {
   if (!workerPromise) {
-    workerPromise = (async () => {
-      const inner = new Worker(new URL("./tsWorker.ts", import.meta.url), {
-        type: "module",
-      });
+    const inner = new Worker(new URL("./tsWorker.ts", import.meta.url), {
+      type: "module",
+    });
+    const promise = (async () => {
       const worker = Comlink.wrap<WorkerShape>(inner);
       await worker.initialize();
       startGlobalsSync(worker);
       return worker;
     })();
+    // Never cache a rejection: drop it (and terminate the dead worker) so the
+    // next caller — e.g. the next code cell to mount — spins up a fresh one
+    // instead of inheriting the same failed init.
+    promise.catch((e) => {
+      console.error("[ts] IntelliSense worker init failed; will retry", e);
+      if (workerPromise === promise) workerPromise = null;
+      inner.terminate();
+    });
+    workerPromise = promise;
   }
   return workerPromise;
 }
