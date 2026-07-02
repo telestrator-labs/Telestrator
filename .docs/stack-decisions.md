@@ -53,13 +53,13 @@ npm imports, render its output, and (eventually) export it as a real app.
 
 - **Monaco** authoring + `SourceModelCompiler` (TS→JS, AMD output).
 - **Sandboxed iframe** (`frame`) so user code can't touch auth tokens or crash the host
-  ([frame-onboarding-guide.md](./frame-onboarding-guide.md)).
+  ([frame-onboarding-guide.md](./archive/typecell/frame-onboarding-guide.md)).
 - **Penpal** typed RPC across the iframe boundary + **y-penpal** to sync a Y.Doc *replica* into the
-  iframe ([y-penpal-onboarding-guide.md](./y-penpal-onboarding-guide.md)).
+  iframe ([y-penpal-onboarding-guide.md](./archive/typecell/y-penpal-onboarding-guide.md)).
 - **`engine/resolvers`** — runtime npm resolution via `es-module-shims` with an
-  **ESM.sh → Skypack → JSPM** fallback chain ([engine-onboarding-guide.md](./engine-onboarding-guide.md)).
+  **ESM.sh → Skypack → JSPM** fallback chain ([engine-onboarding-guide.md](./archive/typecell/engine-onboarding-guide.md)).
 - **`packager`** — a separate, AWS Lambda-bound server-side pipeline for static export
-  ([packager-onboarding-guide.md](./packager-onboarding-guide.md)).
+  ([packager-onboarding-guide.md](./archive/typecell/packager-onboarding-guide.md)).
 
 **Greenfield option — Sandpack.** [Sandpack](https://sandpack.codesandbox.io/) is CodeSandbox's
 in-browser bundler + (optional) editor + preview, packaged for embedding. The headless,
@@ -130,7 +130,7 @@ editing. The load-bearing detail: a code cell is not a static block — it hosts
 and must stay in sync with the document and Yjs.
 
 **Current choice.** **BlockNote** (built on Tiptap/ProseMirror), which the project re-platformed
-onto during Epoch 4 ([development-history.md](./development-history.md)).
+onto during Epoch 4 ([development-history.md](./archive/typecell/development-history.md)).
 
 **Considered.** The three realistic candidates are *all ProseMirror underneath* — the real axis is
 **how much abstraction sits between you and ProseMirror**:
@@ -152,7 +152,7 @@ faster-start alternative (eject to raw Tiptap when the cell node needs control).
 *considered and not chosen.*
 
 **Why.** The hardest part of the whole Document layer is the **code-cell ↔ embedded editor ↔ Yjs**
-seam — the same Monaco↔ProseMirror pain [frame-onboarding-guide.md](./frame-onboarding-guide.md)
+seam — the same Monaco↔ProseMirror pain [frame-onboarding-guide.md](./archive/typecell/frame-onboarding-guide.md)
 flags in the current code, which BlockNote did **not** make easy there either. A raw NodeView gives
 the most control over exactly that seam. Secondary wins: Tiptap is the **most framework-portable**
 of the three (keeps §7 open), and persists ProseMirror/Yjs state your cell model maps onto directly.
@@ -202,7 +202,7 @@ IntelliSense/`.d.ts` acquisition stays deferred** (build on esm.sh's `X-TypeScri
 **The concern.** The mechanism behind the `$` context that tracks reads and re-runs dependent cells.
 
 **Current choice.** **MobX** `autorun()` over an observable `$` object wrapped in a Proxy
-([engine-onboarding-guide.md](./engine-onboarding-guide.md) §3.3–3.4).
+([engine-onboarding-guide.md](./archive/typecell/engine-onboarding-guide.md) §3.3–3.4).
 
 **Considered.** MobX · signals (`@preact/signals-core`, Solid-style, `Reactively`).
 
@@ -213,7 +213,7 @@ Prototype the injected runtime against **MobX** *and* **`@preact/signals-core`**
 1. **Bundle size** added to the runtime (it ships inside *every* Sandpack project).
 2. **Tracking ergonomics** — how naturally a cell's reads/writes of `$` become dependencies.
 3. **Side-effect teardown** — clean disposal of timers/listeners on re-run (today's
-   `hookDisposables.ts` concern in [engine-onboarding-guide.md](./engine-onboarding-guide.md)).
+   `hookDisposables.ts` concern in [engine-onboarding-guide.md](./archive/typecell/engine-onboarding-guide.md)).
 
 **Why deferred (not just indecision).** MobX's automatic deep read-tracking is the highest-fidelity
 port of the current engine; signals give the same dependency-graph semantics with a smaller, more
@@ -245,7 +245,7 @@ there. (The M2 stuck-overlay was *not* a duplicate-client version skew: `pnpm wh
 **The concern.** Real-time multi-user editing and presence over the Yjs CRDT.
 
 **Current choice.** **Self-hosted HocusPocus** WebSocket server + a custom Supabase persistence
-extension ([server-onboarding-guide.md](./server-onboarding-guide.md)).
+extension ([server-onboarding-guide.md](./archive/typecell/server-onboarding-guide.md)).
 
 **Considered.**
 

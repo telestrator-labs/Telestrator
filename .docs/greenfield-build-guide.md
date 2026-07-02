@@ -1,7 +1,7 @@
 # Greenfield Build Guide — A Reactive Notebook from First Principles
 
 > **What this is.** A *from-idea-to-implementation* build path for a new project **inspired by**
-> TypeCell, but built greenfield. Where [development-history.md](./development-history.md) Part 2
+> TypeCell, but built greenfield. Where [development-history.md](./archive/typecell/development-history.md) Part 2
 > prescribes a *1-for-1 rebuild* ordered by the **current package dependency graph**
 > (`util → shared → engine → frame → editor …`), this guide is ordered by the **feature set**:
 > the sequence a junior/mid-level engineer would follow, each step a shippable vertical slice.
@@ -161,8 +161,8 @@ interface NotebookDocument {
 
 This is the greenfield analog of today's `parsers/models.ts` (`Document`/`Cell`/`Language`) and
 the editor-neutral `CodeModel` in `shared` — see
-[parsers-onboarding-guide.md](./parsers-onboarding-guide.md) and
-[shared-onboarding-guide.md](./shared-onboarding-guide.md). Keep this type in a tiny,
+[parsers-onboarding-guide.md](./archive/typecell/parsers-onboarding-guide.md) and
+[shared-onboarding-guide.md](./archive/typecell/shared-onboarding-guide.md). Keep this type in a tiny,
 framework-agnostic `core` library; it is the only thing *every* later milestone depends on.
 
 > **Guiding rule for the whole build:** each milestone is a **shippable vertical slice** you can
@@ -330,7 +330,7 @@ block editor that reads and writes this same `NotebookDocument`.
 - **Why not BlockNote (the current project's editor):** all three candidates (BlockNote, Novel,
   Tiptap) sit over ProseMirror; the axis is *abstraction level*. The hardest part of this whole
   layer is the **executable code-cell ↔ embedded editor ↔ Yjs** seam — the same Monaco↔ProseMirror
-  pain [frame-onboarding-guide.md](./frame-onboarding-guide.md) warns about. A raw Tiptap NodeView
+  pain [frame-onboarding-guide.md](./archive/typecell/frame-onboarding-guide.md) warns about. A raw Tiptap NodeView
   is the canonical ProseMirror pattern for an embedded code editor and gives the most control;
   BlockNote's block model is the most likely to fight it. **Novel** (a Tiptap preset; **1.0,
   Feb 2026, actively maintained**) is a fine faster-start alternative you can eject from. Full
@@ -351,7 +351,7 @@ block editor that reads and writes this same `NotebookDocument`.
   client you drive yourself. Take the cell's code → a virtual project → render Sandpack's
   preview/console below the block.
 - **Maps to:** `frame` (iframe sandbox) **+** `engine` execution plumbing — **both now largely
-  Sandpack.** Contrast [frame-onboarding-guide.md](./frame-onboarding-guide.md): the entire
+  Sandpack.** Contrast [frame-onboarding-guide.md](./archive/typecell/frame-onboarding-guide.md): the entire
   Penpal + Y.Doc-replica + LocalExecutionHost wiring is replaced by "hand files to Sandpack."
 - **Done when:** typing `document.body` work in a cell produces visible output without you writing
   any iframe/PostMessage code.
@@ -370,7 +370,7 @@ the one piece Sandpack does **not** give you.
 - **The one new idea:** a **shared reactive context** (`$`) plus **automatic dependency tracking**.
   Today's engine runs each cell inside MobX `autorun()` over a shared observable `$` — when a cell
   *reads* `$.value`, that read is tracked, and a later write re-runs the cell
-  ([engine-onboarding-guide.md](./engine-onboarding-guide.md): `context.ts`, `executor.ts`,
+  ([engine-onboarding-guide.md](./archive/typecell/engine-onboarding-guide.md): `context.ts`, `executor.ts`,
   `modules.ts`).
 - **Decision — inject a fine-grained reactive runtime *into* the Sandpack bundle:**
   1. The M1 code-cell node already holds each cell's `id` / `language` / `code`. Map each cell →
@@ -429,7 +429,7 @@ the one piece Sandpack does **not** give you.
 - **Recommended:** declare deps in the virtual `package.json`; Sandpack's bundler fetches them from
   its CDN natively. Contrast the current `engine/resolvers` subsystem — a hand-rolled
   ESM.sh → Skypack → JSPM fallback chain over `es-module-shims`
-  ([engine-onboarding-guide.md](./engine-onboarding-guide.md) §3.6). This is also where the M1
+  ([engine-onboarding-guide.md](./archive/typecell/engine-onboarding-guide.md) §3.6). This is also where the M1
   code-cell NodeView gets its real editor: drop **CodeMirror 6** into the NodeView (TS highlighting,
   bracket matching). **Optional sub-step:** swap in **Monaco** for IntelliSense + `.d.ts` type
   fetching if authoring ergonomics justify the weight — but only as an upgrade, not the default.
@@ -444,7 +444,7 @@ the one piece Sandpack does **not** give you.
   Tiptap's Yjs binding (`y-prosemirror`) is first-class, so doing this here makes M6 incremental
   rather than a rewrite. Cache to **IndexedDB** (`y-indexeddb`).
 - **Recommended:** local-first stack mirroring today's `DocConnection → SyncManager →
-  DocumentCoordinator(IndexedDB)` ([editor-onboarding-guide.md](./editor-onboarding-guide.md)), but
+  DocumentCoordinator(IndexedDB)` ([editor-onboarding-guide.md](./archive/typecell/editor-onboarding-guide.md)), but
   there is **no iframe boundary to bridge** — the Y.Doc lives in the one app.
 - **Maps to:** `editor` (document management + IndexedDB cache).
 - **Done when:** edits survive offline reloads and you can switch between saved documents.
@@ -460,7 +460,7 @@ the one piece Sandpack does **not** give you.
 - **The big simplification to call out:** because Sandpack reads code straight from the host
   document (there is no separate iframe *app* holding a replica), there is **no need for a
   y-penpal-style cross-iframe CRDT transport**. The entire
-  [y-penpal package](./y-penpal-onboarding-guide.md) — "y-websocket with the websocket removed,"
+  [y-penpal package](./archive/typecell/y-penpal-onboarding-guide.md) — "y-websocket with the websocket removed,"
   invented purely to sync a Y.Doc across the iframe boundary — **does not exist** in this
   architecture.
 - **Maps to:** `server` (sync) and **`y-penpal` (dropped entirely)**.
@@ -474,7 +474,7 @@ the one piece Sandpack does **not** give you.
   [stack-decisions.md §6](./stack-decisions.md#6-persistence--auth--db)). The *property* to
   replicate: today's design pushes **all** access control into Postgres **Row-Level Security**, with
   a recursive `check_document_access()` so workspace grants cascade to children
-  ([server-onboarding-guide.md](./server-onboarding-guide.md)) — keep that cascading, DB-enforced
+  ([server-onboarding-guide.md](./archive/typecell/server-onboarding-guide.md)) — keep that cascading, DB-enforced
   model. Add forking (copy a doc to your own space) and workspace/project organization.
 - **Maps to:** `server` (RLS/authz) + `editor` (auth, identifiers, routing, fork).
 - **Done when:** a signed-in user can keep private docs, share/fork, and URLs resolve to the right
@@ -488,7 +488,7 @@ the one piece Sandpack does **not** give you.
     bundler is a deployable project. Contrast the current `packager`, a server-side, **AWS
     Lambda-bound** pipeline that writes cells to disk, generates glue (`context.d.ts`,
     `cellFunctions.ts`), and runs `npm install`/`build`
-    ([packager-onboarding-guide.md](./packager-onboarding-guide.md)). Sandpack's
+    ([packager-onboarding-guide.md](./archive/typecell/packager-onboarding-guide.md)). Sandpack's
     `SandpackStatic` / export removes the need for that bespoke build service.
   - **Cross-notebook imports** — `import "!docId"` loading another notebook as a live module
     (today routed by `frame`'s resolver layer).
@@ -547,5 +547,5 @@ matching onboarding guide in this directory; the [README](./README.md) lists the
 ## Where to go next
 
 - Stack choices and the full Sandpack trade-off analysis: **[stack-decisions.md](./stack-decisions.md)**.
-- Why the architecture looks the way it does today (V3 history): **[development-history.md](./development-history.md)** (Part 1 is still valuable context; Part 2 is the rebuild plan this guide offers an alternative to).
+- Why the architecture looks the way it does today (V3 history): **[development-history.md](./archive/typecell/development-history.md)** (Part 1 is still valuable context; Part 2 is the rebuild plan this guide offers an alternative to).
 - Deep dives on the current implementation of any concern: the per-package onboarding guides.
