@@ -6,6 +6,7 @@ import {
 import ts from "typescript";
 import * as Comlink from "comlink";
 import { createWorker } from "@valtown/codemirror-ts/worker";
+import { GLOBALS_PATH, buildGlobalsDts } from "@/editor/cells/tsGlobals";
 
 // The TypeScript language service for code cells, run OFF the main thread. It
 // hosts one shared virtual filesystem — the default libs (fetched from a CDN,
@@ -14,9 +15,8 @@ import { createWorker } from "@valtown/codemirror-ts/worker";
 // compiler is bundled into THIS chunk only, so it loads lazily when the first TS
 // cell mounts, not in the main bundle.
 //
-// SPIKE (tier a — language-level IntelliSense): `$` is typed `any` so cells don't
-// read as a sea of "Cannot find name '$'" errors. Tier b will generate a *typed*
-// `$` declaration from the live reactive graph so member access completes.
+// The `globals.d.ts` seeded here is just the permissive fallback (empty graph);
+// the host (tsEnv.ts) pushes a `$` typed from the live reactive graph — tier b.
 // No explicit `lib` — the ES2022 *target* implies the full default lib closure
 // (`lib.es2022.full.d.ts`, which includes DOM). The exact same options object is
 // handed to both `createDefaultMapFromCDN` (to know which lib files to fetch) and
@@ -33,14 +33,6 @@ const compilerOptions: ts.CompilerOptions = {
   noEmit: true,
 };
 
-// A script-mode (no import/export) .d.ts so these declarations are *global* —
-// visible in every cell, module or script.
-const GLOBALS_DTS = [
-  "// Ambient globals the reactive runtime injects into every cell.",
-  "declare const $: Record<string, any>;",
-  "declare function onDispose(cb: () => void): void;",
-].join("\n");
-
 Comlink.expose(
   createWorker(async () => {
     const fsMap = await createDefaultMapFromCDN(
@@ -49,11 +41,14 @@ Comlink.expose(
       false, // no localStorage in a worker
       ts,
     );
-    fsMap.set("/globals.d.ts", GLOBALS_DTS);
+    // Script-mode (no import/export) .d.ts → the declarations are *global*,
+    // visible in every cell. Seeded with the empty-graph fallback; tsEnv pushes
+    // the real, typed `$` once the graph is known.
+    fsMap.set(GLOBALS_PATH, buildGlobalsDts([]));
     const system = createSystem(fsMap);
     return createVirtualTypeScriptEnvironment(
       system,
-      ["/globals.d.ts"],
+      [GLOBALS_PATH],
       ts,
       compilerOptions,
     );
