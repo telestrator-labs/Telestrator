@@ -1,6 +1,7 @@
 import { afterEach, expect, test } from "vitest";
 import {
   cssRegistry,
+  cssVarsFromEntries,
   parseApi,
   OUTPUT_CLASS,
 } from "@/editor/reactive/cssRegistry";
@@ -9,10 +10,13 @@ const styleFor = (id: string) =>
   document.head.querySelector<HTMLStyleElement>(
     `style[data-telestrator-css="${id}"]`,
   );
+const varsStyle = () =>
+  document.head.querySelector<HTMLStyleElement>("style[data-telestrator-vars]");
 
 afterEach(() => {
   cssRegistry.remove("a");
   cssRegistry.remove("b");
+  cssRegistry.setVars({});
 });
 
 test("set() injects a <style> whose selectors are scoped to output regions", () => {
@@ -50,6 +54,32 @@ test("parseApi extracts class names and custom-property references", () => {
   );
   expect(api.classes).toEqual({ card: "card" });
   expect(api.vars).toEqual({ gap: "var(--gap)", bg: "var(--bg)" });
+});
+
+test("cssVarsFromEntries keeps top-level primitives under ident keys only", () => {
+  expect(
+    cssVarsFromEntries([
+      { key: "pad", value: 16 },
+      { key: "label", value: "hi" },
+      { key: "on", value: true },
+      { key: "styles", value: { a: 1 } }, // object → dropped
+      { key: "rows", value: [1, 2] }, // array → dropped
+      { key: "n", value: NaN }, // non-finite → dropped
+      { key: "2bad", value: 1 }, // invalid ident → dropped
+    ]),
+  ).toEqual({ pad: 16, label: "hi", on: true });
+});
+
+test("setVars publishes primitives as scoped custom properties (js → css)", () => {
+  cssRegistry.setVars({ pad: 16, label: "hi" });
+  const el = varsStyle();
+  expect(el).not.toBeNull();
+  expect(el!.textContent).toContain(`.${OUTPUT_CLASS} {`);
+  expect(el!.textContent).toContain("--pad: 16;");
+  expect(el!.textContent).toContain("--label: hi;");
+  // Empty set clears the declarations.
+  cssRegistry.setVars({});
+  expect(el!.textContent).toBe("");
 });
 
 test("root selectors are replaced by the output scope, not nested under it", () => {

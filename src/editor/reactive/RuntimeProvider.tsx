@@ -10,6 +10,7 @@ import {
 import { createIframeHost } from "@/sandbox/iframeHost";
 import { setValueEntries } from "@/editor/cells/valueRef/valueKeys";
 import { isReservedKey, walkPath } from "@/editor/cells/valueRef/valueRef";
+import { cssRegistry, cssVarsFromEntries } from "@/editor/reactive/cssRegistry";
 import type { CellOutput, RuntimeHost } from "@/runtime";
 
 // The reactive dependency graph, derived from every cell's latest output: which
@@ -113,12 +114,14 @@ export function RuntimeProvider({ children }: { children: ReactNode }) {
     // detached `$`-autocomplete popup reads) stay in sync on every output.
     const graph = computeGraph(outputs.current);
     graphRef.current = graph;
-    setValueEntries(
-      [...graph.values].map(([key, v]) => ({
-        key,
-        value: outputs.current.get(v.writer)?.values[key],
-      })),
-    );
+    const entries = [...graph.values].map(([key, v]) => ({
+      key,
+      value: outputs.current.get(v.writer)?.values[key],
+    }));
+    setValueEntries(entries);
+    // js → css: publish `$` primitives as CSS custom properties on the output
+    // scope, so css cells can reference exported values via `var(--key)`.
+    cssRegistry.setVars(cssVarsFromEntries(entries));
     graphSubs.current.forEach((cb) => cb());
   };
 
