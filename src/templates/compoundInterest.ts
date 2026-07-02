@@ -1,5 +1,5 @@
 import type { NotebookTemplate } from "./types";
-import { codeCell, doc, inputCell, md, para } from "./build";
+import { codeCell, doc, inputCell, md, p, para, valueRef } from "./build";
 
 // Number inputs feeding a closed-form calculation — exercises the `number` kind.
 export const compoundInterest: NotebookTemplate = {
@@ -11,15 +11,11 @@ export const compoundInterest: NotebookTemplate = {
     doc(
       md(
         m,
-        "Set the inputs and the final balance recomputes. The explanation and the calculation are the same artifact.",
+        "Set the inputs and the final balance recomputes — the explanation and the calculation are one artifact. With annual compounding the balance is `principal · (1 + rate)^years`, where `$.rate` is a percentage.",
       ),
       inputCell({ name: "principal", kind: "number", value: 1000 }),
       inputCell({ name: "rate", kind: "number", value: 5 }),
       inputCell({ name: "years", kind: "number", value: 10 }),
-      md(
-        m,
-        "With annual compounding the balance is `principal · (1 + rate)^years`, where `$.rate` is a percentage.",
-      ),
       codeCell(
         "typescript",
         [
@@ -31,6 +27,15 @@ export const compoundInterest: NotebookTemplate = {
           "  interest: Math.round(balance - $.principal),",
           "};",
         ].join("\n"),
+      ),
+      p(
+        "After ",
+        valueRef("$.years"),
+        " years the balance is ",
+        valueRef("$.result.balance"),
+        " — of which ",
+        valueRef("$.result.interest"),
+        " is interest.",
       ),
       md(
         m,

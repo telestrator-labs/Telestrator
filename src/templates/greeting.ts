@@ -1,5 +1,5 @@
 import type { NotebookTemplate } from "./types";
-import { codeCell, doc, inputCell, md, para } from "./build";
+import { codeCell, doc, inputCell, md, p, para, valueRef } from "./build";
 
 // Text + select + toggle feeding one string — exercises the non-numeric kinds.
 export const greeting: NotebookTemplate = {
@@ -11,7 +11,7 @@ export const greeting: NotebookTemplate = {
     doc(
       md(
         m,
-        "Three kinds of knob — a text field, a dropdown, and a switch — feed one reactive cell.",
+        "Three kinds of knob — a text field, a dropdown, and a switch — feed one reactive cell. `$.tone` picks the phrasing, `$.who` fills the blank, and `$.shout` decides the volume.",
       ),
       inputCell({ name: "who", kind: "text", value: "world" }),
       inputCell({
@@ -21,10 +21,6 @@ export const greeting: NotebookTemplate = {
         config: { options: ["casual", "formal", "excited"] },
       }),
       inputCell({ name: "shout", kind: "toggle", value: false }),
-      md(
-        m,
-        "`$.tone` picks the phrasing, `$.who` fills the blank, and `$.shout` decides the volume.",
-      ),
       codeCell(
         "typescript",
         [
@@ -36,6 +32,11 @@ export const greeting: NotebookTemplate = {
           "if ($.shout) s = s.toUpperCase();",
           "$.result = s;",
         ].join("\n"),
+      ),
+      p("It reads: ", valueRef("$.result")),
+      md(
+        m,
+        "Flip any knob and the sentence reassembles — same wiring an interactive doc would use to react to a reader.",
       ),
       para(),
     ),

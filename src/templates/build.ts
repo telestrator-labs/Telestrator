@@ -8,6 +8,7 @@ import {
 } from "@/editor/cells/input/inputCellNode";
 import { KNOWLEDGE_CHECK_NODE } from "@/editor/cells/check/knowledgeCheckNode";
 import { CHART_NODE } from "@/editor/cells/chart/chartNode";
+import { VALUE_REF_NODE } from "@/editor/cells/valueRef/valueRefNode";
 import type {
   AnswerKind,
   KnowledgeCheckConfig,
@@ -107,6 +108,25 @@ export function chart(opts: {
 
 export function para(): JSONContent {
   return { type: "paragraph" };
+}
+
+// An inline `$`-value chip — shows a live value mid-sentence. `expr` is a
+// `$`-expression: a path (`$.result.lossPct`) or, with a stable id + compute
+// mode, a computed one. Use inside `p(...)` alongside text.
+export function valueRef(expr: string): JSONContent {
+  return { type: VALUE_REF_NODE, attrs: { expr } };
+}
+
+// A paragraph of mixed inline content — plain strings become text nodes, other
+// nodes (e.g. valueRef chips) pass through. Lets prose weave live values into a
+// sentence, which `md()` (whole-paragraph markdown) can't express.
+export function p(...inline: Array<string | JSONContent>): JSONContent {
+  return {
+    type: "paragraph",
+    content: inline.map((x) =>
+      typeof x === "string" ? { type: "text", text: x } : x,
+    ),
+  };
 }
 
 // Compose a doc from a mix of single nodes and block runs (md). One level of
