@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   chipCellCode,
   chipOutputKey,
+  containsValueRef,
   flattenValuePaths,
   isPlainPath,
   isReservedKey,
@@ -33,6 +34,29 @@ describe("plain-path classification", () => {
     ]);
     expect(pathSegments("$.rate")).toEqual(["rate"]);
     expect(pathSegments("$.a + 1")).toBeNull();
+  });
+});
+
+describe("containsValueRef", () => {
+  it("false for a bare $ with no path", () => {
+    expect(containsValueRef("$")).toBe(false);
+  });
+
+  it("false for a $ that isn't followed by a dotted path", () => {
+    expect(containsValueRef("$PATH")).toBe(false);
+    expect(containsValueRef("cost - $5")).toBe(false);
+  });
+
+  it("true for a single reference", () => {
+    expect(containsValueRef("$.rate")).toBe(true);
+  });
+
+  it("true when a reference appears among other text", () => {
+    expect(containsValueRef("$.rate * $.qty")).toBe(true);
+  });
+
+  it("false for plain text with no $ at all", () => {
+    expect(containsValueRef("just some text")).toBe(false);
   });
 });
 

@@ -7,10 +7,28 @@
 // A plain path off `$`: `$.a`, `$.styles.vars.gap`. Only dotted identifier access
 // (no operators, calls, brackets), so it can be walked over the value snapshot
 // with no `eval`. Anything richer is a "computed" expression.
-const PLAIN_PATH = /^\$(?:\.[A-Za-z_$][\w$]*)+$/;
+//
+// This is the single source of truth for "what does a `$`-path reference look
+// like" — PLAIN_PATH (anchored, whole-string), containsValueRef (unanchored,
+// existence check), and tokenizeExpr's scanning regex (unanchored + global) are
+// all built from this fragment so the grammar can't silently diverge between them.
+const VALUE_REF_SOURCE = "\\$(?:\\.[A-Za-z_$][\\w$]*)+";
+
+const PLAIN_PATH = new RegExp(`^${VALUE_REF_SOURCE}$`);
 
 export function isPlainPath(expr: string): boolean {
   return PLAIN_PATH.test(expr.trim());
+}
+
+// Whether text contains at least one `$.<path>` reference anywhere within it (not
+// necessarily the whole string) — e.g. true for "$.rate" and "$.rate * $.qty",
+// false for a bare "$" or a non-path "$PATH"/"$5". Used to detect reactive
+// references inside arbitrary surrounding text (see codeSignal.ts) without
+// matching on a bare literal "$" character.
+const VALUE_REF_SCAN = new RegExp(VALUE_REF_SOURCE);
+
+export function containsValueRef(text: string): boolean {
+  return VALUE_REF_SCAN.test(text);
 }
 
 // The segments of a plain path *after* `$` — `$.styles.vars.gap` → `["styles",
@@ -103,7 +121,7 @@ export interface ExprToken {
 // computed chip can render each reference as its own hoverable span. The head key
 // (for tracing) is the first path segment: `$.styles.vars.gap` → head `styles`.
 export function tokenizeExpr(expr: string): ExprToken[] {
-  const re = /\$\.[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*/g;
+  const re = new RegExp(VALUE_REF_SOURCE, "g");
   const tokens: ExprToken[] = [];
   let last = 0;
   for (const m of expr.matchAll(re)) {

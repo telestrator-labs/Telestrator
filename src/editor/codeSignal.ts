@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { containsValueRef } from "@/editor/cells/valueRef/valueRef";
 
 // Gold is the "signal" scheme — reserved for reactive `$` values (the live
 // `.value-ref` chips). Plain inline `code` is neutral (see typography.plugin.ts),
@@ -23,7 +24,7 @@ export const CodeSignal = Extension.create({
             state.doc.descendants((node, pos) => {
               if (
                 node.isText &&
-                node.text?.includes("$") &&
+                containsValueRef(node.text ?? "") &&
                 codeMark.isInSet(node.marks)
               ) {
                 decos.push(
