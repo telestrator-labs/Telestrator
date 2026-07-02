@@ -56,7 +56,49 @@ export function parseApi(code: string): {
   return { classes, vars };
 }
 
+// The js → css direction: pick the `$` values that can be CSS custom properties
+// — top-level primitives (number/string/boolean) under an identifier-shaped key.
+// Objects/arrays/functions/null aren't CSS values and are dropped.
+export function cssVarsFromEntries(
+  entries: Array<{ key: string; value: unknown }>,
+): Record<string, string | number | boolean> {
+  const out: Record<string, string | number | boolean> = {};
+  for (const { key, value } of entries) {
+    if (!/^[A-Za-z_][\w-]*$/.test(key)) continue;
+    if (
+      typeof value === "string" ||
+      typeof value === "boolean" ||
+      (typeof value === "number" && Number.isFinite(value))
+    ) {
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
+// The single <style> that publishes `$` values as custom properties.
+let varsEl: HTMLStyleElement | null = null;
+
 export const cssRegistry = {
+  // Publish `$` values as CSS custom properties on the output scope, so a css
+  // cell (or mounted view) can reference an exported value via `var(--key)` — the
+  // js → css direction, mirroring parseApi's css → js. CSS `var()` re-resolves
+  // reactively, so this alone makes css cells respond to `$` with no re-run.
+  // textContent (not innerHTML) is injection-safe; we only strip chars that could
+  // break out of the declaration.
+  setVars(vars: Record<string, string | number | boolean>): void {
+    if (typeof document === "undefined") return;
+    if (!varsEl) {
+      varsEl = document.createElement("style");
+      varsEl.setAttribute("data-telestrator-vars", "");
+      document.head.appendChild(varsEl);
+    }
+    const decls = Object.entries(vars)
+      .map(([k, v]) => `--${k}: ${String(v).replace(/[;{}]/g, "").trim()};`)
+      .join(" ");
+    varsEl.textContent = decls ? `${SCOPE} { ${decls} }` : "";
+  },
+
   // Inject or update a css cell's stylesheet, scoped to output regions.
   set(id: string, code: string): void {
     if (typeof document === "undefined") return;
