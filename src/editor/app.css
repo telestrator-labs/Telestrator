@@ -319,6 +319,67 @@
   background: var(--color-accent-a3);
   color: var(--color-accent-11);
 }
+
+/* IntelliSense autocomplete popup — themed like the type/error popovers.
+ * Selectors carry the `.cm-tooltip` prefix to outrank CodeMirror's base theme. */
+.cm-tooltip.cm-tooltip-autocomplete {
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 10px 34px rgb(0 0 0 / 0.18);
+}
+.cm-tooltip.cm-tooltip-autocomplete > ul {
+  max-height: 16em;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.cm-tooltip.cm-tooltip-autocomplete > ul > li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  line-height: 1.6;
+  color: var(--olive-12);
+}
+.cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected] {
+  background: var(--color-accent-a5);
+  color: var(--color-text);
+}
+.cm-tooltip.cm-tooltip-autocomplete .cm-completionLabel {
+  flex: 1;
+}
+.cm-tooltip.cm-tooltip-autocomplete .cm-completionMatchedText {
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--color-accent-11);
+}
+.cm-tooltip.cm-tooltip-autocomplete .cm-completionDetail {
+  margin-left: auto;
+  padding-left: 10px;
+  font-style: normal;
+  color: var(--color-text-faint);
+}
+.cm-tooltip.cm-tooltip-autocomplete .cm-completionIcon {
+  width: 1.1em;
+  padding-right: 0;
+  opacity: 0.7;
+  color: var(--color-text-faint);
+}
+/* The docs panel that opens beside a highlighted completion. */
+.cm-tooltip.cm-completionInfo {
+  max-width: 400px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 10px 34px rgb(0 0 0 / 0.18);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--olive-12);
+}
 /* Syntax palette for the signature — mirrors the editor's highlight tokens
  * (raw Radix scales, like CodeEditor's darkHighlightStyle). */
 .ts-hover .quick-info-keyword {
