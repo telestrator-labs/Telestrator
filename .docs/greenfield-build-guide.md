@@ -540,7 +540,8 @@ flowchart LR
 | `shared-test` | **Keep as needed** for integration tests. |
 
 For *what each of those packages does today* (the "here's what that used to be" reference), read the
-matching onboarding guide in this directory; the [README](./README.md) lists them all.
+matching onboarding guide in [`archive/typecell/`](./archive/typecell/); its
+[README](./archive/typecell/README.md) lists them all.
 
 ---
 
