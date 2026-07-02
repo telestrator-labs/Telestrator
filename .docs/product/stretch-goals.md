@@ -12,6 +12,24 @@
 - **Provenance visualization, full.** The design-language signature taken all the way: hover/trace the
   reactive graph as gold-marker strokes + lime connectors; a "dependency lens" — the play-by-play of
   the data flow. *Maya/Riley · soul of the product · depends on: reactive runtime (M3 ✅) + the styling pass.*
+  Scoped into three concrete directions via design prototypes in `.docs/features-roadmap/`
+  (`Studio Mode.dc.html`, `StudioView.dc.html`, `Trace Concepts.dc.html`), evaluated 2026-07-01:
+  - **Studio mode + Trace Inspector (recommended first bet).** A toggleable author dock (dependency
+    graph + live `$` state table + inputs board) paired with click-to-inspect on any value
+    ("made of / why it recomputed / what it drives") — directly implements the "reactivity is
+    legible" design mandate. Highest-confidence, lowest-lift pairing: the `document`/`studio` layout
+    toggle already exists in code (unwired), and both draw on dependency-graph data the runtime
+    already computes live. Needs new: click-to-select state (Trace is hover-only today) and a causal
+    "why it changed" diff (currently only current state is recorded, not history).
+  - **Guided annotation walkthroughs (phase 2).** Author circles/captions a sequence of values, saved
+    with the doc; reader steps Next/Prev. Clean architectural fit — additive Yjs structure alongside
+    existing per-notebook doc persistence, no runtime change — and serves Riley directly, not just Maya.
+  - **Step-by-step replay/scrubber — needs intent validation before scoping further.** Weakest grounding
+    in current product language: today's "replay" means the reader manipulating live inputs, not
+    scrubbing a recorded history. Also the only direction requiring new runtime-level history
+    instrumentation (the engine currently overwrites per-cell state each run rather than logging it)
+    plus a bounded-memory story. Don't commit engineering time until there's a clearer answer to what
+    problem it solves that the Inspector doesn't.
 - **Chart block.** A first-class viz cell wrapping an npm chart lib, reading `$` and re-rendering
   reactively — so "input → chart" needs no boilerplate. *Maya · the most common explorable shape ·
   depends on: input cells + a sanctioned viz lib.*
