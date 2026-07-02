@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>
+:root{--olive1:#fcfdfc;--olive3:#eff1ef;--olive4:#e7e9e7;--olive5:#dfe2df;--olive7:#cccfcc;--olive9:#898e87;--olive11:#60655f;--olive12:#1d211c;--lime9:#bdee63;--violet3:#f4f0fe;--violet6:#d4cafe;--violet11:#6550b9;--shadow:0 1px 2px rgba(29,33,28,.05),0 4px 16px rgba(29,33,28,.04)}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--olive3);color:var(--olive12);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.turn{padding:46px 46px 100px}
+.turnhd{max-width:820px;margin:0 0 30px}
+.kick{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--olive9);display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.kmark{width:22px;height:22px;border-radius:6px;background:var(--olive12);color:var(--lime9);display:flex;align-items:center;justify-content:center}
+.kmark svg{width:13px;height:13px}
+.h1{font-size:30px;font-weight:600;letter-spacing:-.022em;line-height:1.12;margin:0 0 10px}
+.lede{font-size:15px;line-height:1.6;color:var(--olive11);max-width:74ch;text-wrap:pretty}
+.lede b{color:var(--olive12);font-weight:600}
+.optrow{display:flex;gap:44px;align-items:flex-start;flex-wrap:wrap}
+.opt{width:1380px;flex:none}
+.opthd{display:flex;align-items:baseline;gap:12px;margin:0 0 15px 2px}
+.idbadge{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--violet11);background:var(--violet3);border:1px solid var(--violet6);padding:3px 9px;border-radius:7px;letter-spacing:.02em}
+.optname{font-size:18px;font-weight:600;letter-spacing:-.015em}
+.optdesc{font-size:13px;color:var(--olive9)}
+.screen{height:840px;background:var(--olive1);border:1px solid var(--olive4);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(29,33,28,.1)}
+</style></helmet><section class="turn"><div class="turnhd"><div class="kick"><span class="kmark"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,36H40A20,20,0,0,0,20,56V200a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V56A20,20,0,0,0,216,36ZM44,60H76V196H44ZM212,196H100V60H212Z"></path></svg></span><span>Telestrator · Studio mode</span></div><h1 class="h1">Studio — the author's view of a reactive notebook</h1><p class="lede">The <b>Studio</b> layout keeps the document in the center and opens a rich inspector to its right — a first-class <b>reactive dependency map</b>, the live <b>$ state store</b>, and a <b>control board</b> of every slider. Drag any knob and watch the graph fire, the values recompute, and the chart redraw. Both examples are switchable in the left rail — the runtime-heavy <b>Rate Limiting Playground</b> and the teaching-oriented <b>Bits &amp; Bytes Tutorial</b>. Two dock treatments below.</p></div><div class="optrow"><div class="opt" id="1a"><div class="opthd"><span class="idbadge">1A</span><span class="optname">Console dock</span><span class="optdesc">Tabbed inspector — Graph · State · Inputs, one at a time with room to breathe</span></div><div class="screen"><dc-import name="StudioView" variant="console" start-nb="ratelimit" hint-size="100%,100%"></dc-import></div></div><div class="opt" id="1b"><div class="opthd"><span class="idbadge">1B</span><span class="optname">Instrument cockpit</span><span class="optdesc">Everything stacked &amp; collapsible — the whole runtime at a glance</span></div><div class="screen"><dc-import name="StudioView" variant="stack" start-nb="tutorial" hint-size="100%,100%"></dc-import></div></div></div></section>
+</x-dc>
+</body>
+</html>

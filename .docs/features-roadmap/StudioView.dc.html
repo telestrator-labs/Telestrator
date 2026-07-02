@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>
+:root{--olive1:#fcfdfc;--olive2:#f8faf8;--olive3:#eff1ef;--olive4:#e7e9e7;--olive5:#dfe2df;--olive6:#d7dbd7;--olive7:#cccfcc;--olive8:#b9bcb8;--olive9:#898e87;--olive10:#7f847d;--olive11:#60655f;--olive12:#1d211c;--lime3:#eef6d6;--lime5:#d3e7a6;--lime7:#abc978;--lime9:#bdee63;--lime10:#b0e64c;--lime11:#59722b;--violet3:#f4f0fe;--violet5:#e1d9ff;--violet6:#d4cafe;--violet7:#c2b5f5;--violet9:#6e56cf;--violet10:#654dc4;--violet11:#6550b9;--gold3:#f5f2e9;--gold4:#eeeadd;--gold6:#dad1bd;--gold9:#978365;--gold11:#71624b;--goldmark:rgba(173,135,40,.22);--goldline:#b08b2e;--shadow:0 1px 2px rgba(29,33,28,.05),0 4px 16px rgba(29,33,28,.04)}
+*{box-sizing:border-box}html,body{margin:0}
+.serif{font-family:'IBM Plex Serif',Georgia,serif}.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.app{height:100%;min-height:100%;display:flex;background:var(--olive2);color:var(--olive12);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+.rail{width:210px;flex:none;background:var(--olive1);border-right:1px solid var(--olive4);display:flex;flex-direction:column;height:100%}
+.railpad{padding:16px 14px}
+.brand{display:flex;align-items:center;gap:9px}
+.bmark{width:24px;height:24px;border-radius:6px;background:var(--olive12);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex:none}
+.bmark::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:var(--lime9);box-shadow:0 0 0 3px rgba(189,238,99,.25)}
+.bname{font-weight:600;font-size:14px;letter-spacing:-.01em}.bdot{font-size:9px;color:var(--olive9);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
+.search{margin-top:14px;display:flex;align-items:center;gap:8px;background:var(--olive3);border:1px solid var(--olive4);border-radius:8px;padding:6px 9px;font-size:12.5px;color:var(--olive9)}
+.glyph{width:14px;height:14px;display:inline-block;flex:none}
+.railsec{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--olive9);padding:0 14px;margin:12px 0 5px}
+.railscroll{flex:1;overflow:auto;padding-bottom:8px}
+.railitem{display:flex;align-items:center;gap:9px;padding:6px 14px;margin:1px 7px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--olive11);line-height:1.3}
+.railitem:hover{background:var(--olive3)}
+.railitem.active{background:var(--violet3);color:var(--violet11);font-weight:500}
+.rdot{width:6.5px;height:6.5px;border-radius:50%;flex:none}
+.rdot.live{background:var(--lime9);box-shadow:0 0 0 2.5px var(--lime3)}.rdot.idle{background:var(--olive6)}
+.railfoot{border-top:1px solid var(--olive4);padding:11px 14px;display:flex;align-items:center;gap:9px}
+.avatar{width:27px;height:27px;border-radius:50%;background:var(--violet5);color:var(--violet11);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:none}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100%}
+.topbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 20px;background:rgba(248,250,248,.9);border-bottom:1px solid var(--olive4)}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--olive9);min-width:0}
+.crumbcur{color:var(--olive12);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reactive{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--lime11);background:var(--lime3);border:1px solid var(--lime5);padding:2px 4px 2px 8px;border-radius:999px}
+.reactive i{width:6px;height:6px;border-radius:50%;background:var(--lime9)}
+.restart{width:17px;height:17px;border-radius:50%;border:none;background:none;color:var(--lime11);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.restart:hover{background:rgba(120,150,40,.14)}
+.toolset{display:flex;align-items:center;gap:7px;flex:none}
+.seg{display:flex;background:var(--olive3);border:1px solid var(--olive4);border-radius:8px;padding:2px}
+.segbtn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500;color:var(--olive11);cursor:pointer;border:none;background:none;font-family:inherit}
+.segbtn.on{background:var(--olive1);color:var(--olive12);box-shadow:var(--shadow)}
+.segbtn svg{width:13px;height:13px}
+.tbtn{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--olive5);background:var(--olive1);color:var(--olive11);font-family:inherit}
+.tbtn:hover{border-color:var(--olive7)}
+.tbtn.on{background:var(--gold3);border-color:var(--gold6);color:var(--gold11)}
+.tbtn svg{width:14px;height:14px}
+.tbtn.share{background:var(--olive12);border-color:var(--olive12);color:var(--olive1)}
+.stage{flex:1;min-height:0;display:flex}
+.essaywrap{flex:1;min-width:0;overflow:auto;padding:26px 34px 90px;display:flex;justify-content:center}
+.essay{width:100%;max-width:640px}
+.eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--olive9);display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.eyebrow .dia{color:var(--gold11)}
+.doctitle{font-size:31px;font-weight:600;letter-spacing:-.025em;line-height:1.1;margin:0 0 8px}
+.byline{display:flex;align-items:center;gap:9px;color:var(--olive11);font-size:12.5px;margin-bottom:18px}
+.byav{width:22px;height:22px;border-radius:50%;background:var(--violet5);color:var(--violet11);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;flex:none}
+.prose{font-family:'IBM Plex Serif',Georgia,serif;font-size:15.5px;line-height:1.62;color:var(--olive12);margin:0 0 13px;text-wrap:pretty}
+.prose.lead{font-size:16.5px;color:var(--olive11);margin-bottom:15px}
+.var{font-family:'IBM Plex Mono',monospace;font-size:.85em;color:var(--gold11);background:var(--gold3);border-radius:4px;padding:.5px 5px;white-space:nowrap;box-shadow:inset 0 -2px 0 rgba(176,139,46,.28);transition:background .15s}
+.cell{background:var(--olive1);border:1px solid var(--olive6);border-radius:10px;margin:15px 0;box-shadow:var(--shadow);overflow:hidden}
+.cell.active{border-color:var(--lime7);box-shadow:0 0 0 1px var(--lime7),0 6px 22px rgba(120,150,40,.1)}
+.cellhead{display:flex;align-items:center;gap:9px;padding:7px 11px;border-bottom:1px solid var(--olive4)}
+.langchip{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;color:var(--olive11);background:var(--olive3);border:1px solid var(--olive5);padding:2px 7px;border-radius:6px}
+.cellnote{font-size:10.5px;color:var(--olive9);font-family:'IBM Plex Mono',monospace}
+.livedot{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:.05em;color:var(--lime11);margin-left:auto}
+.livedot i{width:7px;height:7px;border-radius:50%;background:var(--lime9);box-shadow:0 0 0 3px var(--lime3);animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 2px var(--lime3)}50%{box-shadow:0 0 0 5px rgba(189,238,99,.18)}}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.55;padding:11px 13px;white-space:pre;overflow-x:auto;color:var(--olive12);tab-size:2}
+.cmt{color:var(--olive9)}.kw{color:var(--violet11)}.fn{color:var(--violet9)}.str{color:var(--lime11)}.dol{color:var(--gold11);font-weight:600}
+.outwell{background:var(--olive2);border-top:1px solid var(--olive4);padding:9px 13px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive11);display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.okmark{color:var(--lime11);font-weight:700}
+.outval{background:var(--gold3);color:var(--gold11);border-radius:4px;padding:1px 6px;font-weight:600;box-shadow:inset 0 -2px 0 rgba(176,139,46,.3)}
+.inputcell .cellhead{background:var(--violet3);border-bottom-color:var(--violet6)}
+.inputcell .langchip{background:var(--violet5);border-color:var(--violet6);color:var(--violet11)}
+.icbody{padding:4px 13px 8px}
+.ictrl{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--olive3)}
+.ictrl:last-child{border-bottom:none}
+.icmeta{width:132px;flex:none;display:flex;flex-direction:column;gap:2px;min-width:0}
+.iclabel{font-size:12.5px;font-weight:600;color:var(--olive12)}
+.icdrive{font-size:10px;color:var(--olive9);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icrange{flex:1;min-width:60px;accent-color:var(--violet9);height:4px;cursor:pointer}
+.icval{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:var(--violet11);min-width:26px;text-align:right}
+.icunit{font-size:10.5px;color:var(--olive9);font-family:'IBM Plex Mono',monospace;width:52px;flex:none}
+.ictrl.ichot .iclabel{color:var(--violet11)}
+.chartwrap{padding:12px 13px 10px}
+.chart{height:104px;display:flex;align-items:flex-end;gap:3px}
+.barcol{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;gap:1px}
+.bara{background:var(--lime9);border-radius:2px 2px 0 0}
+.bard{background:var(--goldline);border-radius:2px 2px 0 0;opacity:.85}
+.tubar{background:var(--lime9);border-radius:2px 2px 0 0;flex:1;min-width:0}
+.tubar.on{background:var(--lime10);box-shadow:0 0 0 1px var(--lime7)}
+.chartfoot{display:flex;align-items:center;justify-content:space-between;margin-top:9px;font-size:10.5px;color:var(--olive9);font-family:'IBM Plex Mono',monospace}
+.legend{display:flex;gap:12px}.legitem{display:flex;align-items:center;gap:5px}.legsw{width:9px;height:9px;border-radius:2px}
+.statrow{display:flex;gap:9px;margin-top:11px}
+.stat{flex:1;background:var(--olive2);border:1px solid var(--olive4);border-radius:9px;padding:9px 11px}
+.stat.ok{background:var(--lime3);border-color:var(--lime5)}
+.sv{font-size:19px;font-weight:600;letter-spacing:-.02em;font-family:'IBM Plex Mono',monospace}
+.stat.ok .sv{color:var(--lime11)}.stat.loss .sv{color:var(--gold11)}
+.sl{font-size:10.5px;color:var(--olive9);margin-top:2px}
+.checkcard{border:1px solid var(--gold6);background:var(--gold3);border-radius:11px;padding:14px 15px;margin:15px 0}
+.chkq{font-size:14px;font-weight:600;color:var(--olive12);margin-bottom:11px;line-height:1.4}
+.chkopts{display:flex;flex-direction:column;gap:7px}
+.chkopt{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--olive1);border:1px solid var(--olive5);border-radius:8px;cursor:pointer;font-size:13px;color:var(--olive11)}
+.chkopt:hover{border-color:var(--gold6)}
+.chkopt.pick{border-color:var(--violet7);background:var(--violet3);color:var(--violet11)}
+.chkopt.right{border-color:var(--lime7);background:var(--lime3);color:var(--lime11);font-weight:500}
+.chkdot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--olive7);flex:none;display:flex;align-items:center;justify-content:center;color:#fff}
+.chkopt.pick .chkdot{border-color:var(--violet9);background:var(--violet9)}
+.chkopt.right .chkdot{border-color:var(--lime11);background:var(--lime11)}
+.chkbtn{margin-top:11px;font-family:inherit;font-size:12.5px;font-weight:500;padding:7px 15px;border-radius:8px;border:1px solid var(--gold6);background:var(--olive1);color:var(--gold11);cursor:pointer}
+.chkbtn:hover{background:#fff}
+/* ---- DOCK ---- */
+.dock{width:384px;flex:none;border-left:1px solid var(--olive4);background:var(--olive1);display:flex;flex-direction:column;height:100%}
+.dockhead{flex:none;display:flex;align-items:flex-start;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--olive4)}
+.dockmark{width:26px;height:26px;border-radius:7px;background:var(--olive12);color:var(--lime9);display:flex;align-items:center;justify-content:center;flex:none}
+.dtitle{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.dsub{font-size:11px;color:var(--olive9);margin-top:1px;line-height:1.35}
+.dockx{margin-left:auto;width:26px;height:26px;border-radius:7px;border:1px solid var(--olive5);background:var(--olive1);color:var(--olive10);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;font-size:13px}
+.dockx:hover{background:var(--olive3)}
+/* runtime strip */
+.rtstrip{flex:none;display:flex;align-items:stretch;gap:1px;background:var(--olive4);border-bottom:1px solid var(--olive4)}
+.rtcell{flex:1;background:var(--olive1);padding:9px 12px}
+.rtk{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--olive9)}
+.rtv{font-size:14px;font-weight:600;letter-spacing:-.01em;margin-top:3px;font-family:'IBM Plex Mono',monospace;display:flex;align-items:center;gap:6px}
+.rtv .rtlive{width:7px;height:7px;border-radius:50%;background:var(--lime9);box-shadow:0 0 0 3px var(--lime3)}
+/* tabs (console) */
+.docktabs{flex:none;display:flex;gap:2px;padding:9px 12px 0;border-bottom:1px solid var(--olive4)}
+.dtab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 6px;border-radius:8px 8px 0 0;font-size:12px;font-weight:500;color:var(--olive10);cursor:pointer;border:1px solid transparent;border-bottom:none;position:relative;top:1px}
+.dtab svg{width:14px;height:14px}
+.dtab.on{color:var(--olive12);background:var(--olive1);border-color:var(--olive4);font-weight:600}
+.dtab:not(.on):hover{color:var(--olive12)}
+.tabbody{flex:1;min-height:0;overflow:auto;padding:15px 16px 24px}
+/* stack sections */
+.stackbody{flex:1;min-height:0;overflow:auto}
+.sect{border-bottom:1px solid var(--olive4)}
+.secthead{display:flex;align-items:center;gap:9px;padding:11px 16px;cursor:pointer;user-select:none}
+.secthead:hover{background:var(--olive2)}
+.sectchev{width:13px;height:13px;color:var(--olive9);transition:transform .15s}
+.sect.col .sectchev{transform:rotate(-90deg)}
+.secttitle{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--olive11)}
+.sectcount{margin-left:auto;font-size:10.5px;color:var(--olive9);font-family:'IBM Plex Mono',monospace}
+.sectbody{padding:2px 16px 16px}
+.sect.col .sectbody{display:none}
+/* graph */
+.graphhead{font-size:11px;color:var(--olive9);line-height:1.4;margin-bottom:9px}
+.graphframe{border:1px solid var(--olive4);border-radius:11px;background:linear-gradient(180deg,var(--olive2),var(--olive1));padding:6px;position:relative}
+.graph{width:100%;display:block}
+.grect{transition:opacity .18s}
+.g-input{fill:var(--violet3);stroke:var(--violet7);stroke-width:1.3}
+.g-code{fill:var(--olive1);stroke:var(--olive7);stroke-width:1.3}
+.g-value{fill:var(--gold3);stroke:var(--goldline);stroke-width:1.3}
+.g-output{fill:var(--olive2);stroke:var(--olive6);stroke-width:1.3}
+.grect.gsel{stroke-width:2.2}
+.gdim{opacity:.22}
+.gtext{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;text-anchor:middle}
+.gt-input{fill:var(--violet11)}.gt-code{fill:var(--olive12)}.gt-value{fill:var(--gold11)}.gt-output{fill:var(--olive11)}
+.gline2{font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-anchor:middle}
+.gline2.gv{fill:var(--gold11);font-weight:600}.gline2.gs{fill:var(--olive9)}.gline2.gvi{fill:var(--violet10);font-weight:600}
+.edge{fill:none;stroke:var(--lime10);stroke-linecap:round;transition:opacity .18s,stroke-width .18s}
+.edge-write{stroke-width:2.3}
+.edge-read{stroke-width:1.6;stroke-dasharray:2.5 4}
+.edge.ghot{stroke-width:3.2}
+.earrow{fill:var(--lime10);transition:opacity .18s}
+.epulse{animation:eflash .7s ease}
+@keyframes eflash{0%{stroke:var(--lime9);opacity:.4}45%{stroke:var(--lime10);opacity:1}100%{opacity:1}}
+.glegend{display:flex;flex-wrap:wrap;gap:9px 16px;margin-top:11px;font-size:10.5px;color:var(--olive11)}
+.glrow{display:flex;align-items:center;gap:7px}
+.glline{width:20px;height:0;border-top:2.3px solid var(--lime10);flex:none}
+.glline.rd{border-top-style:dashed;border-top-width:1.6px}
+.glsw{width:11px;height:11px;border-radius:3px;flex:none}
+/* state table */
+.stblock{border:1px solid var(--olive4);border-radius:11px;overflow:hidden}
+.strow{display:block;padding:10px 12px;border-bottom:1px solid var(--olive4);cursor:default;transition:background .15s}
+.strow:last-child{border-bottom:none}
+.strow.sthot{background:var(--gold3)}
+.strow.sti.sthot{background:var(--violet3)}
+.sttop{display:flex;align-items:center;gap:8px}
+.stkey{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--gold11)}
+.strow.sti .stkey{color:var(--violet11)}
+.stkind{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:1.5px 6px;border-radius:5px}
+.stk-input{background:var(--violet3);color:var(--violet11);border:1px solid var(--violet6)}
+.stk-value{background:var(--gold3);color:var(--gold11);border:1px solid var(--gold6)}
+.stval{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--olive12)}
+.stmeta{display:flex;gap:16px;margin-top:7px}
+.stcol{min-width:0}
+.stcl{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--olive9)}
+.stcv{font-size:11px;color:var(--olive11);font-family:'IBM Plex Mono',monospace;margin-top:2px}
+/* inputs board */
+.icboard{display:flex;flex-direction:column;gap:2px}
+.icboard .ictrl{padding:11px 0}
+.dockmini{font-size:11px;color:var(--olive9);line-height:1.4;margin-bottom:10px}
+</style></helmet><div class="app"><aside class="rail"><div class="railpad"><div class="brand"><div class="bmark"></div><div><div class="bname">Telestrator</div><div class="bdot">Reactive notebook</div></div></div><div class="search"><svg class="glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"></circle><path d="M11 11l3 3"></path></svg><span>Search…</span></div></div><div class="railsec">Notebooks</div><div class="railscroll"><sc-for list="{{ nbs }}" as="nb" hint-placeholder-count="5"><div class="{{ nb.railCls }}" onClick="{{ nb.open }}"><span class="{{ nb.dotCls }}"></span><span>{{ nb.title }}</span></div></sc-for></div><div class="railfoot"><div class="avatar">MK</div><div style="font-size:12px;line-height:1.3"><div style="font-weight:600;color:var(--olive12)">Maya Khan</div><div style="color:var(--olive9);font-size:10.5px">Author workspace</div></div></div></aside><main class="main"><div class="topbar"><div class="crumbs"><span>Notebooks</span><span>/</span><span class="crumbcur">{{ docTitle }}</span><span class="reactive"><i></i>Reactive<button class="restart" onClick="{{ restart }}" title="Restart runtime"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8a5 5 0 1 1-1.46-3.54"></path><path d="M13 2.5V5h-2.5"></path></svg></button></span></div><div class="toolset"><div class="seg"><button class="{{ docSegCls }}" onClick="{{ setDoc }}"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M28,64A12,12,0,0,1,40,52H216a12,12,0,0,1,0,24H40A12,12,0,0,1,28,64Zm12,52H168a12,12,0,0,0,0-24H40a12,12,0,0,0,0,24Zm176,16H40a12,12,0,0,0,0,24H216a12,12,0,0,0,0-24Zm-48,40H40a12,12,0,0,0,0,24H168a12,12,0,0,0,0-24Z"></path></svg>Document</button><button class="{{ studioSegCls }}" onClick="{{ setStudio }}"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,36H40A20,20,0,0,0,20,56V200a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V56A20,20,0,0,0,216,36ZM44,60H76V196H44ZM212,196H100V60H212Z"></path></svg>Studio</button></div><button class="{{ traceBtnCls }}" onClick="{{ toggleTrace }}"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M200,164a36.07,36.07,0,0,0-33.94,24H72a28,28,0,0,1,0-56h96a44,44,0,0,0,0-88H72a12,12,0,0,0,0,24h96a20,20,0,0,1,0,40H72a52,52,0,0,0,0,104h94.06A36,36,0,1,0,200,164Zm0,48a12,12,0,1,1,12-12A12,12,0,0,1,200,212Z"></path></svg>Trace</button><div class="seg"><button class="{{ editSegCls }}" onClick="{{ setEdit }}">Edit</button><button class="{{ readSegCls }}" onClick="{{ setRead }}">Read</button></div><button class="tbtn share"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M176,156a43.78,43.78,0,0,0-29.09,11L106.1,140.8a44.07,44.07,0,0,0,0-25.6L146.91,89a43.83,43.83,0,1,0-13-20.17L93.09,95a44,44,0,1,0,0,65.94L133.9,187.2A44,44,0,1,0,176,156Z"></path></svg>Share</button></div></div><div class="stage"><div class="essaywrap"><div class="{{ essayCls }}"><sc-if value="{{ isRateLimit }}" hint-placeholder-val="{{ true }}"><div class="eyebrow"><span>Runtime · playground</span><span class="dia">◆ reactive</span></div><h1 class="doctitle">Rate limiting, by feel</h1><div class="byline"><span class="byav">MK</span><span>Maya Khan · edited 2h ago</span></div><p class="prose lead">A token bucket drains <span class="var">{{ c_rate }}</span> requests each tick and keeps <span class="var">{{ c_cap }}</span> slots in reserve. Push the dials and watch loss move.</p><div class="cell inputcell"><div class="cellhead"><span class="langchip">◆ input</span><span class="cellnote">writes $.rate · $.capacity</span></div><div class="icbody"><sc-for list="{{ inputRows }}" as="ip" hint-placeholder-count="2"><div class="{{ ip.rowCls }}" onMouseEnter="{{ ip.onEnter }}" onMouseLeave="{{ ip.onLeave }}"><div class="icmeta"><span class="iclabel">{{ ip.label }}</span><span class="icdrive">drives {{ ip.drives }}</span></div><input type="range" class="icrange" min="{{ ip.min }}" max="{{ ip.max }}" step="{{ ip.step }}" value="{{ ip.val }}" onChange="{{ ip.onInput }}"><span class="icval">{{ ip.val }}</span><span class="icunit">{{ ip.unit }}</span></div></sc-for></div></div><div class="cell active"><div class="cellhead"><span class="langchip">TS simulate</span><span class="cellnote">reads $.rate · $.capacity</span><span class="livedot"><i></i>LIVE</span></div><div class="code"><span class="kw">let</span> queue = <span class="dol">0</span>;
+<span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> arrivals) {
+  queue += n;                          <span class="cmt">// arrivals</span>
+  <span class="kw">const</span> ok = Math.<span class="fn">min</span>(queue, <span class="dol">$</span>.rate);
+  queue -= ok;
+  dropped += Math.<span class="fn">max</span>(<span class="dol">0</span>, queue - <span class="dol">$</span>.capacity);
+  queue = Math.<span class="fn">min</span>(queue, <span class="dol">$</span>.capacity);
+}
+<span class="dol">$</span>.result = { allowed, dropped };</div><div class="outwell"><span class="okmark">✓</span><span>$.result</span><span class="outval">{{ c_allowed }} allowed</span><span class="outval">{{ c_dropped }} dropped</span><span class="outval">{{ c_loss }} loss</span></div></div><p class="prose">Same model, two dials — the explanation and the thing it explains share one runtime.</p><div class="cell"><div class="cellhead"><span class="langchip">◆ chart</span><span class="cellnote">reads $.result</span><span class="livedot"><i></i>LIVE</span></div><div class="chartwrap"><div class="chart"><sc-for list="{{ rlBars }}" as="b" hint-placeholder-count="24"><div class="barcol"><div class="bard" style="height:{{ b.dh }}px"></div><div class="bara" style="height:{{ b.ah }}px"></div></div></sc-for></div><div class="chartfoot"><div class="legend"><div class="legitem"><span class="legsw" style="background:var(--lime9)"></span>allowed</div><div class="legitem"><span class="legsw" style="background:var(--goldline)"></span>dropped</div></div><span>24 ticks →</span></div><div class="statrow"><div class="stat ok"><div class="sv">{{ c_allowed }}</div><div class="sl">requests served</div></div><div class="stat loss"><div class="sv">{{ c_loss }}</div><div class="sl">dropped under load</div></div><div class="stat"><div class="sv">{{ c_cap }}</div><div class="sl">queue buffer</div></div></div></div></div></sc-if><sc-if value="{{ isTutorial }}" hint-placeholder-val="{{ false }}"><div class="eyebrow"><span>Teaching · tutorial</span><span class="dia">◆ reactive</span></div><h1 class="doctitle">How many things can n bits hold?</h1><div class="byline"><span class="byav">MK</span><span>Maya Khan · edited yesterday</span></div><p class="prose lead">Line up <span class="var">{{ c_bits }}</span> bits and you can represent <span class="var">{{ c_values }}</span> distinct patterns. Drag the slider and watch how fast that grows.</p><div class="cell inputcell"><div class="cellhead"><span class="langchip">◆ input</span><span class="cellnote">writes $.bits</span></div><div class="icbody"><sc-for list="{{ inputRows }}" as="ip" hint-placeholder-count="1"><div class="{{ ip.rowCls }}" onMouseEnter="{{ ip.onEnter }}" onMouseLeave="{{ ip.onLeave }}"><div class="icmeta"><span class="iclabel">{{ ip.label }}</span><span class="icdrive">drives {{ ip.drives }}</span></div><input type="range" class="icrange" min="{{ ip.min }}" max="{{ ip.max }}" step="{{ ip.step }}" value="{{ ip.val }}" onChange="{{ ip.onInput }}"><span class="icval">{{ ip.val }}</span><span class="icunit">{{ ip.unit }}</span></div></sc-for></div></div><div class="cell active"><div class="cellhead"><span class="langchip">TS compute</span><span class="cellnote">reads $.bits</span><span class="livedot"><i></i>LIVE</span></div><div class="code"><span class="dol">$</span>.values = <span class="dol">2</span> ** <span class="dol">$</span>.bits;   <span class="cmt">// patterns
+</span><span class="dol">$</span>.max = <span class="dol">$</span>.values - <span class="dol">1</span>;   <span class="cmt">// largest value</span></div><div class="outwell"><span class="okmark">✓</span><span>$.values</span><span class="outval">{{ c_values }}</span><span style="color:var(--olive9)">·</span><span>$.max</span><span class="outval">{{ c_max }}</span></div></div><p class="prose">Add exactly one more bit and the count of representable values <em>doubles</em> — that is what exponential growth feels like from the inside.</p><div class="cell"><div class="cellhead"><span class="langchip">◆ chart</span><span class="cellnote">reads $.values</span><span class="livedot"><i></i>LIVE</span></div><div class="chartwrap"><div class="chart"><sc-for list="{{ tuBars }}" as="b" hint-placeholder-count="8"><div class="{{ b.cls }}" style="height:{{ b.h }}px"></div></sc-for></div><div class="chartfoot"><span>1 bit</span><span>2ⁿ growth →</span><span>{{ c_bits }} bits</span></div></div></div><div class="checkcard"><div class="chkq">If you add one more bit, the number of representable values…</div><div class="chkopts"><sc-for list="{{ chkOpts }}" as="o" hint-placeholder-count="3"><div class="{{ o.cls }}" onClick="{{ o.pick }}"><span class="chkdot"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5l2.2 2.2 4.8-5"></path></svg></span><span>{{ o.label }}</span></div></sc-for></div><button class="chkbtn" onClick="{{ checkAns }}">Check answer</button></div></sc-if></div></div><sc-if value="{{ showDock }}" hint-placeholder-val="{{ true }}"><aside class="dock"><div class="dockhead"><div class="dockmark"><svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor"><path d="M216,36H40A20,20,0,0,0,20,56V200a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V56A20,20,0,0,0,216,36ZM44,60H76V196H44ZM212,196H100V60H212Z"></path></svg></div><div><div class="dtitle">Studio</div><div class="dsub">{{ dockSub }}</div></div><button class="dockx" onClick="{{ setDoc }}" title="Back to document">×</button></div><div class="rtstrip"><div class="rtcell"><div class="rtk">Runtime</div><div class="rtv"><span class="rtlive"></span>Reactive</div></div><div class="rtcell"><div class="rtk">Cells</div><div class="rtv">{{ rtCells }}</div></div><div class="rtcell"><div class="rtk">Last run</div><div class="rtv">{{ rtLast }} ms</div></div></div><sc-if value="{{ isConsole }}" hint-placeholder-val="{{ true }}"><div class="docktabs"><button class="{{ tabGraphCls }}" onClick="{{ tabGraph }}"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M200,164a36.07,36.07,0,0,0-33.94,24H72a28,28,0,0,1,0-56h96a44,44,0,0,0,0-88H72a12,12,0,0,0,0,24h96a20,20,0,0,1,0,40H72a52,52,0,0,0,0,104h94.06A36,36,0,1,0,200,164Z"></path></svg>Graph</button><button class="{{ tabStateCls }}" onClick="{{ tabState }}"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24C74.17,24,32,48.6,32,80V176c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm72,96c0,13.36-30.4,32-72,32s-72-18.64-72-32V107.51C73.42,120.72,99.09,128,128,128s54.58-7.28,72-20.49Z"></path></svg>State</button><button class="{{ tabInputCls }}" onClick="{{ tabInput }}"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M40,88H73a32,32,0,0,0,62,0h81a8,8,0,0,0,0-16H135a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16Zm176,80H135a32,32,0,0,0-62,0H40a8,8,0,0,0,0,16H73a32,32,0,0,0,62,0h81a8,8,0,0,0,0-16Z"></path></svg>Inputs</button></div><div class="tabbody"><sc-if value="{{ showGraph }}" hint-placeholder-val="{{ true }}"><div class="graphhead">The reactive dependency map — <b>what feeds what</b>. Hover a node to trace its links; move a slider to watch the flow fire.</div><div class="graphframe"><svg class="{{ graphCls }}" viewBox="0 0 360 264" preserveAspectRatio="xMidYMid meet"><sc-for list="{{ graph.edges }}" as="e" hint-placeholder-count="6"><path d="{{ e.d }}" class="{{ e.cls }}"></path><polygon points="{{ e.arrow }}" class="{{ e.acls }}"></polygon></sc-for><sc-for list="{{ graph.nodes }}" as="n" hint-placeholder-count="6"><rect x="{{ n.x }}" y="{{ n.y }}" width="{{ n.w }}" height="{{ n.h }}" rx="9" class="{{ n.rectCls }}" onMouseEnter="{{ n.onEnter }}" onMouseLeave="{{ n.onLeave }}"></rect><text x="{{ n.cx }}" y="{{ n.t1Y }}" class="{{ n.txtCls }}">{{ n.title }}</text><text x="{{ n.cx }}" y="{{ n.t2Y }}" class="{{ n.line2Cls }}">{{ n.line2 }}</text></sc-for></svg></div><div class="glegend"><div class="glrow"><span class="glline"></span>writes</div><div class="glrow"><span class="glline rd"></span>reads</div><div class="glrow"><span class="glsw" style="background:var(--gold3);box-shadow:inset 0 0 0 1.3px var(--goldline)"></span>$ value</div><div class="glrow"><span class="glsw" style="background:var(--violet3);box-shadow:inset 0 0 0 1.3px var(--violet7)"></span>your input</div></div></sc-if><sc-if value="{{ showState }}" hint-placeholder-val="{{ false }}"><div class="dockmini">Every value in the <b>$</b> store, live. Each row shows who writes it and who reads it.</div><div class="stblock"><sc-for list="{{ stateRows }}" as="r" hint-placeholder-count="3"><div class="{{ r.cls }}" onMouseEnter="{{ r.onEnter }}" onMouseLeave="{{ r.onLeave }}"><div class="sttop"><span class="stkey">{{ r.key }}</span><span class="{{ r.kindCls }}">{{ r.kindLabel }}</span><span class="stval">{{ r.val }}</span></div><div class="stmeta"><div class="stcol"><div class="stcl">Written by</div><div class="stcv">{{ r.writer }}</div></div><div class="stcol"><div class="stcl">Read by</div><div class="stcv">{{ r.readers }}</div></div></div></div></sc-for></div></sc-if><sc-if value="{{ showInput }}" hint-placeholder-val="{{ false }}"><div class="dockmini">Every knob in the notebook, in one board. Drag to drive the runtime.</div><div class="icboard"><sc-for list="{{ inputRows }}" as="ip" hint-placeholder-count="2"><div class="{{ ip.rowCls }}" onMouseEnter="{{ ip.onEnter }}" onMouseLeave="{{ ip.onLeave }}"><div class="icmeta"><span class="iclabel">{{ ip.label }}</span><span class="icdrive">→ {{ ip.drives }}</span></div><input type="range" class="icrange" min="{{ ip.min }}" max="{{ ip.max }}" step="{{ ip.step }}" value="{{ ip.val }}" onChange="{{ ip.onInput }}"><span class="icval">{{ ip.val }}</span><span class="icunit">{{ ip.unit }}</span></div></sc-for></div></sc-if></div></sc-if><sc-if value="{{ isStack }}" hint-placeholder-val="{{ false }}"><div class="stackbody"><div class="{{ secGraphCls }}"><div class="secthead" onClick="{{ toggleGraph }}"><svg class="sectchev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"></path></svg><span class="secttitle">Reactive map</span><span class="sectcount">{{ graphCount }}</span></div><div class="sectbody"><div class="graphframe"><svg class="{{ graphCls }}" viewBox="0 0 360 264" preserveAspectRatio="xMidYMid meet"><sc-for list="{{ graph.edges }}" as="e" hint-placeholder-count="6"><path d="{{ e.d }}" class="{{ e.cls }}"></path><polygon points="{{ e.arrow }}" class="{{ e.acls }}"></polygon></sc-for><sc-for list="{{ graph.nodes }}" as="n" hint-placeholder-count="6"><rect x="{{ n.x }}" y="{{ n.y }}" width="{{ n.w }}" height="{{ n.h }}" rx="9" class="{{ n.rectCls }}" onMouseEnter="{{ n.onEnter }}" onMouseLeave="{{ n.onLeave }}"></rect><text x="{{ n.cx }}" y="{{ n.t1Y }}" class="{{ n.txtCls }}">{{ n.title }}</text><text x="{{ n.cx }}" y="{{ n.t2Y }}" class="{{ n.line2Cls }}">{{ n.line2 }}</text></sc-for></svg></div><div class="glegend"><div class="glrow"><span class="glline"></span>writes</div><div class="glrow"><span class="glline rd"></span>reads</div><div class="glrow"><span class="glsw" style="background:var(--gold3);box-shadow:inset 0 0 0 1.3px var(--goldline)"></span>$ value</div><div class="glrow"><span class="glsw" style="background:var(--violet3);box-shadow:inset 0 0 0 1.3px var(--violet7)"></span>input</div></div></div></div><div class="{{ secStateCls }}"><div class="secthead" onClick="{{ toggleState }}"><svg class="sectchev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"></path></svg><span class="secttitle">$ State store</span><span class="sectcount">{{ stateCount }}</span></div><div class="sectbody"><div class="stblock"><sc-for list="{{ stateRows }}" as="r" hint-placeholder-count="3"><div class="{{ r.cls }}" onMouseEnter="{{ r.onEnter }}" onMouseLeave="{{ r.onLeave }}"><div class="sttop"><span class="stkey">{{ r.key }}</span><span class="{{ r.kindCls }}">{{ r.kindLabel }}</span><span class="stval">{{ r.val }}</span></div><div class="stmeta"><div class="stcol"><div class="stcl">Written by</div><div class="stcv">{{ r.writer }}</div></div><div class="stcol"><div class="stcl">Read by</div><div class="stcv">{{ r.readers }}</div></div></div></div></sc-for></div></div></div><div class="{{ secInputCls }}"><div class="secthead" onClick="{{ toggleInput }}"><svg class="sectchev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"></path></svg><span class="secttitle">Live inputs</span><span class="sectcount">{{ inputCount }}</span></div><div class="sectbody"><div class="icboard"><sc-for list="{{ inputRows }}" as="ip" hint-placeholder-count="2"><div class="{{ ip.rowCls }}" onMouseEnter="{{ ip.onEnter }}" onMouseLeave="{{ ip.onLeave }}"><div class="icmeta"><span class="iclabel">{{ ip.label }}</span><span class="icdrive">→ {{ ip.drives }}</span></div><input type="range" class="icrange" min="{{ ip.min }}" max="{{ ip.max }}" step="{{ ip.step }}" value="{{ ip.val }}" onChange="{{ ip.onInput }}"><span class="icval">{{ ip.val }}</span><span class="icunit">{{ ip.unit }}</span></div></sc-for></div></div></div></div></sc-if></aside></sc-if></div></main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1380,&quot;height&quot;:840},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;console&quot;,&quot;options&quot;:[&quot;console&quot;,&quot;stack&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;startNb&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ratelimit&quot;,&quot;options&quot;:[&quot;ratelimit&quot;,&quot;tutorial&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.ARRIVALS = [2,5,9,3,12,7,4,15,6,2,10,8,5,13,4,7,9,3,11,6,4,8,14,5];
+    this.NB = {
+      ratelimit: {
+        id:'ratelimit', name:'Rate Limiting Playground', dot:'live', cells:9,
+        inputs:[
+          {key:'rate', label:'Drain rate', min:1, max:20, step:1, unit:'req / t'},
+          {key:'capacity', label:'Queue buffer', min:1, max:20, step:1, unit:'slots'},
+        ],
+        nodes:[
+          {id:'rate', kind:'input', title:'$.rate', sub:'input', x:14, y:34, w:98, h:46},
+          {id:'capacity', kind:'input', title:'$.capacity', sub:'input', x:14, y:118, w:98, h:46},
+          {id:'simulate', kind:'code', title:'simulate', sub:'code', x:150, y:78, w:86, h:48},
+          {id:'result', kind:'value', title:'$.result', sub:'value', x:266, y:34, w:80, h:46},
+          {id:'chart', kind:'output', title:'chart', sub:'chart', x:266, y:132, w:80, h:44},
+          {id:'prose', kind:'output', title:'prose', sub:'reads', x:150, y:196, w:86, h:44},
+        ],
+        edges:[['rate','simulate','read'],['capacity','simulate','read'],['simulate','result','write'],['result','chart','read'],['result','prose','read'],['rate','prose','read']],
+      },
+      tutorial: {
+        id:'tutorial', name:'Bits & Bytes Tutorial', dot:'idle', cells:12,
+        inputs:[{key:'bits', label:'Number of bits', min:1, max:16, step:1, unit:'bits'}],
+        nodes:[
+          {id:'bits', kind:'input', title:'$.bits', sub:'input', x:14, y:110, w:98, h:46},
+          {id:'compute', kind:'code', title:'compute', sub:'code', x:150, y:104, w:86, h:48},
+          {id:'values', kind:'value', title:'$.values', sub:'value', x:266, y:38, w:80, h:44},
+          {id:'max', kind:'value', title:'$.max', sub:'value', x:266, y:110, w:80, h:44},
+          {id:'chart', kind:'output', title:'chart', sub:'chart', x:266, y:192, w:80, h:44},
+          {id:'prose', kind:'output', title:'prose', sub:'reads', x:150, y:192, w:86, h:44},
+          {id:'check', kind:'output', title:'check', sub:'reads', x:14, y:196, w:98, h:44},
+        ],
+        edges:[['bits','compute','read'],['compute','values','write'],['compute','max','write'],['values','chart','read'],['values','prose','read'],['bits','prose','read'],['bits','check','read']],
+      },
+    };
+    this.state = {
+      variant: props.variant || 'console',
+      nb: props.startNb || 'ratelimit',
+      layout: 'studio',
+      mode: 'edit',
+      inputs: { rate:9, capacity:6, bits:8 },
+      tab: 'graph',
+      hover: null,
+      pulse: false,
+      trace: true,
+      runs: 34,
+      last: '3.8',
+      collapsed: {},
+      pick: null,
+      checked: false,
+    };
+  }
+  cur() { return this.NB[this.state.nb]; }
+  fmt(n) { return n.toLocaleString('en-US'); }
+  sim(rate, cap) {
+    let q = 0, allowed = 0, dropped = 0; const series = [];
+    for (const n of this.ARRIVALS) {
+      q += n;
+      const ok = Math.min(q, rate); q -= ok; allowed += ok;
+      const d = Math.max(0, q - cap); dropped += d; q = Math.min(q, cap);
+      series.push({ ok, d });
+    }
+    const total = allowed + dropped;
+    return { allowed, dropped, loss: total ? Math.round(dropped / total * 100) : 0, series };
+  }
+  store() {
+    const i = this.state.inputs;
+    if (this.state.nb === 'ratelimit') { const r = this.sim(i.rate, i.capacity); return { rate:i.rate, capacity:i.capacity, result:r }; }
+    const v = Math.pow(2, i.bits); return { bits:i.bits, values:v, max:v - 1 };
+  }
+  name(id) { const n = this.cur().nodes.find(x => x.id === id); return n ? n.title : id; }
+  valForNode(n) {
+    const s = this.store();
+    switch (n.id) {
+      case 'rate': return s.rate + ' /t';
+      case 'capacity': return String(s.capacity);
+      case 'result': return s.result.loss + '% loss';
+      case 'bits': return String(s.bits);
+      case 'values': return this.fmt(s.values);
+      case 'max': return this.fmt(s.max);
+      default: return null;
+    }
+  }
+  setInput(key, v) {
+    v = +v;
+    this.setState(s => ({ inputs: { ...s.inputs, [key]: v }, pulse: true, runs: s.runs + 1, last: (2 + Math.random() * 4).toFixed(1) }), () => {
+      clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ pulse: false }), 680);
+    });
+  }
+  restart() {
+    this.setState(s => ({ pulse: true, runs: s.runs + 1, last: (2 + Math.random() * 4).toFixed(1) }), () => {
+      clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ pulse: false }), 680);
+    });
+  }
+  selectNb(id) { if (!this.NB[id]) return; this.setState({ nb: id, hover: null, pulse: false, pick: null, checked: false }); }
+  edgeGeo(sn, tn) {
+    const scx = sn.x + sn.w / 2, scy = sn.y + sn.h / 2, tcx = tn.x + tn.w / 2, tcy = tn.y + tn.h / 2;
+    const K = 30; let sx, sy, tx, ty, d, arrow;
+    if (Math.abs(scx - tcx) < 26) {
+      if (tcy > scy) { sx = scx; sy = sn.y + sn.h; tx = tcx; ty = tn.y; arrow = tx + ',' + ty + ' ' + (tx - 4.5) + ',' + (ty - 8) + ' ' + (tx + 4.5) + ',' + (ty - 8); }
+      else { sx = scx; sy = sn.y; tx = tcx; ty = tn.y + tn.h; arrow = tx + ',' + ty + ' ' + (tx - 4.5) + ',' + (ty + 8) + ' ' + (tx + 4.5) + ',' + (ty + 8); }
+      const my = Math.round((sy + ty) / 2);
+      d = 'M' + sx + ',' + sy + ' C' + sx + ',' + my + ' ' + tx + ',' + my + ' ' + tx + ',' + ty;
+    } else if (tcx > scx) {
+      sx = sn.x + sn.w; sy = scy; tx = tn.x; ty = tcy;
+      d = 'M' + sx + ',' + sy + ' C' + (sx + K) + ',' + sy + ' ' + (tx - K) + ',' + ty + ' ' + tx + ',' + ty;
+      arrow = tx + ',' + ty + ' ' + (tx - 8) + ',' + (ty - 4.5) + ' ' + (tx - 8) + ',' + (ty + 4.5);
+    } else {
+      sx = sn.x; sy = scy; tx = tn.x + tn.w; ty = tcy;
+      d = 'M' + sx + ',' + sy + ' C' + (sx - K) + ',' + sy + ' ' + (tx + K) + ',' + ty + ' ' + tx + ',' + ty;
+      arrow = tx + ',' + ty + ' ' + (tx + 8) + ',' + (ty - 4.5) + ' ' + (tx + 8) + ',' + (ty + 4.5);
+    }
+    return { d, arrow };
+  }
+  buildGraph() {
+    const nb = this.cur(), hover = this.state.hover, pulse = this.state.pulse;
+    const byId = {}; nb.nodes.forEach(n => byId[n.id] = n);
+    const nbrs = new Set();
+    if (hover) { nbrs.add(hover); nb.edges.forEach(e => { if (e[0] === hover) nbrs.add(e[1]); if (e[1] === hover) nbrs.add(e[0]); }); }
+    const nodes = nb.nodes.map(n => {
+      const dim = hover && !nbrs.has(n.id);
+      const val = this.valForNode(n);
+      const line2 = val != null ? val : n.sub;
+      let l2 = 'gline2 ';
+      if (val != null) l2 += (n.kind === 'input' ? 'gvi' : 'gv'); else l2 += 'gs';
+      return {
+        x:n.x, y:n.y, w:n.w, h:n.h, cx:n.x + n.w / 2,
+        t1Y:n.y + 21, t2Y:n.y + 35, title:n.title, line2,
+        rectCls:'grect g-' + n.kind + (dim ? ' gdim' : '') + (n.id === hover ? ' gsel' : ''),
+        txtCls:'gtext gt-' + n.kind + (dim ? ' gdim' : ''),
+        line2Cls:l2 + (dim ? ' gdim' : ''),
+        onEnter:() => this.setState({ hover:n.id }), onLeave:() => this.setState({ hover:null }),
+      };
+    });
+    const edges = nb.edges.map(e => {
+      const g = this.edgeGeo(byId[e[0]], byId[e[1]]);
+      const touch = hover && (e[0] === hover || e[1] === hover);
+      const dim = hover && !touch;
+      const suffix = (dim ? ' gdim' : '') + (touch ? ' ghot' : '') + (pulse ? ' epulse' : '');
+      return { d:g.d, arrow:g.arrow, cls:'edge edge-' + e[2] + suffix, acls:'earrow' + suffix };
+    });
+    return { nodes, edges };
+  }
+  stateRows() {
+    const nb = this.cur();
+    return nb.nodes.filter(n => n.kind === 'input' || n.kind === 'value').map(n => {
+      const readers = nb.edges.filter(e => e[0] === n.id).map(e => this.name(e[1]));
+      const w = nb.edges.find(e => e[1] === n.id && e[2] === 'write');
+      const writer = n.kind === 'input' ? 'you · slider' : (w ? this.name(w[0]) : '—');
+      return {
+        key:n.title, val:this.valForNode(n) || '', writer,
+        readers: readers.length ? readers.join(' · ') : '—',
+        cls:'strow ' + (n.kind === 'input' ? 'sti' : '') + (this.state.hover === n.id ? ' sthot' : ''),
+        kindCls:'stkind stk-' + n.kind, kindLabel:n.kind,
+        onEnter:() => this.setState({ hover:n.id }), onLeave:() => this.setState({ hover:null }),
+      };
+    });
+  }
+  driveHint(key) { return key === 'rate' ? 'simulate' : key === 'capacity' ? 'simulate' : 'compute'; }
+  inputRows() {
+    const nb = this.cur(), i = this.state.inputs;
+    return nb.inputs.map(inp => ({
+      key:inp.key, label:inp.label, unit:inp.unit, min:inp.min, max:inp.max, step:inp.step,
+      val:i[inp.key], drives:this.driveHint(inp.key),
+      rowCls:'ictrl' + (this.state.hover === inp.key ? ' ichot' : ''),
+      onInput:(e) => this.setInput(inp.key, e.target.value),
+      onEnter:() => this.setState({ hover:inp.key }), onLeave:() => this.setState({ hover:null }),
+    }));
+  }
+  seg(on) { return 'segbtn' + (on ? ' on' : ''); }
+  tab(t) { return 'dtab' + (this.state.tab === t ? ' on' : ''); }
+  secCls(id) { return 'sect' + (this.state.collapsed[id] ? ' col' : ''); }
+  toggleSec(id) { this.setState(s => ({ collapsed: { ...s.collapsed, [id]: !s.collapsed[id] } })); }
+  renderVals() {
+    const s = this.state, st = this.store(), isRL = s.nb === 'ratelimit';
+    const nbs = [
+      { id:'ratelimit' }, { id:'tutorial' },
+      { id:'x1', name:'CSV → Chart Pipeline', dot:'live' },
+      { id:'x2', name:'Signals vs MobX Spike', dot:'idle' },
+      { id:'x3', name:'Yjs Sync Prototype', dot:'idle' },
+    ].map(it => {
+      const real = this.NB[it.id];
+      return {
+        title: real ? real.name : it.name,
+        dotCls: 'rdot ' + (real ? real.dot : it.dot),
+        railCls: 'railitem' + (it.id === s.nb ? ' active' : ''),
+        open: real ? () => this.selectNb(it.id) : () => {},
+      };
+    });
+    const rlBars = (() => {
+      if (!isRL) return [];
+      const mx = Math.max(1, ...st.result.series.map(t => t.ok + t.d)); const H = 96;
+      return st.result.series.map(t => ({ ah: Math.round(t.ok / mx * H), dh: Math.round(t.d / mx * H) }));
+    })();
+    const tuBars = (() => {
+      if (isRL) return [];
+      const out = []; for (let b = 1; b <= st.bits; b++) out.push({ h: Math.max(3, Math.round(Math.pow(2, b) / st.values * 96)), cls: 'tubar' + (b === st.bits ? ' on' : '') });
+      return out;
+    })();
+    const CHK = [
+      { label:'stays the same' }, { label:'doubles' }, { label:'goes up by one' },
+    ].map((o, idx) => {
+      let cls = 'chkopt';
+      if (s.checked && idx === 1) cls += ' right';
+      else if (s.pick === idx) cls += ' pick';
+      return { label:o.label, cls, pick:() => this.setState({ pick:idx }) };
+    });
+    return {
+      nbs,
+      docTitle: isRL ? 'Rate limiting, by feel' : 'Bits & Bytes Tutorial',
+      isRateLimit: isRL, isTutorial: !isRL,
+      isConsole: s.variant === 'console', isStack: s.variant === 'stack',
+      showDock: s.layout === 'studio',
+      dockSub: s.variant === 'console' ? 'Author console · trace, state & inputs' : 'Author cockpit · everything at a glance',
+      docSegCls: this.seg(s.layout === 'document'), studioSegCls: this.seg(s.layout === 'studio'),
+      setDoc: () => this.setState({ layout:'document' }), setStudio: () => this.setState({ layout:'studio' }),
+      traceBtnCls: 'tbtn' + (s.trace ? ' on' : ''), toggleTrace: () => this.setState(x => ({ trace: !x.trace })),
+      editSegCls: this.seg(s.mode === 'edit'), readSegCls: this.seg(s.mode === 'read'),
+      setEdit: () => this.setState({ mode:'edit' }), setRead: () => this.setState({ mode:'read' }),
+      essayCls: 'essay' + (s.layout === 'studio' ? ' studio' : ''),
+      restart: () => this.restart(),
+      // chips
+      c_rate: st.rate, c_cap: isRL ? st.capacity : 0, c_loss: isRL ? st.result.loss + '%' : '',
+      c_allowed: isRL ? st.result.allowed : 0, c_dropped: isRL ? st.result.dropped : 0,
+      c_bits: st.bits, c_values: isRL ? '' : this.fmt(st.values), c_max: isRL ? '' : this.fmt(st.max),
+      inputRows: this.inputRows(),
+      rlBars, tuBars, chkOpts: CHK, checkAns: () => this.setState({ checked:true }),
+      // dock
+      rtCells: this.cur().cells, rtLast: s.last,
+      graph: this.buildGraph(), graphCls: 'graph' + (s.pulse ? ' pulsing' : ''),
+      tabGraphCls: this.tab('graph'), tabStateCls: this.tab('state'), tabInputCls: this.tab('input'),
+      tabGraph: () => this.setState({ tab:'graph' }), tabState: () => this.setState({ tab:'state' }), tabInput: () => this.setState({ tab:'input' }),
+      showGraph: s.tab === 'graph', showState: s.tab === 'state', showInput: s.tab === 'input',
+      stateRows: this.stateRows(),
+      secGraphCls: this.secCls('graph'), secStateCls: this.secCls('state'), secInputCls: this.secCls('input'),
+      toggleGraph: () => this.toggleSec('graph'), toggleState: () => this.toggleSec('state'), toggleInput: () => this.toggleSec('input'),
+      graphCount: this.cur().nodes.length + ' nodes', stateCount: this.stateRows().length + ' keys', inputCount: this.cur().inputs.length,
+    };
+  }
+}
+</script>
+</body>
+</html>

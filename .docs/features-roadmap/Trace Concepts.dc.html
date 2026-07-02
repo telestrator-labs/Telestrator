@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>
+:root{--olive1:#fcfdfc;--olive2:#f8faf8;--olive3:#eff1ef;--olive4:#e7e9e7;--olive5:#dfe2df;--olive6:#d7dbd7;--olive7:#cccfcc;--olive8:#b9bcb8;--olive9:#898e87;--olive10:#7f847d;--olive11:#60655f;--olive12:#1d211c;--lime3:#eef6d6;--lime5:#d3e7a6;--lime7:#abc978;--lime9:#bdee63;--lime10:#b0e64c;--lime11:#59722b;--violet3:#f4f0fe;--violet5:#e1d9ff;--violet6:#d4cafe;--violet7:#c2b5f5;--violet9:#6e56cf;--violet10:#654dc4;--violet11:#6550b9;--gold3:#f5f2e9;--gold4:#eeeadd;--gold6:#dad1bd;--gold9:#978365;--gold11:#71624b;--goldmark:rgba(173,135,40,.22);--goldline:#b08b2e;--shadow:0 1px 2px rgba(29,33,28,.05),0 4px 16px rgba(29,33,28,.04)}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--olive3);color:var(--olive12);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.serif{font-family:'IBM Plex Serif',Georgia,serif}.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.canvas{padding:44px 44px 90px}
+.introcard{max-width:1220px;margin:0 auto 34px;background:var(--olive1);border:1px solid var(--olive4);border-radius:16px;padding:26px 30px;box-shadow:var(--shadow)}
+.introbadge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold11);background:var(--gold3);border:1px solid var(--gold6);padding:4px 10px;border-radius:999px}
+.introtitle{font-size:27px;font-weight:600;letter-spacing:-.02em;margin:14px 0 8px}
+.introlede{font-family:'IBM Plex Serif',Georgia,serif;font-size:16.5px;line-height:1.6;color:var(--olive11);max-width:76ch}
+.introlede b{color:var(--olive12);font-weight:600}
+.diag{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap}
+.diagcol{flex:1;min-width:250px;background:var(--olive2);border:1px solid var(--olive4);border-radius:11px;padding:13px 15px}
+.diaglbl{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--olive9);margin-bottom:6px}
+.diagnow{color:var(--olive11)}.diagnew{border-color:var(--gold6);background:var(--gold3)}
+.diagtxt{font-size:13px;line-height:1.5;color:var(--olive11)}.diagnew .diagtxt{color:var(--gold11)}
+.optrow{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+.opt{width:762px;flex:none}
+.opthead{margin-bottom:14px;padding:0 4px}
+.obadge{display:inline-flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--violet11);background:var(--violet3);border:1px solid var(--violet6);padding:2px 9px;border-radius:7px}
+.otitle{font-size:20px;font-weight:600;letter-spacing:-.015em;margin:9px 0 3px}
+.ojob{font-size:12px;font-weight:600;letter-spacing:.03em;color:var(--lime11);text-transform:uppercase}
+.oblurb{font-family:'IBM Plex Serif',Georgia,serif;font-size:14px;line-height:1.55;color:var(--olive11);margin-top:8px;max-width:66ch}
+.optstage{background:var(--olive2);border:1px solid var(--olive5);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.stamac{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--olive4);background:var(--olive1)}
+.macdot{width:10px;height:10px;border-radius:50%;background:var(--olive6)}
+.macttl{margin-left:8px;font-size:12px;color:var(--olive9);display:flex;align-items:center;gap:7px}
+.macpill{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lime11);background:var(--lime3);border:1px solid var(--lime5);padding:2px 7px;border-radius:999px}
+.stbody{display:flex}
+.essaycol{flex:1;min-width:0;padding:22px 26px 24px;position:relative}
+/* prose + cells (Ink & Signal) */
+.prose{font-family:'IBM Plex Serif',Georgia,serif;font-size:16px;line-height:1.66;color:var(--olive12);margin:0 0 15px;max-width:60ch;text-wrap:pretty}
+.prose.lead{font-size:17.5px;color:var(--olive11);margin-bottom:18px}
+.var{font-family:'IBM Plex Mono',monospace;font-size:.86em;color:var(--gold11);background:var(--gold3);border-radius:4px;padding:.5px 4px;cursor:pointer;white-space:nowrap;box-shadow:inset 0 0 0 1px transparent}
+.var:hover{background:var(--goldmark)}
+.var.on{background:var(--goldmark);box-shadow:inset 0 -2px 0 var(--goldline)}
+.cell{background:var(--olive1);border:1px solid var(--olive6);border-radius:11px;margin:15px 0;box-shadow:var(--shadow);position:relative;transition:box-shadow .2s,border-color .2s,opacity .2s}
+.cell.wide{margin-left:-12px;margin-right:-12px}
+.cell.dim{opacity:.4}
+.cell.active{border-color:var(--lime7);box-shadow:0 0 0 1px var(--lime7),0 6px 22px rgba(120,150,40,.13)}
+.cell.done{border-color:var(--lime5)}
+.cell.pulsing{animation:cellpulse .55s ease}
+@keyframes cellpulse{0%{box-shadow:0 0 0 1px var(--lime9),0 0 24px rgba(189,238,99,.6)}100%{box-shadow:0 0 0 1px var(--lime7),0 6px 22px rgba(120,150,40,.13)}}
+.cell.marked{border-color:var(--gold6);box-shadow:0 0 0 2px var(--olive2),0 0 0 4.5px var(--goldline),0 8px 24px rgba(176,139,46,.16)}
+.cellhead{display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--olive4)}
+.langchip{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--olive11);background:var(--olive3);border:1px solid var(--olive5);padding:3px 8px;border-radius:6px}
+.reads{font-size:11px;color:var(--olive9);font-family:'IBM Plex Mono',monospace}
+.livedot{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;letter-spacing:.04em;color:var(--lime11);margin-left:auto}
+.livedot i{width:8px;height:8px;border-radius:50%;background:var(--lime9);box-shadow:0 0 0 3px var(--lime3)}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.62;padding:12px 15px;white-space:pre;overflow-x:auto;color:var(--olive12);tab-size:2}
+.cmt{color:var(--olive9)}.kw{color:var(--violet11)}.fn{color:var(--violet9)}.str{color:var(--lime11)}.dol{color:var(--gold11);font-weight:600}
+.outwell{background:var(--olive2);border-top:1px solid var(--olive4);padding:10px 15px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive11);display:flex;align-items:center;gap:9px;flex-wrap:wrap;transition:background .2s}
+.outwell.hot{background:var(--lime3);border-top-color:var(--lime5)}
+.okmark{color:var(--lime11);font-weight:700}
+.outval{background:var(--gold3);color:var(--gold11);border-radius:4px;padding:1px 6px;font-weight:600;box-shadow:inset 0 -2px 0 rgba(176,139,46,.32)}
+.outval.mk{background:var(--goldmark);box-shadow:inset 0 -2px 0 var(--goldline)}
+.inputcell{display:flex;align-items:center;gap:15px;padding:13px 16px}
+.ilabel{display:flex;flex-direction:column;gap:2px;min-width:132px}
+.iname{font-size:13px;font-weight:600;color:var(--olive12)}
+.ikey{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--olive9)}
+.slider{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;background:var(--olive5);outline:none}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--violet9);border:3px solid var(--olive1);box-shadow:0 1px 4px rgba(110,86,207,.45)}
+.slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--violet9);border:3px solid var(--olive1)}
+.ivalue{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:var(--gold11);background:var(--gold3);border-radius:6px;padding:3px 9px;min-width:44px;text-align:center;box-shadow:inset 0 -2px 0 var(--goldline)}
+.iunit{font-size:11.5px;color:var(--olive9);min-width:58px}
+.chartwrap{padding:14px 16px 11px}
+.chart{display:flex;align-items:flex-end;gap:3px;height:104px;border-bottom:1px solid var(--olive5)}
+.barcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;min-width:0;height:100%}
+.bard{background:var(--goldline);border-radius:2px 2px 0 0;margin-bottom:1px}
+.bara{background:var(--lime9);border-radius:2px 2px 0 0}
+.chartfoot{display:flex;align-items:center;justify-content:space-between;margin-top:9px;font-size:11.5px;color:var(--olive9)}
+.legend{display:flex;gap:13px}.legitem{display:flex;align-items:center;gap:6px}.legsw{width:10px;height:10px;border-radius:3px}
+/* 1a inspector column */
+.inspcol{width:266px;flex:none;border-left:1px solid var(--olive4);background:var(--olive1);padding:16px 16px 20px;align-self:stretch}
+.inspkick{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--olive9);display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.inspkick b{color:var(--gold11)}
+.inspempty{font-family:'IBM Plex Serif',Georgia,serif;font-size:13.5px;line-height:1.55;color:var(--olive9);background:var(--olive2);border:1px dashed var(--olive6);border-radius:11px;padding:14px}
+.inspcard{border:1px solid var(--gold6);border-radius:12px;overflow:hidden;background:var(--olive1)}
+.insptop{background:var(--gold3);padding:12px 14px;border-bottom:1px solid var(--gold6)}
+.inspval{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:var(--gold11)}
+.inspnum{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--olive12);margin-top:3px}
+.inspsub{font-size:11px;color:var(--olive9);margin-top:2px}
+.inspsec{padding:11px 14px;border-top:1px solid var(--olive4)}
+.inspsec:first-child{border-top:none}
+.seclbl{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--olive9);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.updot{width:6px;height:6px;border-radius:50%;background:var(--gold9)}.downdot{width:6px;height:6px;border-radius:50%;background:var(--lime9)}.whydot{width:6px;height:6px;border-radius:50%;background:var(--violet9)}
+.chipup{display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--olive11);padding:5px 8px;border-radius:7px;background:var(--olive2);border:1px solid var(--olive4);margin-bottom:5px}
+.chipup b{color:var(--gold11);font-weight:600}.chipup span{color:var(--olive12)}
+.whytext{font-family:'IBM Plex Serif',Georgia,serif;font-size:13px;line-height:1.5;color:var(--olive12)}
+.whytext em{font-style:normal;color:var(--violet11);font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:.92em}
+.chipdown{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--olive11);padding:5px 8px;border-radius:7px;margin-bottom:4px}
+.chipdown:hover{background:var(--lime3)}
+.ddnot{width:5px;height:5px;border-radius:50%;background:var(--lime10);flex:none}
+.drivesn{font-size:11px;color:var(--lime11);font-weight:600;margin-top:4px}
+.inspclose{margin-top:12px;font-size:11.5px;color:var(--violet11);cursor:pointer;font-weight:500}
+/* 1b replay bar */
+.replaybar{border-top:1px solid var(--olive4);background:var(--olive1);padding:13px 18px 15px}
+.rbtop{display:flex;align-items:center;gap:12px}
+.rbctrls{display:flex;gap:6px}
+.rbbtn{display:flex;align-items:center;gap:6px;font-family:inherit;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;border:1px solid var(--violet9);background:var(--violet9);color:#fff;cursor:pointer}
+.rbbtn:hover{background:var(--violet10)}
+.rbbtn.ghost{background:var(--olive1);color:var(--olive11);border-color:var(--olive5)}
+.rbbtn.ghost:hover{border-color:var(--olive7);background:var(--olive2)}
+.rbnow{margin-left:auto;font-size:11px;color:var(--olive9);font-family:'IBM Plex Mono',monospace}
+.rbtrack{display:flex;margin:16px 4px 6px}
+.rbstep{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer}
+.rbstep:not(:first-child)::before{content:"";position:absolute;top:8px;right:50%;left:-50%;height:2.5px;background:var(--olive5);border-radius:2px}
+.rbstep.done::before,.rbstep.active::before{background:var(--lime10)}
+.rbdot{width:17px;height:17px;border-radius:50%;background:var(--olive1);border:2.5px solid var(--olive6);z-index:1;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--olive9)}
+.rbstep.done .rbdot{background:var(--lime10);border-color:var(--lime10);color:var(--olive12)}
+.rbstep.active .rbdot{border-color:var(--lime10);background:var(--lime3);box-shadow:0 0 0 4px rgba(189,238,99,.28)}
+.rblabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--olive9);text-align:center;line-height:1.3}
+.rbstep.active .rblabel{color:var(--lime11);font-weight:600}
+.rbstep.done .rblabel{color:var(--olive11)}
+.rbcaption{margin-top:12px;background:var(--olive2);border:1px solid var(--olive4);border-left:3px solid var(--lime9);border-radius:9px;padding:11px 14px;font-family:'IBM Plex Serif',Georgia,serif;font-size:14px;line-height:1.55;color:var(--olive12)}
+.rbcaption b{font-family:'IBM Plex Mono',monospace;font-size:.86em;color:var(--gold11);font-weight:600;background:var(--gold3);padding:.5px 4px;border-radius:4px}
+/* 1c guided */
+.gcapwrap{position:absolute;top:20px;right:22px;width:236px;z-index:9}
+.gcaption{background:var(--olive1);border:1px solid var(--gold6);border-radius:12px;box-shadow:0 10px 30px rgba(29,33,28,.13);overflow:hidden}
+.gcaphd{display:flex;align-items:center;gap:9px;padding:11px 13px 9px}
+.gcapnum{width:22px;height:22px;border-radius:50%;background:var(--goldline);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;font-family:'IBM Plex Mono',monospace}
+.gcapof{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold11)}
+.gcaptext{font-family:'IBM Plex Serif',Georgia,serif;font-size:13.5px;line-height:1.55;color:var(--olive12);padding:0 13px 12px}
+.gcaptext b{font-family:'IBM Plex Mono',monospace;font-size:.9em;color:var(--gold11);font-weight:600}
+.gnavbar{border-top:1px solid var(--olive4);background:var(--olive1);padding:11px 18px;display:flex;align-items:center;gap:12px}
+.gnavbtn{display:flex;align-items:center;gap:6px;font-family:inherit;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;border:1px solid var(--olive5);background:var(--olive1);color:var(--olive11);cursor:pointer}
+.gnavbtn:hover{border-color:var(--olive7)}
+.gnavbtn.prim{background:var(--gold3);border-color:var(--gold6);color:var(--gold11)}
+.gnavbtn.prim:hover{background:var(--gold4)}
+.gdots{display:flex;gap:7px;align-items:center}
+.gdot{width:8px;height:8px;border-radius:50%;background:var(--olive6);cursor:pointer}
+.gdot.on{background:var(--goldline);box-shadow:0 0 0 3px var(--gold3)}
+.gauth{margin-left:auto;display:flex;align-items:center;gap:8px}
+.gaddbtn{display:flex;align-items:center;gap:6px;font-family:inherit;font-size:11.5px;font-weight:500;padding:6px 11px;border-radius:8px;border:1px dashed var(--olive6);background:none;color:var(--olive10);cursor:pointer}
+.gaddbtn:hover{border-color:var(--violet7);color:var(--violet11);background:var(--violet3)}
+.gprog{font-size:11px;color:var(--olive9);font-family:'IBM Plex Mono',monospace}
+.footnote{max-width:1220px;margin:30px auto 0;font-family:'IBM Plex Serif',Georgia,serif;font-size:13.5px;line-height:1.6;color:var(--olive11);text-align:center}
+.footnote code{font-family:'IBM Plex Mono',monospace;font-size:.9em;color:var(--gold11);background:var(--gold3);padding:1px 5px;border-radius:4px}
+.glyph{width:14px;height:14px;display:inline-block;flex:none}
+@media(max-width:820px){.inspcol{display:none}}
+</style></helmet><div class="canvas"><div class="introcard"><span class="introbadge">◆ Trace, reimagined</span><div class="introtitle">From a diagram you look at → a tool you think with</div><p class="introlede">Today the Trace only draws <b>what feeds what</b> — pretty lime connectors, no answers. But the authoring brief says the trace must let anyone answer two real questions: <b>“what does this value drive?”</b> and <b>“why did this re-run?”</b> — and the telestrator metaphor is about <b>replay and annotation</b>, not decoration. Three directions below, all over the same rate-limiter explorable, all reusing the reactive graph the runtime already records.</p><div class="diag"><div class="diagcol diagnow"><div class="diaglbl">Trace today</div><div class="diagtxt">Hover a value → lines appear from writer to readers. It confirms a link exists. You can’t click it, question it, replay it, or teach with it. Calm, but hollow.</div></div><div class="diagcol diagnew"><div class="diaglbl">What each option adds</div><div class="diagtxt"><b>1a</b> explains a value (made-of · why · drives). <b>1b</b> replays the propagation step by step. <b>1c</b> lets an author narrate the flow as a saved walkthrough. Try each — they’re live.</div></div></div></div>
+
+<div class="optrow">
+
+<section class="opt" id="1a"><div class="opthead"><span class="obadge">1a</span><div class="otitle">Explain this value — the Inspector</div><div class="ojob">Explain-a-value · Impact preview</div><p class="oblurb">Click any <span class="mono">$</span>-value or output. A dockside inspector answers it in the value’s own voice: <b>what it’s made of</b>, <b>why it last recomputed</b>, and <b>what it drives</b> — the impact list is the “what will this affect” preview, always on. Serves author and reader identically.</p></div><div class="optstage"><div class="stamac"><span class="macdot"></span><span class="macdot"></span><span class="macdot"></span><span class="macttl">Rate limiting, by feel<span class="macpill">reactive</span></span></div><div class="stbody"><div class="essaycol"><p class="prose lead">A token bucket, by feel: two dials — a drain <span class="{{ a.rateVar }}" onClick="{{ a.pickRate }}">$.rate</span> and a <span class="{{ a.capVar }}" onClick="{{ a.pickCap }}">$.capacity</span> buffer — decide how bursty traffic gets throttled.</p><div class="{{ a.inpRate }}"><div class="ilabel"><span class="iname">Drain rate</span><span class="ikey">$.rate · slider</span></div><input class="slider" type="range" min="1" max="24" value="9"><span class="ivalue">9</span><span class="iunit">req / tick</span></div><div class="{{ a.inpCap }}"><div class="ilabel"><span class="iname">Queue buffer</span><span class="ikey">$.capacity · slider</span></div><input class="slider" type="range" min="1" max="20" value="6"><span class="ivalue">6</span><span class="iunit">buffer</span></div><div class="{{ a.simCell }}"><div class="cellhead"><span class="langchip">◷ ts</span><span class="reads">simulate</span><span class="livedot"><i></i>LIVE</span></div><div class="code"><span class="kw">const</span> ticks = incoming.<span class="fn">map</span>((n) => {
+  queue += n;                     <span class="cmt">// arrivals</span>
+  <span class="kw">const</span> ok = Math.<span class="fn">min</span>(queue, <span class="dol">$</span>.rate);
+  queue -= ok;
+  <span class="kw">const</span> drop = Math.<span class="fn">max</span>(<span class="num">0</span>, queue - <span class="dol">$</span>.capacity);
+  <span class="kw">return</span> { ok, drop };
+});
+<span class="dol">$</span>.result = <span class="fn">summarize</span>(ticks);</div><div class="{{ a.outWell }}" onClick="{{ a.pickResult }}"><span class="okmark">✓</span><span>$.result</span><span class="{{ a.resVal }}">176 allowed</span><span class="{{ a.resVal }}">47 dropped</span><span class="{{ a.resVal }}">21% loss</span></div></div><div class="{{ a.chartCell }}"><div class="cellhead"><span class="langchip">▦ chart</span><span class="reads">reads $.result</span><span class="livedot"><i></i>LIVE</span></div><div class="chartwrap"><div class="chart"><sc-for list="{{ bars }}" as="bar" hint-placeholder-count="24"><div class="barcol"><div class="bard" style="height:{{ bar.dh }}px"></div><div class="bara" style="height:{{ bar.ah }}px"></div></div></sc-for></div><div class="chartfoot"><div class="legend"><div class="legitem"><span class="legsw" style="background:var(--lime9)"></span>allowed</div><div class="legitem"><span class="legsw" style="background:var(--goldline)"></span>dropped</div></div><span>24 ticks of bursty traffic →</span></div></div></div></div><aside class="inspcol"><div class="inspkick"><b>◆</b> Inspector</div><sc-if value="{{ a.hasInsp }}" hint-placeholder-val="{{ true }}"><div class="inspcard"><div class="insptop"><div class="inspval">{{ a.insp.label }}</div><div class="inspnum">{{ a.insp.num }}</div><div class="inspsub">{{ a.insp.sub }}</div></div><div class="inspsec"><div class="seclbl"><span class="updot"></span>Made of</div><sc-for list="{{ a.insp.up }}" as="u" hint-placeholder-count="3"><div class="chipup"><b>{{ u.t }}</b><span>{{ u.v }}</span></div></sc-for></div><div class="inspsec"><div class="seclbl"><span class="whydot"></span>Why it recomputed</div><p class="whytext">{{ a.insp.why }}</p></div><div class="inspsec"><div class="seclbl"><span class="downdot"></span>Drives</div><sc-for list="{{ a.insp.drives }}" as="d" hint-placeholder-count="2"><div class="chipdown"><span class="ddnot"></span>{{ d }}</div></sc-for><div class="drivesn">{{ a.insp.driveN }}</div></div></div><div class="inspclose" onClick="{{ a.clearInsp }}">Clear selection</div></sc-if><sc-if value="{{ a.noInsp }}" hint-placeholder-val="{{ false }}"><div class="inspempty">Click any $-value — the <span class="mono">$.rate</span> chip, the slider, or a number in the output — to explain it: what it’s made of, why it last ran, and everything it drives.</div></sc-if></aside></div></div></section>
+
+<section class="opt" id="1b"><div class="opthead"><span class="obadge">1b</span><div class="otitle">Replay the play — the Scrubber</div><div class="ojob">Replay · Play-by-play</div><p class="oblurb">The telestrator’s core move. Change a value and the runtime doesn’t just settle — it <b>replays the propagation</b> one hop at a time: the changed input, the cell that re-runs, the value it writes, the view that repaints. Press play, or scrub any step. Readers <b>see</b> causality; authors demonstrate it.</p></div><div class="optstage"><div class="stamac"><span class="macdot"></span><span class="macdot"></span><span class="macdot"></span><span class="macttl">Rate limiting, by feel<span class="macpill">replaying</span></span></div><div class="stbody"><div class="essaycol"><p class="prose lead">A token bucket, by feel: two dials decide how bursty traffic gets throttled. You just nudged the rate — watch it move through the graph.</p><div class="{{ b.inpRate }}"><div class="ilabel"><span class="iname">Drain rate</span><span class="ikey">$.rate · slider</span></div><input class="slider" type="range" min="1" max="24" value="9"><span class="ivalue">9</span><span class="iunit">req / tick</span></div><div class="{{ b.inpCap }}"><div class="ilabel"><span class="iname">Queue buffer</span><span class="ikey">$.capacity · slider</span></div><input class="slider" type="range" min="1" max="20" value="6"><span class="ivalue">6</span><span class="iunit">unchanged</span></div><div class="{{ b.simCell }}"><div class="cellhead"><span class="langchip">◷ ts</span><span class="reads">simulate</span><span class="livedot"><i></i>LIVE</span></div><div class="code"><span class="kw">const</span> ticks = incoming.<span class="fn">map</span>((n) => {
+  queue += n;                     <span class="cmt">// arrivals</span>
+  <span class="kw">const</span> ok = Math.<span class="fn">min</span>(queue, <span class="dol">$</span>.rate);
+  queue -= ok;
+  <span class="kw">return</span> { ok, drop: Math.<span class="fn">max</span>(<span class="num">0</span>, queue - <span class="dol">$</span>.capacity) };
+});
+<span class="dol">$</span>.result = <span class="fn">summarize</span>(ticks);</div><div class="{{ b.outWell }}"><span class="okmark">✓</span><span>$.result</span><span class="outval">176 allowed</span><span class="outval">47 dropped</span><span class="outval">21% loss</span></div></div><div class="{{ b.chartCell }}"><div class="cellhead"><span class="langchip">▦ chart</span><span class="reads">reads $.result</span><span class="livedot"><i></i>LIVE</span></div><div class="chartwrap"><div class="chart"><sc-for list="{{ bars }}" as="bar" hint-placeholder-count="24"><div class="barcol"><div class="bard" style="height:{{ bar.dh }}px"></div><div class="bara" style="height:{{ bar.ah }}px"></div></div></sc-for></div><div class="chartfoot"><div class="legend"><div class="legitem"><span class="legsw" style="background:var(--lime9)"></span>allowed</div><div class="legitem"><span class="legsw" style="background:var(--goldline)"></span>dropped</div></div><span>24 ticks of bursty traffic →</span></div></div></div></div></div><div class="replaybar"><div class="rbtop"><div class="rbctrls"><button class="rbbtn" onClick="{{ b.play }}"><svg class="glyph" viewBox="0 0 16 16" fill="currentColor"><path d="M4 3l9 5-9 5z"></path></svg>{{ b.playLabel }}</button><button class="rbbtn ghost" onClick="{{ b.step }}">Step ▸</button><button class="rbbtn ghost" onClick="{{ b.reset }}">Reset</button></div><span class="rbnow">$.rate changed · 6 → 9</span></div><div class="rbtrack"><sc-for list="{{ b.steps }}" as="st" hint-placeholder-count="4"><div class="{{ st.cls }}" onClick="{{ st.go }}"><span class="rbdot">{{ st.mark }}</span><span class="rblabel">{{ st.label }}</span></div></sc-for></div><div class="rbcaption">{{ b.caption }}</div></div></div></section>
+
+<section class="opt" id="1c"><div class="opthead"><span class="obadge">1c</span><div class="otitle">Guided trace — the Annotation</div><div class="ojob">Guided walkthrough · Teaching</div><p class="oblurb">The telestrator literally: the author <b>circles</b> what matters, <b>captions</b> it, and sequences the marks into a numbered walkthrough saved with the doc. A reader steps Next / Prev; each step circles a value in gold and narrates it. This is trace as <b>authored narration</b> — the play drawn for someone else.</p></div><div class="optstage"><div class="stamac"><span class="macdot"></span><span class="macdot"></span><span class="macdot"></span><span class="macttl">Rate limiting, by feel<span class="macpill">guided trace</span></span></div><div class="stbody"><div class="essaycol"><div class="gcapwrap"><div class="gcaption"><div class="gcaphd"><span class="gcapnum">{{ c.num }}</span><span class="gcapof">Step {{ c.num }} of 3</span></div><p class="gcaptext">{{ c.text }}</p></div></div><p class="prose lead" style="max-width:44ch">A token bucket, by feel: two dials decide how bursty traffic gets throttled. Follow the trace →</p><div class="{{ c.inpRate }}"><div class="ilabel"><span class="iname">Drain rate</span><span class="ikey">$.rate · slider</span></div><input class="slider" type="range" min="1" max="24" value="9"><span class="ivalue">9</span><span class="iunit">req / tick</span></div><div class="{{ c.inpCap }}"><div class="ilabel"><span class="iname">Queue buffer</span><span class="ikey">$.capacity · slider</span></div><input class="slider" type="range" min="1" max="20" value="6"><span class="ivalue">6</span><span class="iunit">buffer</span></div><div class="{{ c.simCell }}"><div class="cellhead"><span class="langchip">◷ ts</span><span class="reads">simulate</span><span class="livedot"><i></i>LIVE</span></div><div class="code"><span class="kw">const</span> ticks = incoming.<span class="fn">map</span>((n) => {
+  queue += n;                     <span class="cmt">// arrivals</span>
+  <span class="kw">const</span> ok = Math.<span class="fn">min</span>(queue, <span class="dol">$</span>.rate);
+  queue -= ok;
+  <span class="kw">return</span> { ok, drop: Math.<span class="fn">max</span>(<span class="num">0</span>, queue - <span class="dol">$</span>.capacity) };
+});
+<span class="dol">$</span>.result = <span class="fn">summarize</span>(ticks);</div><div class="{{ c.outWell }}"><span class="okmark">✓</span><span>$.result</span><span class="outval">176 allowed</span><span class="{{ c.lossVal }}">21% loss</span></div></div></div></div><div class="gnavbar"><button class="gnavbtn" onClick="{{ c.prev }}">◂ Back</button><button class="gnavbtn prim" onClick="{{ c.next }}">{{ c.nextLabel }} ▸</button><div class="gdots"><sc-for list="{{ c.dots }}" as="d" hint-placeholder-count="3"><span class="{{ d.cls }}" onClick="{{ d.go }}"></span></sc-for></div><span class="gprog">{{ c.num }} / 3</span><div class="gauth"><button class="gaddbtn"><svg class="glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 3v10M3 8h10"></path></svg>Annotate</button></div></div></div></section>
+
+</div><p class="footnote">Same explorable, three tools. All three read the graph the runtime already keeps (per-cell <code>$</code> reads/writes). Tell me which to refine — or mix: <b>1a</b>’s inspector is the quiet default, <b>1b</b>’s replay the “show me,” <b>1c</b>’s walkthrough the author’s layer on top.</p></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    // graph: which cell writes each $-value, which cells read it
+    this.graph = {
+      rate: { writer: 'inp-rate', readers: ['cell-sim'] },
+      capacity: { writer: 'inp-cap', readers: ['cell-sim'] },
+      result: { writer: 'cell-sim', readers: ['cell-chart'] },
+    };
+    // one honest run of the token-bucket sim (rate 9, cap 6) → chart bars
+    const incoming = [2,3,5,9,14,18,12,6,3,2,4,11,17,20,15,8,5,3,6,13,19,16,9,4];
+    let queue = 0;
+    const out = incoming.map((n) => {
+      queue += n;
+      const ok = Math.min(queue, 9);
+      queue -= ok;
+      const drop = Math.max(0, queue - 6);
+      queue = Math.min(queue, 6);
+      return { ok, drop };
+    });
+    const maxBar = Math.max(1, ...out.map((d) => d.ok + d.drop));
+    const H = 104;
+    this.bars = out.map((d) => ({
+      ah: Math.round((d.ok / maxBar) * H),
+      dh: Math.round((d.drop / maxBar) * H),
+    }));
+    this.state = { aTarget: 'result', bStep: 1, cStep: 0, playing: false };
+  }
+  componentWillUnmount() { clearInterval(this._iv); }
+  // ---- shared cell base classes ----
+  _base(id) {
+    if (id === 'cell-chart') return 'cell wide';
+    if (id === 'inp-rate' || id === 'inp-cap') return 'cell inputcell';
+    return 'cell';
+  }
+  // ---- 1a inspector data ----
+  _inspData(t) {
+    const D = {
+      rate: {
+        label: '$.rate', num: '9', sub: 'requests / tick · input',
+        up: [{ t: 'input', v: 'you — rate slider' }],
+        why: 'Nothing upstream. Inputs are roots of the graph — you set them directly.',
+        drives: ['simulate', '$.result → chart'], driveN: 'drives 2 cells',
+      },
+      capacity: {
+        label: '$.capacity', num: '6', sub: 'queue buffer · input',
+        up: [{ t: 'input', v: 'you — buffer slider' }],
+        why: 'A knob, not a computed value — no dependencies to explain.',
+        drives: ['simulate', '$.result → chart'], driveN: 'drives 2 cells',
+      },
+      result: {
+        label: '$.result', num: '176 ok · 47 dropped', sub: '21% loss · from simulate',
+        up: [{ t: '$.rate', v: '9' }, { t: '$.capacity', v: '6' }, { t: 'simulate', v: '24 ticks' }],
+        why: 'Recomputed 2s ago because $.rate changed (6 → 9). $.capacity was unchanged, so only this path re-ran.',
+        drives: ['chart cell', '“21% loss” in the prose'], driveN: 'drives 1 cell + 1 mention',
+      },
+    };
+    return D[t];
+  }
+  _aActive(t) {
+    const g = this.graph[t];
+    if (!g) return new Set();
+    return new Set([g.writer, ...g.readers]);
+  }
+  _aCls(id) {
+    const t = this.state.aTarget;
+    if (!t) return this._base(id);
+    return this._base(id) + (this._aActive(t).has(id) ? ' active' : ' dim');
+  }
+  // ---- 1b replay ----
+  _bPlay() {
+    clearInterval(this._iv);
+    this.setState({ bStep: 0, playing: true });
+    this._iv = setInterval(() => {
+      this.setState((p) => {
+        if (p.bStep >= 3) { clearInterval(this._iv); return { playing: false }; }
+        return { bStep: p.bStep + 1 };
+      });
+    }, 950);
+  }
+  _bCls(id) {
+    const step = this.state.bStep;
+    if (id === 'inp-cap') return 'cell inputcell dim'; // unchanged input, off the causal path
+    const act = { 'inp-rate': 0, 'cell-sim': 1, 'cell-chart': 3 };
+    const a = act[id];
+    const isActive = step === a || (id === 'cell-sim' && step === 2);
+    let c = this._base(id);
+    if (isActive) c += ' active pulsing';
+    else if (step > a) c += ' done';
+    else c += ' dim';
+    return c;
+  }
+  // ---- 1c guided ----
+  _cTargets() { return ['inp-rate', 'cell-sim', 'cell-sim']; }
+  _cCls(id) {
+    const target = this._cTargets()[this.state.cStep];
+    return this._base(id) + (id === target ? ' active marked' : ' dim');
+  }
+  renderVals() {
+    const s = this.state;
+    const insp = this._inspData(s.aTarget);
+    const bCaps = [
+      'You dragged the rate to 9. The runtime flags every cell that read $.rate as stale — nothing has recomputed yet.',
+      'simulate is the only reader of $.rate. It replays 24 ticks of traffic and writes a fresh $.result.',
+      '$.result changed to 176 allowed · 47 dropped. Anything reading it is now stale in turn.',
+      'The chart reads $.result and repaints. The change has reached the reader’s eye — the play is complete.',
+    ];
+    const bStepDefs = [
+      { label: '$.rate\nchanged', act: 0 },
+      { label: 'simulate\nre-runs', act: 1 },
+      { label: '$.result\nwritten', act: 2 },
+      { label: 'chart\nrepaints', act: 3 },
+    ];
+    const bSteps = bStepDefs.map((d, i) => ({
+      label: d.label,
+      mark: s.bStep > i ? '✓' : (i + 1),
+      cls: 'rbstep' + (s.bStep === i ? ' active' : (s.bStep > i ? ' done' : '')),
+      go: () => { clearInterval(this._iv); this.setState({ bStep: i, playing: false }); },
+    }));
+    const cTexts = [
+      { num: 1, text: 'This knob is the drain rate — how fast the bucket empties each tick. The whole model turns on this one number.' },
+      { num: 2, text: 'Each tick, arrivals pile into the queue and simulate drains up to $.rate. Whatever overflows the buffer is dropped.' },
+      { num: 3, text: 'Push the rate below the traffic bursts and loss climbs fast. Now drag it yourself and watch the chart answer.' },
+    ];
+    const c = cTexts[s.cStep];
+    return {
+      bars: this.bars,
+      // ---- 1a ----
+      a: {
+        aTarget: s.aTarget,
+        hasInsp: !!s.aTarget,
+        noInsp: !s.aTarget,
+        insp: insp || {},
+        rateVar: 'var' + (s.aTarget === 'rate' ? ' on' : ''),
+        capVar: 'var' + (s.aTarget === 'capacity' ? ' on' : ''),
+        resVal: 'outval' + (s.aTarget === 'result' ? ' mk' : ''),
+        inpRate: this._aCls('inp-rate'),
+        inpCap: this._aCls('inp-cap'),
+        simCell: this._aCls('cell-sim'),
+        chartCell: this._aCls('cell-chart'),
+        outWell: 'outwell' + (s.aTarget === 'result' ? ' hot' : ''),
+        pickRate: () => this.setState({ aTarget: 'rate' }),
+        pickCap: () => this.setState({ aTarget: 'capacity' }),
+        pickResult: () => this.setState({ aTarget: 'result' }),
+        clearInsp: () => this.setState({ aTarget: null }),
+      },
+      // ---- 1b ----
+      b: {
+        steps: bSteps,
+        caption: bCaps[s.bStep],
+        playLabel: s.playing ? 'Playing…' : 'Play',
+        inpRate: this._bCls('inp-rate'),
+        inpCap: this._bCls('inp-cap'),
+        simCell: this._bCls('cell-sim'),
+        chartCell: this._bCls('cell-chart'),
+        outWell: 'outwell' + (s.bStep >= 2 ? ' hot' : ''),
+        play: () => this._bPlay(),
+        step: () => { clearInterval(this._iv); this.setState((p) => ({ bStep: Math.min(3, p.bStep + 1), playing: false })); },
+        reset: () => { clearInterval(this._iv); this.setState({ bStep: 0, playing: false }); },
+      },
+      // ---- 1c ----
+      c: {
+        num: c.num,
+        text: c.text,
+        inpRate: this._cCls('inp-rate'),
+        inpCap: this._cCls('inp-cap'),
+        simCell: this._cCls('cell-sim'),
+        outWell: 'outwell' + (s.cStep === 2 ? ' hot' : ''),
+        lossVal: 'outval' + (s.cStep === 2 ? ' mk' : ''),
+        nextLabel: s.cStep >= 2 ? 'Restart' : 'Next',
+        prev: () => this.setState((p) => ({ cStep: Math.max(0, p.cStep - 1) })),
+        next: () => this.setState((p) => ({ cStep: p.cStep >= 2 ? 0 : p.cStep + 1 })),
+        dots: [0, 1, 2].map((i) => ({
+          cls: 'gdot' + (s.cStep === i ? ' on' : ''),
+          go: () => this.setState({ cStep: i }),
+        })),
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>
