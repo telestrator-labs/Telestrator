@@ -12,9 +12,12 @@ export const INPUT_CELL_NODE = "inputCell";
 // Per-kind config persisted as JSON in `data-config` (slider min/max/step,
 // select options, an optional label).
 export interface InputCellConfig {
-  min?: number;
-  max?: number;
-  step?: number;
+  // A slider bound is a literal number OR a `$`-reference (e.g. `$.capacity`)
+  // resolved against the live graph, so bounds/step can be driven by another
+  // value. Non-slider kinds ignore these.
+  min?: number | string;
+  max?: number | string;
+  step?: number | string;
   options?: string[];
   // Raw, comma-separated text the author typed for `options`. Kept as the
   // select field's source of truth so separators survive keystrokes/re-renders;

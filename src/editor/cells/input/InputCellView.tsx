@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { useRuntime } from "@/editor/reactive/RuntimeProvider";
+import { useRuntime, usePathValue } from "@/editor/reactive/RuntimeProvider";
+import { pathSegments } from "@/editor/cells/valueRef/valueRef";
 import { useCellTrace } from "@/editor/trace/TraceContext";
 import { useReadingMode } from "@/editor/shared/ReadingMode";
 import { cx } from "@/ui/cx";
@@ -44,15 +45,18 @@ export function InputCellView({
   const kind = node.attrs.kind as InputKind;
   const config = (node.attrs.config ?? {}) as InputCellConfig;
   const rawValue = node.attrs.value as unknown;
+  // Resolve the slider bounds — each may be a literal number or a `$`-reference
+  // (`$.capacity`) resolved against the live graph, so a bound can be driven by
+  // another value and updates reactively. Always called (3 fixed hooks); ignored
+  // by non-slider kinds.
+  const min = useResolvedBound(config.min, 0);
+  const max = useResolvedBound(config.max, 100);
+  const step = useResolvedBound(config.step, 1);
   // Coerce the stored value to one valid for the current kind/config so the
   // control, the readout, and the generated `$` binding never diverge (e.g. a
-  // fresh select still holding the numeric default, or a value left over from a
-  // previous kind).
-  const value = coerceValue(kind, rawValue, {
-    min: config.min,
-    max: config.max,
-    options: config.options,
-  });
+  // fresh select still holding the numeric default, a value left over from a
+  // previous kind, or a slider value now outside a `$`-driven bound).
+  const value = coerceValue(kind, rawValue, { min, max, options: config.options });
 
   const rt = useRuntime();
   const trace = useCellTrace(id, value);
@@ -173,6 +177,9 @@ export function InputCellView({
           kind={kind}
           value={value}
           config={config}
+          min={min}
+          max={max}
+          step={step}
           setValue={setValue}
         />
       </div>
@@ -236,22 +243,46 @@ function GearIcon() {
   );
 }
 
+// Resolve a slider bound (min/max/step) that may be a literal number or a
+// `$`-reference like `$.capacity`. A `$.`-path resolves against the live value
+// graph (reactive); a bare number (or numeric string) is a literal; anything
+// blank/unresolvable falls back. Calls a fixed set of hooks so it's safe to
+// invoke unconditionally, once per bound.
+function useResolvedBound(
+  raw: number | string | undefined,
+  fallback: number,
+): number {
+  const expr = typeof raw === "string" ? raw.trim() : "";
+  const segments = pathSegments(expr); // non-null only for a `$.`-path
+  const refValue = usePathValue(segments ?? []);
+  if (typeof raw === "number") return Number.isFinite(raw) ? raw : fallback;
+  if (segments) {
+    const n = Number(refValue);
+    return Number.isFinite(n) ? n : fallback;
+  }
+  const n = Number(expr);
+  return expr !== "" && Number.isFinite(n) ? n : fallback;
+}
+
 function Control({
   kind,
   value,
   config,
+  min,
+  max,
+  step,
   setValue,
 }: {
   kind: InputKind;
   value: unknown;
   config: InputCellConfig;
+  min: number;
+  max: number;
+  step: number;
   setValue: (next: unknown) => void;
 }) {
   switch (kind) {
     case "slider": {
-      const min = config.min ?? 0;
-      const max = config.max ?? 100;
-      const step = config.step ?? 1;
       const n = Number(value);
       return (
         <div className="flex items-center gap-3">
@@ -328,33 +359,40 @@ function ConfigEditor({
   config: InputCellConfig;
   setConfig: (patch: Partial<InputCellConfig>) => void;
 }) {
-  const numberField = (
+  // A bound accepts a number *or* a `$`-reference (e.g. `$.capacity`) — stored as
+  // a number when numeric, else the raw string. Text (not number) input so a
+  // `$`-ref can be typed; resolved reactively at render (useResolvedBound).
+  const boundField = (
     label: string,
     key: "min" | "max" | "step",
-    fallback: number,
+    placeholder: string,
   ) => (
-    <label className="flex items-center gap-1 text-text-muted">
-      {label}
+    <label className="flex items-center justify-between gap-2 text-text-muted">
+      <span>{label}</span>
       <input
-        type="number"
-        className="w-14 rounded border border-border-strong bg-surface px-1 py-0.5 font-mono text-xs text-text outline-none focus-visible:border-accent-8"
-        value={String(config[key] ?? fallback)}
-        onChange={(e) =>
+        aria-label={`slider ${label}`}
+        className="w-40 rounded border border-border-strong bg-surface px-1.5 py-0.5 font-mono text-xs text-text outline-none focus-visible:border-accent-8"
+        placeholder={placeholder}
+        value={String(config[key] ?? "")}
+        onChange={(e) => {
+          const text = e.target.value;
+          const num = Number(text.trim());
           setConfig({
-            [key]: Number(e.target.value),
-          } as Partial<InputCellConfig>)
-        }
+            [key]:
+              text.trim() !== "" && Number.isFinite(num) ? num : text,
+          } as Partial<InputCellConfig>);
+        }}
       />
     </label>
   );
 
   if (kind === "slider")
     return (
-      <span className="flex items-center gap-2">
-        {numberField("min", "min", 0)}
-        {numberField("max", "max", 100)}
-        {numberField("step", "step", 1)}
-      </span>
+      <div className="flex flex-col gap-1.5">
+        {boundField("min", "min", "0 or $.value")}
+        {boundField("max", "max", "100 or $.value")}
+        {boundField("step", "step", "1")}
+      </div>
     );
 
   if (kind === "select")
