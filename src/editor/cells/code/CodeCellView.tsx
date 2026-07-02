@@ -298,6 +298,8 @@ export function CodeCellView({
         <CodeEditor
           value={code}
           language={language === "css" ? "css" : "typescript"}
+          // Stable virtual filename in the shared TS env → worker IntelliSense.
+          path={id ? `/cells/${id}.tsx` : undefined}
           autoFocus={id ? shouldFocusCell(id) : false}
           onChange={(next) => updateAttributes({ code: next })}
           onArrowOut={moveOut}

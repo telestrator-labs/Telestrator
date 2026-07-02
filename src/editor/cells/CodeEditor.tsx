@@ -22,6 +22,16 @@ import {
 import { tags as t } from "@lezer/highlight";
 import { javascript } from "@codemirror/lang-javascript";
 import { css } from "@codemirror/lang-css";
+import { autocompletion } from "@codemirror/autocomplete";
+import {
+  tsFacetWorker,
+  tsSyncWorker,
+  tsLinterWorker,
+  tsAutocompleteWorker,
+  tsHoverWorker,
+} from "@valtown/codemirror-ts";
+import { getTsWorker } from "@/editor/cells/tsEnv";
+import { tsHoverTooltip } from "@/editor/cells/tsHoverTooltip";
 
 type CellLanguage = "typescript" | "css";
 
@@ -150,6 +160,7 @@ const cellTheme = EditorView.theme({
 export function CodeEditor({
   value,
   language,
+  path,
   autoFocus,
   onChange,
   onArrowOut,
@@ -159,6 +170,9 @@ export function CodeEditor({
 }: {
   value: string;
   language: CellLanguage;
+  // The cell's virtual filename in the shared TS env (e.g. `/cells/<id>.tsx`).
+  // When set on a TS cell, the editor wires up worker-backed IntelliSense.
+  path?: string;
   // Focus the editor on mount (set for a freshly inserted cell).
   autoFocus?: boolean;
   onChange: (code: string) => void;
@@ -172,6 +186,9 @@ export function CodeEditor({
   const viewRef = useRef<EditorView | null>(null);
   const langCompartment = useRef(new Compartment());
   const highlightCompartment = useRef(new Compartment());
+  // Holds the worker-backed TypeScript extensions, attached asynchronously once
+  // the shared TS worker has initialized (see the effect below).
+  const tsCompartment = useRef(new Compartment());
   // Keep the latest callbacks without recreating the editor.
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -256,6 +273,8 @@ export function CodeEditor({
           cellTheme,
           keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
           langCompartment.current.of(languageExtension(language)),
+          // Empty until the TS worker is ready (reconfigured below).
+          tsCompartment.current.of([]),
           EditorView.updateListener.of((update) => {
             if (update.docChanged)
               onChangeRef.current(update.state.doc.toString());
@@ -273,6 +292,26 @@ export function CodeEditor({
       requestAnimationFrame(() => {
         if (alive) view.focus();
       });
+    }
+
+    // Worker-backed TypeScript IntelliSense (SPIKE): only for TS cells with a
+    // virtual path. The shared worker initializes async (fetches libs), so we
+    // attach the extensions once it's ready; `alive` guards against unmount.
+    if (language === "typescript" && path) {
+      getTsWorker()
+        .then((worker) => {
+          if (!alive) return;
+          view.dispatch({
+            effects: tsCompartment.current.reconfigure([
+              tsFacetWorker.of({ worker, path }),
+              tsSyncWorker(),
+              tsLinterWorker(),
+              autocompletion({ override: [tsAutocompleteWorker()] }),
+              tsHoverWorker({ renderTooltip: tsHoverTooltip }),
+            ]),
+          });
+        })
+        .catch((e) => console.error("[ts] IntelliSense worker failed", e));
     }
 
     // Swap the syntax palette when the theme flips (the ThemeProvider toggles
