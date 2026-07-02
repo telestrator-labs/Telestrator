@@ -69,4 +69,7 @@ The app is intentionally small right now:
 
 - **`next/staging`** is the base for this greenfield line.
 - Scoped feature work goes on **`next/feat/<name>`** branches off `next/staging`.
+- Always work on a feature branch and open a PR into `next/staging` — do not commit
+  directly to `next/staging`. If asked to commit/push without a branch specified,
+  confirm whether to branch first before proceeding.
 - `staging` holds the original TypeCell implementation — don't merge it into `next/*`.
